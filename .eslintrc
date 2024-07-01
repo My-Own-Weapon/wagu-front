@@ -1,0 +1,63 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "jest/globals": true,
+  },
+  "plugins": ["jest"],
+  "extends": ["eslint:recommended", "next/core-web-vitals", "next/babel"],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+  },
+  "rules": {
+    "no-process-exit": "error",
+    "max-depth": ["error", 2],
+    "max-lines-per-function": ["error", 15],
+    "array-callback-return": "error", // 4.7
+    "prefer-destructuring": [
+      "error",
+      {
+        "array": true,
+        "object": true,
+      },
+      {
+        "enforceForRenamedProperties": false,
+      },
+    ],
+    // airbnb style guide
+    "template-curly-spacing": ["error", "never"],
+    "default-param-last": ["error"],
+    "no-param-reassign": ["error"],
+    "function-paren-newline": ["error", { "minItems": 3 }],
+    "arrow-parens": ["error", "always"],
+    "arrow-body-style": ["off", "as-needed"], // 명시적 return이 필요한 경우가 있어서
+    "implicit-arrow-linebreak": ["error", "beside"],
+    "prefer-exponentiation-operator": "error",
+    "no-plusplus": "error",
+    // "operator-linebreak": ["error", "after"], // airbnb와 충돌
+    "no-extra-boolean-cast": "off",
+    "no-case-declarations": "error",
+    "no-unneeded-ternary": "error",
+    "no-nested-ternary": "error",
+    "no-mixed-operators": "off", // 프리티어와 충돌 -> 프리티어가 지속적으로 괄호를 삭제함(1.13 버전에서 수정되었지만 결국 현재 버전에서는 괄호를 삭제함)
+    "nonblock-statement-body-position": ["error", "beside"],
+    "brace-style": "error",
+    "no-else-return": "error",
+    "no-unused-vars": "off",
+    "jest/no-disabled-tests": "warn",
+    "jest/no-focused-tests": "error",
+    "jest/no-identical-title": "error",
+    "jest/prefer-to-have-length": "warn",
+    "jest/valid-expect": "error",
+  },
+  "overrides": [
+    {
+      "files": ["__tests__/**/*.js", "*.test.js", "paramType.js"],
+      "rules": {
+        "max-lines-per-function": "off",
+        "arrow-body-style": "off",
+      },
+    },
+  ],
+}
