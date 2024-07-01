@@ -1,0 +1,22 @@
+name: "👙 Feature"
+description: "어떤 기능을 만드셨는지 알려주세요 !"
+labels: "👙 Feature"
+body:
+  - type: textarea
+    attributes:
+      label: 📝 Desc
+      description: 어떤 기능을 하는지 알려주세요 !
+      placeholder: 실제 예시를 들어주면 좋아요.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: ✅ Todos
+      description: 기능 구현을 위해 해야할 일을 작성해주세요.
+      placeholder: 함수, 컴포넌트, 페이지 등등.. 적어줘도 좋아요.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 🧞‍♂️ Etc...
+      description: 하고싶은 얘기가 있나요 ?
