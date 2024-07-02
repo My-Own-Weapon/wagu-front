@@ -4,7 +4,7 @@ class ApiService {
   private accessToken = '';
 
   async signup(formData: FormData) {
-    const res = await fetch(`${this.baseUrl}/users`, {
+    const res = await fetch(`${this.baseUrl}/api/users`, {
       method: 'POST',
       body: formData,
       credentials: 'include',
@@ -14,7 +14,7 @@ class ApiService {
   }
 
   async fetchPosts() {
-    const res = await fetch(`${this.baseUrl}/allPosts`, {
+    const res = await fetch(`${this.baseUrl}/api/allPosts`, {
       method: 'GET',
       credentials: 'include',
     });
@@ -23,4 +23,5 @@ class ApiService {
   }
 }
 
+// eslint-disable-next-line import/prefer-default-export
 export const apiService = new ApiService();
