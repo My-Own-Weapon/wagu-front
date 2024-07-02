@@ -70,7 +70,8 @@
     "react/jsx-props-no-spreading": 0,
     "@typescript-eslint/semi": "off",
     "react/jsx-filename-extension": ["warn", { "extensions": [".ts", ".tsx"] }],
-    "no-useless-catch": "off"
+    "no-useless-catch": "off",
+    "import/no-extraneous-dependencies": "off" //msw를 제대로 인식하지 못함
   },
   "overrides": [
     {

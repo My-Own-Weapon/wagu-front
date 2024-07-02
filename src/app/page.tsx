@@ -16,5 +16,7 @@ export default function Home() {
     fetchPosts();
   }, []);
 
-  return <main className={s.main}>{post}</main>;
+  console.log(post);
+
+  return <main className={s.main}>wagu book</main>;
 }
