@@ -7,18 +7,16 @@
   padding: 1rem;
   background-color: $background;
   border: $border;
-  border-radius: 5px;
+  border-radius: 8px;
   color: $color;
   font-size: 1.2rem;
   cursor: pointer;
-
-  &:hover {
-    background-color: $btnHover;
-    color: $white;
-  }
 }
 
 .container {
+  width: 375px;
+  height: 100dvh;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -46,9 +44,12 @@
 
   .button {
     @include button-styles($primaryOrange, $white, none);
+    font-weight: bold;
   }
 
   .buttonOutline {
-    @include button-styles($btnSub, $primaryOrange, 2px solid $primaryOrange);
+    @include button-styles($btnSub, $primaryOrange, 1px solid $primaryOrange);
+    font-weight: bold;
+    color: $textTitle;
   }
 }
