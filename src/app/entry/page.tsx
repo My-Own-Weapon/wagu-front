@@ -1,7 +1,7 @@
 import Image from 'next/image';
-import s from '@/styles/pages/index.module.scss';
+import s from './page.module.scss';
 
-export default function Home() {
+export default function EntryPage() {
   return (
     <main className={s.container}>
       <div className={s.logo}>
