@@ -6,6 +6,12 @@
       "options": {
         "printWidth": 200
       }
+    },
+    {
+      "files": ".eslintrc",
+      "options": {
+        "trailingComma": "none"
+      }
     }
   ],
   "tabWidth": 2,
