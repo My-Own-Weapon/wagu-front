@@ -20,8 +20,6 @@ export default function SignupPage() {
   });
   const [signupFailMsg, setSignupFailMsg] = useState<string | null>(null);
 
-  // const [error, setError] = useState<string | null>(null);
-  // const [message, setMessage] = useState<string | null>(null);
   const router = useRouter();
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
