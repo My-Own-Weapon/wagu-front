@@ -18,5 +18,5 @@ export default function Home() {
 
   // console.log(post);
 
-  return <div className={s.container}>wagu book</div>;
+  return <main className={s.container}>wagu book</main>;
 }
