@@ -1,10 +1,6 @@
 @import '@/styles/variables/colors.scss';
+@import '@/styles/mixin/index.scss';
 
-.main {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  padding: 6rem;
-  background-color: $bgColor;
+.container {
+  @include mainStyle;
 }
