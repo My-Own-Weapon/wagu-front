@@ -1,12 +1,11 @@
 body {
-  background-color: bisque;
   font-family:
     'Pretendard Variable',
     Pretendard,
+    Roboto,
     -apple-system,
     BlinkMacSystemFont,
     system-ui,
-    Roboto,
     'Helvetica Neue',
     'Segoe UI',
     'Apple SD Gothic Neo',
@@ -16,4 +15,20 @@ body {
     'Segoe UI Emoji',
     'Segoe UI Symbol',
     sans-serif;
+
+  width: 100%;
+  height: 100dvh;
+  margin: 0 auto;
+}
+
+@media (min-width: 375px) {
+  body {
+    width: 375px; /* 최대 너비를 설정하여 큰 화면에서 중앙 정렬 유지 */
+  }
+}
+
+@media (min-width: 768px) {
+  body {
+    max-width: 768px;
+  }
 }
