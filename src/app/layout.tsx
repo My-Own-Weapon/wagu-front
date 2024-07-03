@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import '@styles/reset.css';
 import '@styles/globals.css';
 import React from 'react';
+import s from './layout.module.scss';
 
 const APP_NAME = 'WaGu Book';
 const APP_DEFAULT_TITLE = 'WaGu Book';
@@ -55,7 +56,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <main className={s.container}>{children}</main>
+      </body>
     </html>
   );
 }
