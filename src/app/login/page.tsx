@@ -1,89 +1,49 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
 import Image from 'next/image';
-import s from './page.module.scss';
 import Link from 'next/link';
-
-interface Credentials {
-  username: string;
-  password: string;
-}
+import BackButton from '@/components/BackBtn';
+import InputBox from '@/components/ui/InputBox';
+import { useFormState, useFormStatus } from 'react-dom';
+import { useRouter } from 'next/navigation';
+import { handleSubmitAction } from './handleSubmitAction';
+import s from './page.module.scss';
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [state, formAction] = useFormState(handleSubmitAction, {
+    message: null,
+  });
+  const { pending } = useFormStatus();
+  const router = useRouter();
 
-  const loginUser = async (credentials: Credentials) => {
-    console.log('실행됨');
-    const response = await fetch('http://3.39.118.22:8080/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-    });
-    return response.json();
-  };
-
-  const handleLogin = async (e: FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    try {
-      const credentials: Credentials = { username, password };
-      console.log(credentials);
-      const response = await loginUser(credentials);
-      if (response.success) {
-        console.log('Login successful', response);
-      } else {
-        setError(response.message);
-      }
-    } catch (err) {
-      setError('An error occurred during login.');
-    }
-  };
+  if (state.status === 200) {
+    router.push('/');
+  }
 
   return (
     <main className={s.container}>
       <div className={s.header}>
-        <Link href="/" passHref>
-          <span className={s.backButton}>←</span>
-        </Link>
+        <BackButton />
         <h1 className={s.title}>로그인</h1>
       </div>
-      <form className={s.form} onSubmit={handleLogin}>
-        <div>
-          <label htmlFor="username" className={s.label}>
-            아이디
-          </label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            className={s.input}
-            placeholder="아이디를 입력하세요"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="password" className={s.label}>
-            비밀번호
-          </label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            className={s.input}
-            placeholder="************"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        {error && <p className={s.error}>{error}</p>}
-        <button type="submit" className={s.loginButton}>
+      <form className={s.form} action={formAction}>
+        <InputBox
+          className={s.inputBox}
+          label="아이디"
+          name="username"
+          placeholder="아이디를 입력해 주세요"
+          type="text"
+        />
+        <InputBox
+          className={s.inputBox}
+          label="비밀번호"
+          name="password"
+          placeholder="비밀번호를를 입력해 주세요"
+          type="password"
+        />
+        <Pending />
+        {state.status !== 200 && <div className={s.error}>{state.message}</div>}
+        <button type="submit" className={s.loginBtn} disabled={pending}>
           로그인
         </button>
       </form>
@@ -106,7 +66,17 @@ export default function LoginPage() {
           <span className={s.signupLink}>회원가입</span>
         </Link>
       </div>
-      <div className={s.homeIndicator}></div>
+      <div className={s.homeIndicator} />
     </main>
   );
+}
+
+function Pending() {
+  const { pending } = useFormStatus();
+
+  if (pending) {
+    return <div>로그인중 중...</div>;
+  }
+
+  return null;
 }
