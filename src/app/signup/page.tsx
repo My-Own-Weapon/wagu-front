@@ -19,7 +19,6 @@ export default function SignupPage() {
     phoneNumber: '',
   });
   const [signupFailMsg, setSignupFailMsg] = useState<string | null>(null);
-
   const router = useRouter();
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
