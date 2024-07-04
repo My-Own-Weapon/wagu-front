@@ -31,13 +31,8 @@
     "array-callback-return": "error", // 4.7
     "prefer-destructuring": [
       "error",
-      {
-        "array": true,
-        "object": true
-      },
-      {
-        "enforceForRenamedProperties": false
-      }
+      { "array": true, "object": true },
+      { "enforceForRenamedProperties": false }
     ],
     "prettier/prettier": ["warn"],
     "operator-linebreak": ["error", "after"],
@@ -75,15 +70,23 @@
     "@typescript-eslint/semi": "off",
     "react/jsx-filename-extension": ["warn", { "extensions": [".ts", ".tsx"] }],
     "no-useless-catch": "off",
-    "import/no-extraneous-dependencies": "off" //msw를 제대로 인식하지 못함
+    "import/no-extraneous-dependencies": "off" /* msw를 제대로 인식하지 못함 */,
+    /* about label, input connection with htmlfor */
+    "jsx-a11y/label-has-associated-control": [
+      "error",
+      { "required": { "some": ["nesting", "id"] } }
+    ],
+    "jsx-a11y/label-has-for": [
+      "error",
+      { "required": { "some": ["nesting", "id"] } }
+    ],
+    /* about default parameter */
+    "react/require-default-props": [2, { "functions": "defaultArguments" }]
   },
   "overrides": [
     {
       "files": ["__tests__/**/*.js", "*.test.js", "paramType.js"],
-      "rules": {
-        "max-lines-per-function": "off",
-        "arrow-body-style": "off"
-      }
+      "rules": { "max-lines-per-function": "off", "arrow-body-style": "off" }
     }
   ]
 }

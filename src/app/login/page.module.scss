@@ -1,0 +1,172 @@
+@import '@/styles/variables/radius.scss';
+@import '@/styles/variables/textSize.scss';
+@import '@/styles/variables/zIndex.scss';
+
+@import '@/styles/mixins/index.scss';
+
+.container {
+  @include mainStyle;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  background-color: $bgColor;
+  padding: 0;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px;
+
+  .backButton {
+    position: absolute;
+    left: 18px;
+    font-size: $textXLarge;
+    color: $gray800;
+    text-decoration: none;
+  }
+
+  .title {
+    font-size: $textTitle;
+    font-weight: 600;
+    color: $gray800;
+  }
+}
+
+.inputBox {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+
+  label {
+    font-size: $textMedium;
+    font-weight: 500;
+    color: $gray800;
+    margin-bottom: 8px;
+  }
+
+  input {
+    width: 100%;
+    height: 56px;
+    padding: 0 24px;
+    border: 1px solid $primaryOrange;
+    border-radius: 8px;
+    background-color: #ece6d9;
+    font-size: $textMedium;
+    font-weight: 500;
+    color: #979797;
+    box-sizing: border-box; // 이 요소에만 box-sizing 적용
+  }
+}
+
+.form {
+  width: 100%;
+  max-width: 311px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.socialLogin {
+  width: 100%;
+  max-width: 311px;
+  margin-top: 40px;
+  text-align: center;
+
+  .divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #e5e5ec;
+    }
+
+    span {
+      font-size: $textMedium;
+      font-weight: 500;
+      color: #767676;
+    }
+  }
+
+  .socialButtons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 25px;
+
+    .socialButton {
+      width: 93px;
+      height: 56px;
+      border: 1px solid #e5e5ec;
+      border-radius: 12px;
+      background-color: $bgColor;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+
+      img {
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+}
+
+.loginBtn {
+  width: 100%;
+  height: 60px;
+  border-radius: $radiusMedium;
+  background-color: $primaryOrange;
+  color: $white;
+
+  &:disabled {
+    background-color: #e5e5ec;
+  }
+}
+
+.footer {
+  font-size: $textMedium;
+  font-weight: 500;
+  color: $gray800;
+  text-align: center;
+  margin-top: 40px;
+
+  .signupLink {
+    color: $primaryOrange;
+    text-decoration: none;
+  }
+
+  .signupLink:disabled {
+    color: #e5e5ec;
+  }
+}
+
+.homeIndicator {
+  position: absolute;
+  bottom: 8px;
+  width: 134px;
+  height: 5px;
+  background: #3f4162;
+  border-radius: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.error {
+  color: red;
+  font-weight: 500;
+  margin-top: 8px;
+}

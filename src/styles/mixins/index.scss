@@ -1,0 +1,11 @@
+@import '@/styles/variables/colors.scss';
+
+@mixin mainStyle {
+  width: 100%;
+  height: 100dvh;
+
+  box-sizing: content-box;
+  border: 1px solid $gray200;
+
+  background-color: $white;
+}

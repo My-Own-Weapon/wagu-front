@@ -1,8 +1,7 @@
-import Link from 'next/link';
 import Image from 'next/image';
-import s from './page.module.scss';
+import s from '@/styles/pages/index.module.scss';
 
-export default function EntryPage() {
+export default function Home() {
   return (
     <main className={s.container}>
       <div className={s.logo}>
@@ -16,12 +15,8 @@ export default function EntryPage() {
       </div>
       <h1>WAGU BOOK</h1>
       <p>너와 나의 맛집 기록</p>
-      <Link className={s.button} href="/signup">
-        회원가입
-      </Link>
-      <Link className={s.buttonOutline} href="/login">
-        로그인
-      </Link>
+      <button className={s.button}>회원가입</button>
+      <button className={s.buttonOutline}>로그인</button>
     </main>
   );
 }
