@@ -15,6 +15,38 @@
   padding: 0;
 }
 
+.inputBox {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+
+  label {
+    font-size: $textMedium;
+    font-weight: 500;
+    color: $gray800;
+    margin-bottom: 8px;
+  }
+
+  input {
+    width: 100%;
+    height: 56px;
+    padding: 0 24px;
+    border: 1px solid $border;
+    border-radius: 8px;
+    background-color: #ece6d9;
+    font-size: $textMedium;
+    font-weight: 500;
+    color: #979797;
+    box-sizing: border-box; // 이 요소에만 box-sizing 적용
+
+    &:focus {
+      border-color: $primaryOrange;
+    }
+  }
+}
+
 .header {
   width: 100%;
   display: flex;
@@ -46,7 +78,7 @@
   max-width: 311px;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 20px;
   box-sizing: border-box;
 
   .label {
@@ -74,7 +106,7 @@
     height: 56px;
     background-color: $primaryOrange;
     border: none;
-    border-radius: $radius-medium;
+    border-radius: $radiusMedium;
     color: #ffffff;
     font-size: $textLarge;
     font-weight: 600;
@@ -156,4 +188,19 @@
   border-radius: 100px;
   left: 50%;
   transform: translateX(-50%);
+}
+
+.error {
+  font-weight: 500;
+  color: red;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.message {
+  font-size: $textMedium;
+  font-weight: 500;
+  color: $gray800;
+  text-align: center;
+  margin-top: 40px;
 }

@@ -1,138 +1,103 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, ChangeEventHandler, FormEventHandler } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import BackButton from '@/components/BackBtn';
+import InputBox from '@/components/ui/InputBox';
+import { apiService } from '@/services/apiService';
+import { SignupDetails } from '@/types';
+import { useRouter } from 'next/navigation';
 import s from './page.module.scss';
 
-interface SignupCredentials {
-  username: string;
-  password: string;
-  passwordConfirm: string;
-}
-
-class APIError extends Error {
-  constructor(
-    public message: string,
-    public status: number,
-  ) {
-    super(message);
-  }
-}
-
-const signupUser = async (credentials: SignupCredentials) => {
-  console.log('실행됨');
-  const response = await fetch('http://3.39.118.22:8080/join', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(credentials),
+export default function SignupPage() {
+  const [signupDetails, setSignupDetails] = useState<SignupDetails>({
+    username: '',
+    password: '',
+    passwordConfirm: '',
+    name: '',
+    phoneNumber: '',
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new APIError(errorData.message || '회원가입 실패', response.status);
-  }
+  // const [error, setError] = useState<string | null>(null);
+  // const [message, setMessage] = useState<string | null>(null);
+  const router = useRouter();
 
-  return response.json();
-};
+  const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    const { name, value } = e.target;
 
-export default function SignupPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
+    setSignupDetails((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-  const handleSignup = async (e: FormEvent) => {
+  const handleSubit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
-    setError(null);
-    setMessage(null);
+    const res = await apiService.signup(signupDetails);
 
-    if (!username || !password || !passwordConfirm) {
-      setError('모든 필드를 입력해 주세요.');
-      return;
-    }
-
-    if (password !== passwordConfirm) {
-      setError('비밀번호가 일치하지 않습니다.');
-      return;
-    }
-
-    try {
-      const credentials: SignupCredentials = {
-        username,
-        password,
-        passwordConfirm,
-      };
-      const response = await signupUser(credentials);
-      setMessage('회원가입 성공');
-      console.log('Signup successful', response);
-    } catch (err) {
-      if (err instanceof APIError) {
-        setError(err.message);
-      } else {
-        setError('회원가입 중 오류가 발생했습니다.');
-      }
+    if (res.ok) {
+      router.push('/login');
+    } else {
+      console.log(res);
+      console.error('Signup failed');
     }
   };
 
   return (
     <main className={s.container}>
       <div className={s.header}>
-        <Link href="/" passHref legacyBehavior>
-          <a className={s.backButton}>
-            <Image src="/BackIcon.svg" alt="Back" width={18} height={18} />
-          </a>
-        </Link>
+        <BackButton />
         <h1 className={s.title}>회원가입</h1>
       </div>
-      <form className={s.form} onSubmit={handleSignup}>
-        <div>
-          <label htmlFor="username" className={s.label}>
-            아이디
-          </label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            className={s.input}
-            placeholder="아이디를 입력하세요"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="password" className={s.label}>
-            비밀번호
-          </label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            className={s.input}
-            placeholder="************"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="passwordConfirm" className={s.label}>
-            비밀번호 확인
-          </label>
-          <input
-            type="password"
-            id="passwordConfirm"
-            name="passwordConfirm"
-            className={s.input}
-            placeholder="************"
-            value={passwordConfirm}
-            onChange={(e) => setPasswordConfirm(e.target.value)}
-          />
-        </div>
-        {error && <p className={s.error}>{error}</p>}
-        {message && <p className={s.message}>{message}</p>}
+      <form className={s.form} onSubmit={handleSubit}>
+        <InputBox
+          className={s.inputBox}
+          label="아이디"
+          name="username"
+          value={signupDetails.username}
+          type="text"
+          placeholder="아이디를 입력해 주세요"
+          onChange={handleChange}
+        />
+        <InputBox
+          className={s.inputBox}
+          label="비밀번호"
+          name="password"
+          value={signupDetails.password}
+          type="password"
+          placeholder="비밀번호를 입력해 주세요"
+          onChange={handleChange}
+        />
+        <InputBox
+          className={s.inputBox}
+          label="비밀번호 확인"
+          name="passwordConfirm"
+          value={signupDetails.passwordConfirm}
+          type="password"
+          placeholder="비밀번호를 다시 입력해 주세요"
+          onChange={handleChange}
+        />
+        <InputBox
+          className={s.inputBox}
+          label="이름"
+          name="name"
+          value={signupDetails.name}
+          type="text"
+          placeholder="이름을 입력해 주세요"
+          onChange={handleChange}
+        />
+        <InputBox
+          className={s.inputBox}
+          label="휴대폰 번호"
+          name="phoneNumber"
+          value={signupDetails.phoneNumber}
+          type="tel"
+          placeholder="휴대폰 번호를 입력해 주세요"
+          onChange={handleChange}
+        />
+        {/* {error && <p className={s.error}>{error}</p>}
+        {message && <p className={s.message}>{message}</p>} */}
         <button type="submit" className={s.signupButton}>
           회원가입
         </button>
@@ -153,10 +118,45 @@ export default function SignupPage() {
       <div className={s.footer}>
         계정이 이미 있나요?{' '}
         <Link href="/login" passHref legacyBehavior>
-          <a className={s.loginLink}>로그인</a>
+          <a className={s.loginLink} href="/">
+            로그인
+          </a>
         </Link>
       </div>
-      <div className={s.homeIndicator}></div>
+      <div className={s.homeIndicator} />
     </main>
   );
 }
+
+// const handleSignup = async (e: FormEvent) => {
+//   e.preventDefault();
+//   setError(null);
+//   setMessage(null);
+
+//   if (!signupDetails || !password || !passwordConfirm) {
+//     setError('모든 필드를 입력해 주세요.');
+//     return;
+//   }
+
+//   if (password !== passwordConfirm) {
+//     setError('비밀번호가 일치하지 않습니다.');
+//     return;
+//   }
+
+//   try {
+//     const credentials: SignupCredentials = {
+//       username: signupDetails,
+//       password,
+//       passwordConfirm,
+//     };
+//     const response = await signupUser(credentials);
+//     setMessage('회원가입 성공');
+//     console.log('Signup successful', response);
+//   } catch (err) {
+//     if (err instanceof APIError) {
+//       setError(err.message);
+//     } else {
+//       setError('회원가입 중 오류가 발생했습니다.');
+//     }
+//   }
+// };
