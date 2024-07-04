@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
-import '@styles/reset.css';
-import '@styles/globals.css';
+import '@/styles/reset.css';
+import '@/styles/globals.css';
 import React from 'react';
 
 const APP_NAME = 'WaGu Book';
