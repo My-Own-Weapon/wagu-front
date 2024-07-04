@@ -1,10 +1,12 @@
+/* eslint-disable no-console */
 import { http, HttpResponse } from 'msw';
 
 export const handlers = [
   http.post('/api/login', () => {
     console.log('mock Api : login sucess !!');
 
-    return HttpResponse.json({ accessToken: '1234', status: 201 });
+    // return HttpResponse.json({ accessToken: '1234', status: 200 });
+    return HttpResponse.json({ accessToken: '1234', status: 403 });
   }),
 
   http.post('/api/logout', () => {
@@ -17,21 +19,21 @@ export const handlers = [
     });
   }),
 
-  http.post('/api/users', async () => {
+  http.post('/api/join', async () => {
     console.log('mock Api : 회원가입 !!');
     /* 중복된 유저 */
-    return HttpResponse.text(JSON.stringify('Already exists user'), {
-      status: 403,
-    });
+    // return HttpResponse.text(JSON.stringify('Already exists user'), {
+    //   status: 403,
+    // });
 
     /* 성공 */
-    // return HttpResponse.json({
-    //   message: '성공',
-    //   succ: true,
-    // });
+    return HttpResponse.json({
+      message: '성공',
+      succ: true,
+    });
   }),
 
-  http.get('/api/allPosts', () => {
+  http.get('/api/posts', () => {
     console.log('fetch all post !!');
 
     return HttpResponse.json(getMockPosts());
