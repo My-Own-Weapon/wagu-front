@@ -18,6 +18,7 @@ export default function SignupPage() {
     name: '',
     phoneNumber: '',
   });
+  const [signupFailMsg, setSignupFailMsg] = useState<string | null>(null);
 
   // const [error, setError] = useState<string | null>(null);
   // const [message, setMessage] = useState<string | null>(null);
@@ -36,11 +37,10 @@ export default function SignupPage() {
     e.preventDefault();
     const res = await apiService.signup(signupDetails);
 
-    if (res.ok) {
+    if (res.ok || res.status === 200) {
       router.push('/login');
     } else {
-      console.log(res);
-      console.error('Signup failed');
+      setSignupFailMsg('회원가입에 실패했습니다. 다시 시도해 주세요.');
     }
   };
 
@@ -96,8 +96,7 @@ export default function SignupPage() {
           placeholder="휴대폰 번호를 입력해 주세요"
           onChange={handleChange}
         />
-        {/* {error && <p className={s.error}>{error}</p>}
-        {message && <p className={s.message}>{message}</p>} */}
+        {signupFailMsg && <p className={s.message}>{signupFailMsg}</p>}
         <button type="submit" className={s.signupButton}>
           회원가입
         </button>
