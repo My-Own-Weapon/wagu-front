@@ -1,22 +1,16 @@
 'use client';
 
-// import { useEffect, useState } from 'react';
-// import { apiService } from '@/services/ApiService';
+import { useRouter } from 'next/navigation';
 import s from './page.module.scss';
 
 export default function Home() {
-  // const [post, setPost] = useState([]);
+  const router = useRouter();
 
-  // useEffect(() => {
-  //   const fetchPosts = async () => {
-  //     const data = await apiService.fetchPosts();
-  //     setPost(data);
-  //   };
+  const isCookieExist = () => {
+    return document.cookie.includes('token');
+  };
 
-  //   fetchPosts();
-  // }, []);
-
-  // console.log(post);
+  if (!isCookieExist()) router.push('/entry');
 
   return <main className={s.container}>wagu book</main>;
 }
