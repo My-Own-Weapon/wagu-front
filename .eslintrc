@@ -79,7 +79,9 @@
     "jsx-a11y/label-has-for": [
       "error",
       { "required": { "some": ["nesting", "id"] } }
-    ]
+    ],
+    /* about default parameter */
+    "react/require-default-props": [2, { "functions": "defaultArguments" }]
   },
   "overrides": [
     {
