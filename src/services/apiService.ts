@@ -102,6 +102,19 @@ class ApiService {
 
     return data;
   }
+
+  async createPost(formData: FormData) {
+    const res = await fetch(`${this.baseUrl}/posts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      body: formData,
+      credentials: 'include',
+    });
+
+    return res.json();
+  }
 }
 
 export const apiService = new ApiService();
