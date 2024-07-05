@@ -15,22 +15,24 @@ export const handleSubmitAction = async (
 
   try {
     const res = await apiService.login({ username, password });
-    if (res.status === 403) {
-      return {
-        message: '잘못된 입력.',
-      };
-    }
 
     if (res.status === 200) {
       cookies().set('token', res.accessToken);
       return res;
     }
+
+    if (res.status === 403) {
+      return {
+        message: '아이디 또는 비밀번호가 일치하지 않습니다.',
+      };
+    }
+
     return {
-      message: '로그인에 실패했습니다.',
+      message: `invalid res status. ${res.status}`,
     };
   } catch (e) {
     return {
-      message: '회원가입에 실패했습니다.',
+      message: 'login fetch error.',
     };
   }
 };

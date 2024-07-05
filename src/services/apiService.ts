@@ -14,6 +14,7 @@ class ApiService {
       body: JSON.stringify({ username, password }),
       credentials: 'include',
     });
+    console.log(res);
 
     return res.json();
   }
@@ -39,6 +40,7 @@ class ApiService {
       }),
       credentials: 'include',
     });
+    console.log(res);
 
     return res;
   }
