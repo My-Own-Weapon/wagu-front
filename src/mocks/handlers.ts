@@ -5,8 +5,18 @@ export const handlers = [
   http.post('/api/login', () => {
     console.log('mock Api : login sucess !!');
 
-    // return HttpResponse.json({ accessToken: '1234', status: 200 });
-    return HttpResponse.json({ accessToken: '1234', status: 403 });
+    return HttpResponse.json({
+      headers: { 'Set-Cookie': 'JSESSIONID=helloworld' },
+      status: 200,
+      ok: true,
+    });
+
+    // return HttpResponse.json({
+    //     headers: {
+    //       status: 200,
+    //       ok: false,
+    //     },
+    //   });
   }),
 
   http.post('/api/logout', () => {
@@ -42,49 +52,44 @@ export const handlers = [
 
 function getMockPosts() {
   return {
-    friends: [
+    liveFollows: [
       {
-        id: 1,
+        id: 'follow1',
         userName: '김철수',
       },
       {
-        id: 2,
+        id: 'follow2',
         userName: '신짱구',
       },
       {
-        id: 3,
+        id: 'follow3',
         userName: '이유리',
       },
       {
-        id: 4,
+        id: 'follow4',
         userName: '훈이',
       },
     ],
     posts: [
       {
-        id: 'post1',
-        imgUrl: '@public/foodTestImg.png',
-        storeName: '기숙사 식당',
-      },
-      {
-        id: 'post2',
-        imgUrl: '@public/foodTestImg.png',
-        storeName: '정담 순댓국',
-      },
-      {
-        id: 'post3',
-        imgUrl: '@public/foodTestImg.png',
-        storeName: '경슐랭',
-      },
-      {
-        id: 'post4',
-        imgUrl: '@public/foodTestImg.png',
-        storeName: '숑숑돈까스',
-      },
-      {
-        id: 'post5',
-        imgUrl: '@public/foodTestImg.png',
-        storeName: '마라마라탕',
+        postMainMenu: '초콜렛 김밥',
+        postImage: '/public/wagu-logo.svg',
+        postContent:
+          '음층마싯게요음층마싯게요음층마싯게요음층마싯게요음층마싯게요음층마싯게요음층마싯게요음층마싯게요',
+        storeName: '',
+        storeLocation: {
+          address: '서울 강남구',
+          posx: 0,
+          posy: 0,
+        },
+        menus: [
+          {
+            menuName: '송이버섯',
+            menuPrice: 0,
+            categoryName: '한식',
+          },
+        ],
+        auto: true,
       },
     ],
   };

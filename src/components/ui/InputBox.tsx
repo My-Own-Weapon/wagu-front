@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, ChangeEventHandler, useRef } from 'react';
+import { ChangeEvent, ChangeEventHandler, useId } from 'react';
 
 type InputBoxProps = {
   className?: string;
@@ -23,7 +23,7 @@ export default function InputBox({
   onChange = undefined,
   readOnly = false,
 }: InputBoxProps) {
-  const id = useRef(`textbox-${Math.random().toString().slice(2)}`);
+  const id = useId();
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     if (!onChange) return;
@@ -33,9 +33,9 @@ export default function InputBox({
 
   return (
     <div className={className}>
-      <label htmlFor={id.current}>{label}</label>
+      <label htmlFor={id}>{label}</label>
       <input
-        id={id.current}
+        id={id}
         type={type}
         name={name}
         placeholder={placeholder}
