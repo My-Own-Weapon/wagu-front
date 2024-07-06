@@ -17,7 +17,7 @@ export default function KakaoMap() {
 
   useEffect(() => {
     const script = document.createElement('script');
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=948985235eb596e79f570535fd01a71e&autoload=false`;
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=948985235eb596e79f570535fd01a71e&autoload=false&libraries=services`;
     script.async = true;
     document.head.appendChild(script);
 
@@ -37,27 +37,64 @@ export default function KakaoMap() {
 
         const map = new window.kakao.maps.Map(container, options);
 
-        const customMarkerImageUrl = '/RedPoint.svg'; // 사용자 정의 마커 이미지 경로
-        const customMarkerImageSize = new window.kakao.maps.Size(24, 35); // 마커 이미지 크기
+        const markerPosition1 = new window.kakao.maps.LatLng(
+          37.3000665143311,
+          127.03347594765566,
+        );
+        const markerPosition2 = new window.kakao.maps.LatLng(
+          37.3010665143314,
+          127.03447594765588,
+        );
+
+        const customMarkerImageUrl = '/OrangeMarker.svg';
+        const customMarkerImageSize = new window.kakao.maps.Size(24, 35);
         const customMarkerImageOptions = {
           offset: new window.kakao.maps.Point(12, 35),
-        }; // 마커 이미지 옵션
+        };
         const customMarkerImage = new window.kakao.maps.MarkerImage(
           customMarkerImageUrl,
           customMarkerImageSize,
           customMarkerImageOptions,
         );
-        const markerPosition = new window.kakao.maps.LatLng(
-          37.3000665143311,
-          127.03347594765566,
-        );
-        const marker = new window.kakao.maps.Marker({
-          position: markerPosition,
-          image: customMarkerImage,
-        });
-        marker.setMap(map);
 
-        // 지도에 idle 이벤트 등록
+        const markers = [
+          new window.kakao.maps.Marker({
+            position: markerPosition1,
+            image: customMarkerImage,
+          }),
+          new window.kakao.maps.Marker({
+            position: markerPosition2,
+            image: customMarkerImage,
+          }),
+        ];
+
+        markers.forEach((marker) => marker.setMap(map));
+
+        window.kakao.maps.event.addListener(map, 'center_changed', () => {
+          markers.forEach((marker) => {
+            const position = marker.getPosition();
+            const bounds = map.getBounds();
+
+            if (!bounds.contain(position)) {
+              const projection = map.getProjection();
+              const anchorPoint = projection.pointFromCoords(position);
+              // const newPoint = adjustPointToBounds(anchorPoint, bounds);
+              // const newPosition = projection.coordsFromPoint(newPoint);
+              // marker.setPosition(newPosition);
+            }
+          });
+        });
+
+        // function adjustPointToBounds(point, bounds) {
+        //   const minPoint = bounds.getMin();
+        //   const maxPoint = bounds.getMax();
+
+        //   point.x = Math.max(minPoint.x, Math.min(maxPoint.x, point.x));
+        //   point.y = Math.max(minPoint.y, Math.min(maxPoint.y, point.y));
+
+        //   return point;
+        // }
+
         window.kakao.maps.event.addListener(map, 'idle', function () {
           const bounds = map.getBounds();
           const swLatLng = bounds.getSouthWest();
@@ -113,7 +150,6 @@ export default function KakaoMap() {
       <div>
         <h1>지도</h1>
         <div id="map" style={{ width: '329px', height: '315px' }}></div>
-
         <button
           className={s.btn}
           onClick={async () => {
