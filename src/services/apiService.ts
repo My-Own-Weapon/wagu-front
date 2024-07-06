@@ -1,4 +1,5 @@
 import { LoginUserInputs, SignupDetails } from '@/types';
+import { delay } from '@/utils/delay';
 
 class ApiService {
   private baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -15,12 +16,15 @@ class ApiService {
       credentials: 'include',
     });
 
-    console.log('---------------------------------');
-    console.log('api', res);
-    console.log(res.headers.get('set-cookie'));
-    console.log('---------------------------------');
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
 
-    return res;
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
+    const data = await res.text();
+
+    return data;
   }
 
   async signup({
@@ -30,7 +34,7 @@ class ApiService {
     name,
     phoneNumber,
   }: SignupDetails) {
-    console.log(this.baseUrl);
+    await delay(1000);
     const res = await fetch(`${this.baseUrl}/join`, {
       method: 'POST',
       headers: {
@@ -44,20 +48,59 @@ class ApiService {
         phoneNumber,
       }),
     });
-    console.log(res);
 
-    return res;
+    return res.text();
   }
 
-  async fetchPosts({ cookie }: { cookie: string }) {
-    console.log(cookie);
-
-    const res = await fetch(`${this.baseUrl}/followers`, {
+  async fetchPosts() {
+    const res = await fetch(`${this.baseUrl}/posts`, {
       method: 'GET',
       credentials: 'include',
     });
 
     return res.json();
+  }
+
+  /* ✅ TODO 
+    parameter로 데이터를 받도록 수정 또한, swagger에 맞게 param type 생성 */
+  // async addPost(postData: AddPostProps) {
+  async addPost() {
+    const res = await fetch(`${this.baseUrl}/posts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        postMainMenu: 'string',
+        postImage: 'string',
+        postContent: 'string',
+        storeName: 'string',
+        storeLocation: {
+          address: 'string',
+          posx: 0,
+          posy: 0,
+        },
+        menus: [
+          {
+            menuName: 'string',
+            menuPrice: 0,
+            categoryName: 'string',
+          },
+        ],
+        auto: true,
+      }),
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
+    const data = await res.text();
+
+    return data;
   }
 }
 

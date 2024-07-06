@@ -1,36 +1,36 @@
 'use client';
 
+import { apiService } from '@/services/apiService';
+import { ChangeEventHandler, FormEventHandler, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+
 import BackButton from '@/components/BackBtn';
 import InputBox from '@/components/ui/InputBox';
-// import { useFormState, useFormStatus } from 'react-dom';
-// import { handleSubmitAction } from './handleSubmitAction';
-// import { apiService } from '@/services/apiService';
-import { ChangeEventHandler, FormEventHandler, useState } from 'react';
-import axios from 'axios';
+
 import s from './page.module.scss';
 
-// interface State {
-//   message: string | null;
-// }
+interface CookieProtocol {
+  key: string;
+  value: string;
+}
 
 export default function LoginPage() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // const [state, formAction] = useFormState<State, FormData>(
-  //   handleSubmitAction,
-  //   {
-  //     message: null,
-  //   },
-  // );
-  // const { pending } = useFormStatus();
   const [loginInfo, setLoginInfo] = useState({
     username: '',
     password: '',
   });
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const router = useRouter();
+
+  const setCookie = ({ key, value }: CookieProtocol) => {
+    document.cookie = `${key}=${value}`;
+  };
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     const { name, value } = e.target;
+
     setLoginInfo({
       ...loginInfo,
       [name]: value,
@@ -41,39 +41,12 @@ export default function LoginPage() {
     e.preventDefault();
 
     try {
-      console.log('loginInfo : ', loginInfo);
-      // const res = await apiService.login(loginInfo);
-
-      const res = await axios({
-        url: 'http://3.39.118.22:8080/login',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        data: {
-          username: loginInfo.username,
-          password: loginInfo.password,
-        },
-        withCredentials: true,
-      });
-
-      console.log(res);
-
-      console.log(res.status === 200);
-
-      if (res.status === 200) {
-        /* server action */
-        // const sessionId = res.headers.get('JSESSIONID');
-        // console.log('sessionId is :', sessionId);
-
-        /* axios */
-        const resres = res.data;
-        console.log('sessionId is :', resres);
-      }
-      // eslint-disable-next-line no-shadow
-    } catch (e) {
-      if (e instanceof Error) {
-        console.error(e.message);
+      await apiService.login(loginInfo);
+      setCookie({ key: 'username', value: loginInfo.username });
+      router.push('/');
+    } catch (error) {
+      if (error instanceof Error) {
+        setErrorMsg(error.message);
       }
     }
   };
@@ -84,7 +57,6 @@ export default function LoginPage() {
         <BackButton />
         <h1 className={s.title}>로그인</h1>
       </div>
-      {/* <form className={s.form} action={formAction}> */}
       <form className={s.form} onSubmit={handleSubmit}>
         <InputBox
           className={s.inputBox}
@@ -102,9 +74,7 @@ export default function LoginPage() {
           onChange={handleChange}
           type="password"
         />
-        {/* <Pending /> */}
-        {/* {state.message && <div className={s.error}>{state.message}</div>} */}
-        {/* <button type="submit" className={s.loginBtn} disabled={pending}> */}
+        {errorMsg && <div className={s.error}>{errorMsg}</div>}
         <button type="submit" className={s.loginBtn}>
           로그인
         </button>
@@ -132,13 +102,3 @@ export default function LoginPage() {
     </main>
   );
 }
-
-// function Pending() {
-//   const { pending } = useFormStatus();
-
-//   if (pending) {
-//     return <div>로그인중 중...</div>;
-//   }
-
-//   return null;
-// }
