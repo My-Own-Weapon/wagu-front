@@ -14,9 +14,13 @@ class ApiService {
       body: JSON.stringify({ username, password }),
       credentials: 'include',
     });
-    console.log(res);
 
-    return res.json();
+    console.log('---------------------------------');
+    console.log('api', res);
+    console.log(res.headers.get('set-cookie'));
+    console.log('---------------------------------');
+
+    return res;
   }
 
   async signup({
@@ -26,6 +30,7 @@ class ApiService {
     name,
     phoneNumber,
   }: SignupDetails) {
+    console.log(this.baseUrl);
     const res = await fetch(`${this.baseUrl}/join`, {
       method: 'POST',
       headers: {
@@ -38,15 +43,16 @@ class ApiService {
         name,
         phoneNumber,
       }),
-      credentials: 'include',
     });
     console.log(res);
 
     return res;
   }
 
-  async fetchPosts() {
-    const res = await fetch(`${this.baseUrl}/posts`, {
+  async fetchPosts({ cookie }: { cookie: string }) {
+    console.log(cookie);
+
+    const res = await fetch(`${this.baseUrl}/followers`, {
       method: 'GET',
       credentials: 'include',
     });

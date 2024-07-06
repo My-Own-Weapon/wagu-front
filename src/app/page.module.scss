@@ -3,3 +3,8 @@
 .container {
   @include mainStyle;
 }
+
+.btn {
+  width: 100px;
+  height: 60px;
+}
