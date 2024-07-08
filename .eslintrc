@@ -35,7 +35,6 @@
       { "enforceForRenamedProperties": false }
     ],
     "prettier/prettier": ["warn"],
-    "operator-linebreak": ["error", "after"],
     "import/prefer-default-export": "off", // for singleton pattern
     "no-use-before-define": "off", // 전략적 hoisting 사용을 위해
     "import/extensions": "off",
@@ -81,7 +80,8 @@
       { "required": { "some": ["nesting", "id"] } }
     ],
     /* about default parameter */
-    "react/require-default-props": [2, { "functions": "defaultArguments" }]
+    "react/require-default-props": [2, { "functions": "defaultArguments" }],
+    "no-shadow": ["error", { "hoist": "functions" }]
   },
   "overrides": [
     {

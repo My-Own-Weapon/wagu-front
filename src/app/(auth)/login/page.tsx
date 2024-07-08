@@ -54,7 +54,7 @@ export default function LoginPage() {
   return (
     <main className={s.container}>
       <div className={s.header}>
-        <BackButton />
+        <BackButton goto="/entry" />
         <h1 className={s.title}>로그인</h1>
       </div>
       <form className={s.form} onSubmit={handleSubmit}>

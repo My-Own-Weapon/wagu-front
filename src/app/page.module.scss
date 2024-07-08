@@ -1,10 +1,72 @@
-@import '@/styles/variables/colors.scss';
 @import '@/styles/mixins/index.scss';
+@import '@/styles/variables/radius.scss';
+@import '@/styles/variables/colors.scss';
+
 .container {
   @include mainStyle;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
 }
 
 .btn {
   width: 100px;
   height: 60px;
+}
+
+.liveFriendsContainer {
+  width: 100%;
+  height: auto;
+
+  margin: 10px 24px 0 24px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+
+  overflow: hidden;
+
+  p {
+    font-weight: 600;
+    font-size: 12px;
+  }
+}
+
+.friendsList {
+  width: 100%;
+  height: auto;
+
+  display: flex;
+  gap: 16px;
+
+  overflow: hidden;
+
+  li {
+    border: 1px solid $primaryOrange;
+    border-radius: $radiusMedium;
+  }
+}
+
+.categoryContainer {
+  margin: 0 24px;
+}
+
+.categoriesList {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+
+  overflow: hidden;
+
+  li {
+    width: 40px;
+    border: 1px solid $primaryOrange;
+  }
+}
+
+.postsContainer {
+  margin: 0 24px;
 }
