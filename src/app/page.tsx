@@ -65,19 +65,21 @@ export default function Home() {
             </li>
           ))}
         </ul>
-        <div>
-          <p>📚 카테고리</p>
-          <ul className={s.categoriesList}>
-            {getCategories().map(({ id, name }) => (
-              <li key={id}>
-                <span>📘</span>
-                <p>{name}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
+      </div>
+      <div className={s.categoryContainer}>
+        <p>📚 카테고리</p>
+        <ul className={s.categoriesList}>
+          {getCategories().map(({ id, name }) => (
+            <li key={id}>
+              <span>📘</span>
+              <p>{name}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className={s.postsContainer}>
         <Post>
-          <Post.Title title="한식 Posts" />
+          <Post.Title title="🔖 한식 Posts" />
           <Post.PostCards posts={posts} />
         </Post>
       </div>
