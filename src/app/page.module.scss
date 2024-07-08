@@ -1,5 +1,7 @@
-@import '@/styles/variables/colors.scss';
 @import '@/styles/mixins/index.scss';
+@import '@/styles/variables/radius.scss';
+@import '@/styles/variables/colors.scss';
+
 .container {
   @include mainStyle;
 }
@@ -7,4 +9,47 @@
 .btn {
   width: 100px;
   height: 60px;
+}
+
+.liveFriendsContainer {
+  width: 100%;
+  height: auto;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+
+  p {
+    font-weight: 600;
+    font-size: 12px;
+  }
+}
+
+.friendsList {
+  width: 100%;
+  height: auto;
+
+  display: flex;
+  gap: 16px;
+
+  overflow: hidden;
+
+  li {
+    border: 1px solid $primaryOrange;
+    border-radius: $radiusMedium;
+  }
+}
+
+.categoriesList {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+
+  overflow: hidden;
+
+  li {
+    width: 40px;
+    border: 1px solid $primaryOrange;
+  }
 }
