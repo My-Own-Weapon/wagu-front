@@ -2,7 +2,6 @@
   position: fixed;
   bottom: 0;
   left: 0;
-  right: 0;
 
   width: 100%;
   height: 60px;
@@ -13,4 +12,17 @@
   gap: 10px;
 
   border: 1px solid plum;
+
+  div {
+    width: 100%;
+    height: auto;
+
+    border: 1px solid cyan;
+
+    p,
+    span {
+      width: 100%;
+      height: 100%;
+    }
+  }
 }

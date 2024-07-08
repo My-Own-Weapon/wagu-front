@@ -1,6 +1,15 @@
+'use client';
+
+import { useSelectedLayoutSegment } from 'next/navigation';
+
 import s from './Footer.module.scss';
 
 export default function Footer() {
+  const segment = useSelectedLayoutSegment();
+  if (segment === '(auth)') {
+    return null;
+  }
+
   return (
     <nav className={s.container}>
       <div>

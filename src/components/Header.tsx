@@ -2,9 +2,16 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSelectedLayoutSegment } from 'next/navigation';
+
 import s from './Header.module.scss';
 
 export default function Header() {
+  const segment = useSelectedLayoutSegment();
+  if (segment === '(auth)') {
+    return null;
+  }
+
   return (
     <header className={s.container}>
       <div className={s.profileArea}>

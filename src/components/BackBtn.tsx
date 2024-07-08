@@ -1,14 +1,16 @@
-// BackButton.tsx
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { ReactElement } from 'react';
 import s from './BackBtn.module.scss';
 
-export default function BackBtn(): ReactElement {
+interface Props {
+  goto: string;
+}
+
+export default function BackBtn({ goto }: Props) {
   const router = useRouter();
 
   const handleBackClick = () => {
-    router.back();
+    router.push(goto);
   };
 
   return (
