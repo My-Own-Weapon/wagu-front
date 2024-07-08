@@ -103,13 +103,10 @@ class ApiService {
     return data;
   }
 
-  async createPost(formData: FormData) {
-    const res = await fetch(`${this.baseUrl}/posts`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      body: formData,
+  // eslint-disable-next-line class-methods-use-this
+  async fetchLiveFriends() {
+    const res = await fetch(`http://localhost:9090/api/liveFriends`, {
+      method: 'GET',
       credentials: 'include',
     });
 

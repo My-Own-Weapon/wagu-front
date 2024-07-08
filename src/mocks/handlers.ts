@@ -48,6 +48,12 @@ export const handlers = [
 
     return HttpResponse.json(getMockPosts());
   }),
+
+  http.get('/api/liveFriends', () => {
+    console.log('fetch live friends !!');
+
+    return HttpResponse.json(getLiveFriends());
+  }),
 ];
 
 function getMockPosts() {
@@ -93,4 +99,29 @@ function getMockPosts() {
       },
     ],
   };
+}
+
+function getLiveFriends() {
+  return [
+    {
+      memberId: 1,
+      username: '김철수',
+      each: true,
+    },
+    {
+      memberId: 2,
+      username: '신짱구',
+      each: true,
+    },
+    {
+      memberId: 3,
+      username: '이유리',
+      each: true,
+    },
+    {
+      memberId: 4,
+      username: '훈이',
+      each: true,
+    },
+  ];
 }
