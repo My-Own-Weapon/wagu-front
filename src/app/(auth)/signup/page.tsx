@@ -1,11 +1,13 @@
 'use client';
 
-import Image from 'next/image';
-import Link from 'next/link';
 import BackButton from '@/components/BackBtn';
 import InputBox from '@/components/ui/InputBox';
+
+import Image from 'next/image';
+import Link from 'next/link';
 import { useFormState, useFormStatus } from 'react-dom';
 import { handleSubmitAction } from './handleSubmitAction';
+
 import s from './page.module.scss';
 
 interface SignupState {
@@ -25,7 +27,7 @@ export default function SignupPage() {
   return (
     <main className={s.container}>
       <div className={s.header}>
-        <BackButton />
+        <BackButton goto="/entry" />
         <h1 className={s.title}>회원가입</h1>
       </div>
       <form className={s.form} action={formAction}>
