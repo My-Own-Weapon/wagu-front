@@ -11,9 +11,10 @@ export const handlers = [
       ok: true,
     });
 
+    /* unauthorization */
     // return HttpResponse.json({
     //     headers: {
-    //       status: 200,
+    //       status: 401,
     //       ok: false,
     //     },
     //   });
@@ -49,6 +50,17 @@ export const handlers = [
     return HttpResponse.json(getMockPosts());
   }),
 
+  http.get('/api/posts/:postId', ({ request }) => {
+    console.log('fetch post !!');
+
+    const splitedUrl = request.url.split('/');
+    const path = Number(splitedUrl[splitedUrl.length - 1]);
+
+    if (path % 2 === 0) return HttpResponse.json(getMockPostPossiblePatch());
+
+    return HttpResponse.json(getMockPostNotPossiblePatch());
+  }),
+
   http.get('/api/liveFriends', () => {
     console.log('fetch live friends !!');
 
@@ -57,47 +69,131 @@ export const handlers = [
 ];
 
 function getMockPosts() {
+  return [
+    {
+      id: 1,
+      category: 'KOREAN',
+      postMainMenu: 'KOREAN',
+      postImage: 'string',
+      postContent: 'string',
+      createDate: '2024-07-08T15:50:59.563Z',
+      updateDate: '2024-07-08T15:50:59.563Z',
+      auto: true,
+    },
+    {
+      id: 2,
+      category: 'KOREAN',
+      postMainMenu: 'KOREAN',
+      postImage: 'string',
+      postContent: 'string',
+      createDate: '2024-07-08T15:50:59.563Z',
+      updateDate: '2024-07-08T15:50:59.563Z',
+      auto: true,
+    },
+    {
+      id: 11123,
+      category: 'KOREAN',
+      postMainMenu: 'KOREAN',
+      postImage: 'string',
+      postContent: 'string',
+      createDate: '2024-07-08T15:50:59.563Z',
+      updateDate: '2024-07-08T15:50:59.563Z',
+      auto: true,
+    },
+    {
+      id: 1111,
+      category: 'KOREAN',
+      postMainMenu: 'KOREAN',
+      postImage: 'string',
+      postContent: 'string',
+      createDate: '2024-07-08T15:50:59.563Z',
+      updateDate: '2024-07-08T15:50:59.563Z',
+      auto: true,
+    },
+    {
+      id: 2222,
+      category: 'JAPANESE',
+      postMainMenu: 'JAPANESE',
+      postImage: 'string',
+      postContent: 'string',
+      createDate: '2024-07-08T15:50:59.563Z',
+      updateDate: '2024-07-08T15:50:59.563Z',
+      auto: true,
+    },
+    {
+      id: 2223,
+      category: 'JAPANESE',
+      postMainMenu: 'JAPANESE',
+      postImage: 'string',
+      postContent: 'string',
+      createDate: '2024-07-08T15:50:59.563Z',
+      updateDate: '2024-07-08T15:50:59.563Z',
+      auto: true,
+    },
+    {
+      id: 2225,
+      category: 'JAPANESE',
+      postMainMenu: 'JAPANESE',
+      postImage: 'string',
+      postContent: 'string',
+      createDate: '2024-07-08T15:50:59.563Z',
+      updateDate: '2024-07-08T15:50:59.563Z',
+      auto: true,
+    },
+    {
+      id: 3331,
+      category: 'CHINESE',
+      postMainMenu: 'CHINESE',
+      postImage: 'string',
+      postContent: 'string',
+      createDate: '2024-07-08T15:50:59.563Z',
+      updateDate: '2024-07-08T15:50:59.563Z',
+      auto: true,
+    },
+    {
+      id: 4443,
+      category: 'WESTERN',
+      postMainMenu: 'WESTERN',
+      postContent: 'string',
+      createDate: '2024-07-08T15:50:59.563Z',
+      updateDate: '2024-07-08T15:50:59.563Z',
+      auto: true,
+    },
+    {
+      id: 4442,
+      category: 'WESTERN',
+      postMainMenu: 'WESTERN',
+      postContent: 'string',
+      createDate: '2024-07-08T15:50:59.563Z',
+      updateDate: '2024-07-08T15:50:59.563Z',
+      auto: true,
+    },
+  ];
+}
+
+function getMockPostPossiblePatch() {
   return {
-    liveFollows: [
-      {
-        id: 'follow1',
-        userName: '김철수',
-      },
-      {
-        id: 'follow2',
-        userName: '신짱구',
-      },
-      {
-        id: 'follow3',
-        userName: '이유리',
-      },
-      {
-        id: 'follow4',
-        userName: '훈이',
-      },
-    ],
-    posts: [
-      {
-        postMainMenu: '초콜렛 김밥',
-        postImage: '/public/wagu-logo.svg',
-        postContent:
-          '음층마싯게요음층마싯게요음층마싯게요음층마싯게요음층마싯게요음층마싯게요음층마싯게요음층마싯게요',
-        storeName: '',
-        storeLocation: {
-          address: '서울 강남구',
-          posx: 0,
-          posy: 0,
-        },
-        menus: [
-          {
-            menuName: '송이버섯',
-            menuPrice: 0,
-            categoryName: '한식',
-          },
-        ],
-        auto: true,
-      },
-    ],
+    id: 111,
+    writer: 'zxc',
+    postMainMenu: 'string',
+    postImage: 'string',
+    postContent: '호박고구마'.repeat(150),
+    createDate: '2024-07-08T15:50:59.563Z',
+    updateDate: '2024-07-08T15:50:59.563Z',
+    auto: true,
+  };
+}
+
+function getMockPostNotPossiblePatch() {
+  return {
+    id: 111,
+    writer: 'other',
+    postMainMenu: 'string',
+    postImage: 'string',
+    postContent: '호박고구마'.repeat(150),
+    createDate: '2024-07-08T15:50:59.563Z',
+    updateDate: '2024-07-08T15:50:59.563Z',
+    auto: true,
   };
 }
 
