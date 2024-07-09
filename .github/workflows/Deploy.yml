@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 22.4.1
 
       # 의존성 package 설치.
       - name: Install dependencies
