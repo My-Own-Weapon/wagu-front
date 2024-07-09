@@ -2,14 +2,24 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useSelectedLayoutSegment } from 'next/navigation';
+import {
+  useSelectedLayoutSegment,
+  useSelectedLayoutSegments,
+} from 'next/navigation';
 
 import s from './Header.module.scss';
 
 export default function Header() {
   const segment = useSelectedLayoutSegment();
-  if (segment === '(auth)') {
+  const segments = useSelectedLayoutSegments();
+
+  if (segment === '(auth)' || segment === 'posts') {
     return null;
+  }
+  if (segments.length >= 2) {
+    if (segments[segments.length - 1] === 'board') return null;
+    const [, , postid] = segments;
+    if (!!postid) return null;
   }
 
   return (

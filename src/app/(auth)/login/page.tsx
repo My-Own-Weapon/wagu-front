@@ -1,13 +1,12 @@
 'use client';
 
+import InputBox from '@/components/ui/InputBox';
 import { apiService } from '@/services/apiService';
+
 import { ChangeEventHandler, FormEventHandler, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-
-import BackButton from '@/components/BackBtn';
-import InputBox from '@/components/ui/InputBox';
 
 import s from './page.module.scss';
 
@@ -53,10 +52,6 @@ export default function LoginPage() {
 
   return (
     <main className={s.container}>
-      <div className={s.header}>
-        <BackButton goto="/entry" />
-        <h1 className={s.title}>로그인</h1>
-      </div>
       <form className={s.form} onSubmit={handleSubmit}>
         <InputBox
           className={s.inputBox}

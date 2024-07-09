@@ -10,6 +10,10 @@ export default function BackBtn({ goto }: Props) {
   const router = useRouter();
 
   const handleBackClick = () => {
+    if (goto === 'back') {
+      router.back();
+      return;
+    }
     router.push(goto);
   };
 
