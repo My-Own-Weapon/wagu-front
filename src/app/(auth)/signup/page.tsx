@@ -1,6 +1,5 @@
 'use client';
 
-import BackButton from '@/components/BackBtn';
 import InputBox from '@/components/ui/InputBox';
 
 import Image from 'next/image';
