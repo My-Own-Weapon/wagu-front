@@ -1,16 +1,13 @@
-# workflow의 이름을 설정해준다.
+# workflow 이름 설정.
 name: CI/CD
 
-# workflow가 작동되는 이벤트를 정의한다.
-# 해당 workflow같은 경우는 main branch에 push 될 경우 작동된다.
+# ✅ TODO : branch가 main일때 배포되도록 변경
 on:
   push:
     branches:
       - dev
 
-# 아래 S3와 CodeDeploy에서 사용 될 env값을 정의한다.
-# 이 값은 2편과 3편에서 설정해준 S3의 버킷명과
-# CodeDeploy의 applicationName, groupName과 일치해야한다.
+# aws에서 설정해준 이름 그대로 붙여넣기 하면됨
 env:
   S3_BUCKET_NAME: wagu-front-bucket
   CODE_DEPLOY_APPLICATION_NAME: wagu-front-code-deploy
@@ -27,22 +24,22 @@ jobs:
         with:
           node-version: 16
 
-      # pacakge.json에 명시된 의존성을 설치한다.
+      # 의존성 package 설치.
       - name: Install dependencies
         run: npm install
 
-      # 프로젝트를 빌드한다.
+      # 프로젝트 빌드.
       - name: Build next app
         run: npm build
 
       # S3에 올리기 전 빌드파일을 압축해준다.
-      # 여기서 $GITHUB_SHA라는 값을 사용하는데 이 값은 Github에서 기본적으로 제공하는 환경변수다.
+      # $GITHUB_SHA : github 제공 환경변수.
       # $GITHUB_SHA는 해당 워크플로우를 트리거 한 커밋의 고유값이 할당되어있다.
       - name: Make zip file
         run: zip -qq -r ./$GITHUB_SHA.zip . -x "node_modules/*"
         shell: bash
 
-      # 2편에서 만든 IAM사용자를 이용해 AWS 서비스에 접근하는데 필요한 권한을 얻어오는 단계이다.
+      # IAM을 이용해 AWS에 접근을 위한 정보
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -50,12 +47,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
-      # Make zip file 단계에서 압축된 빌드 파일을 S3 버킷에 업로드하는 단계이다.
+      # Make zip file 단계에서 압축된 빌드 파일을 S3 버킷에 업로드하는 단계
       - name: Upload to S3
         run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip
 
-      # S3에 업로드 된 빌드 파일을 이용해 CodeDeploy가 정의된 동작을 하도록 트리거해주는 단계이다.
-      # CodeDeploy의 동작에 대한 정의는 다음편에서 다뤄볼것이다.
+      # S3에 업로드 된 빌드 파일을 이용해 CodeDeploy가 정의된 동작을 하도록 트리거 단계
       - name: Code Deploy
         run: |
           aws deploy create-deployment \
