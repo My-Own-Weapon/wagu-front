@@ -7,6 +7,8 @@ import {
   useSelectedLayoutSegments,
 } from 'next/navigation';
 
+import HeaderLogo from '@public/images/header-logo.svg';
+
 import s from './Header.module.scss';
 
 export default function Header() {
@@ -33,7 +35,9 @@ export default function Header() {
         />
       </div>
       <div>
-        <Link href="/">wagu book</Link>
+        <Link href="/">
+          <HeaderLogo />
+        </Link>
       </div>
       <div>
         <Link href="/search">Search</Link>

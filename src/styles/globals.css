@@ -1,6 +1,7 @@
 :root {
   --mainBgColor: #ffffff;
   --mainBorderColor: #efefef;
+  --bgColor: #fffaf3;
 }
 
 body {
@@ -24,5 +25,5 @@ body {
   width: 100dvw;
   height: 100dvh;
 
-  background-color: violet;
+  background-color: var(--bgColor);
 }

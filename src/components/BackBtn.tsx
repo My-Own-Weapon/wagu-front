@@ -19,7 +19,7 @@ export default function BackBtn({ goto }: Props) {
 
   return (
     <button className={s.container} type="button" onClick={handleBackClick}>
-      <Image src="/BackIcon.svg" alt="backBtn" width={24} height={24} />
+      <Image src="/back-btn.svg" alt="backBtn" width={24} height={24} />
     </button>
   );
 }

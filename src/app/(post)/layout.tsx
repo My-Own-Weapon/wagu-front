@@ -5,9 +5,9 @@ export default function layout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   return (
-    <div>
+    <>
       <BackHeader />
       {children}
-    </div>
+    </>
   );
 }
