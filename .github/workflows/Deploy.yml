@@ -30,7 +30,7 @@ jobs:
 
       # 의존성 package 설치.
       - name: Install dependencies
-        run: npm install
+        run: npm run install
 
       # 프로젝트 빌드.
       - name: Build next app
