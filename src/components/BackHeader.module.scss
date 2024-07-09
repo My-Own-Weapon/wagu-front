@@ -1,0 +1,42 @@
+@import '@/styles/variables/colors.scss';
+
+.headerContainer {
+  position: sticky;
+  top: 0;
+
+  width: 100%;
+  height: 60px;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  background-color: rgba($bgColor, 0.5);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid $border;
+
+  img {
+    background-color: transparent;
+  }
+
+  button {
+    position: absolute;
+    left: 0;
+
+    background-color: transparent;
+
+    margin-left: 24px;
+
+    cursor: pointer;
+  }
+}
+
+.headerTitle {
+  font-size: $textTitle;
+  font-weight: 600;
+  color: $gray800;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}

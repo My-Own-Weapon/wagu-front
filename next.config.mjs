@@ -5,7 +5,17 @@ const withPWA = withPWAInit({
   dest: 'public',
 });
 
-const nextConfig = {};
+const nextConfig = {
+  reactStrictMode: true,
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ['@svgr/webpack'],
+    });
+
+    return config;
+  },
+};
 
 export default withPWA({
   ...nextConfig,

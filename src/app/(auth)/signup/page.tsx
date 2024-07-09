@@ -26,10 +26,6 @@ export default function SignupPage() {
 
   return (
     <main className={s.container}>
-      <div className={s.header}>
-        <BackButton goto="/entry" />
-        <h1 className={s.title}>회원가입</h1>
-      </div>
       <form className={s.form} action={formAction}>
         <InputBox
           className={s.inputBox}

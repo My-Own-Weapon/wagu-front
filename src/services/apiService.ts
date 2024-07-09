@@ -1,5 +1,4 @@
 import { LoginUserInputs, SignupDetails } from '@/types';
-import { delay } from '@/utils/delay';
 
 class ApiService {
   private baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -34,7 +33,6 @@ class ApiService {
     name,
     phoneNumber,
   }: SignupDetails) {
-    await delay(1000);
     const res = await fetch(`${this.baseUrl}/join`, {
       method: 'POST',
       headers: {
@@ -54,6 +52,15 @@ class ApiService {
 
   async fetchPosts() {
     const res = await fetch(`${this.baseUrl}/posts`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    return res.json();
+  }
+
+  async fetchPost(postId: string) {
+    const res = await fetch(`${this.baseUrl}/posts/${postId}`, {
       method: 'GET',
       credentials: 'include',
     });

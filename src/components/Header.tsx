@@ -2,14 +2,26 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useSelectedLayoutSegment } from 'next/navigation';
+import {
+  useSelectedLayoutSegment,
+  useSelectedLayoutSegments,
+} from 'next/navigation';
+
+import HeaderLogo from '@public/images/header-logo.svg';
 
 import s from './Header.module.scss';
 
 export default function Header() {
   const segment = useSelectedLayoutSegment();
-  if (segment === '(auth)') {
+  const segments = useSelectedLayoutSegments();
+
+  if (segment === '(auth)' || segment === 'posts') {
     return null;
+  }
+  if (segments.length >= 2) {
+    if (segments[segments.length - 1] === 'board') return null;
+    const [, , postid] = segments;
+    if (!!postid) return null;
   }
 
   return (
@@ -23,7 +35,9 @@ export default function Header() {
         />
       </div>
       <div>
-        <Link href="/">wagu book</Link>
+        <Link href="/">
+          <HeaderLogo />
+        </Link>
       </div>
       <div>
         <Link href="/search">Search</Link>

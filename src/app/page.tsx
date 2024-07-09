@@ -2,7 +2,7 @@
 
 import UserIcon from '@/components/UserIcon';
 
-import { useEffect, useState } from 'react';
+import { MouseEventHandler, useEffect, useState } from 'react';
 import { apiService } from '@/services/apiService';
 import { Post } from '@/components/Post';
 
@@ -16,6 +16,7 @@ interface Friend {
 
 interface PostData {
   id: string;
+  category: CategoryCodes;
   storeName: string;
   postMainMenu: string;
   postImage: string;
@@ -23,9 +24,35 @@ interface PostData {
   createDate: string;
 }
 
+const categoryMap = {
+  전부: 'ALL',
+  한식: 'KOREAN',
+  일식: 'JAPANESE',
+  중식: 'CHINESE',
+  분식: 'FASTFOOD',
+  양식: 'WESTERN',
+  카페: 'CAFE',
+  디저트: 'DESSERT',
+} as const;
+
+type CategoryCodes = (typeof categoryMap)[Categories];
+
+type Categories = keyof typeof categoryMap;
+
 export default function Home() {
-  const [posts, setPosts] = useState<PostData[]>([]);
+  const [allPosts, setAllPosts] = useState<PostData[]>([]);
+  const [filteredPosts, setFilteredPosts] = useState<PostData[]>([]);
   const [liveFriends, setLiveFriends] = useState<Friend[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<Categories>('전부');
+
+  const handleCategoryClick: MouseEventHandler<HTMLUListElement> = (e) => {
+    const target = e.target as HTMLElement;
+    const li = target.closest('li');
+    if (!li?.dataset) return;
+
+    const category = li.dataset.category as Categories;
+    setSelectedCategory(category);
+  };
 
   async function fetchData() {
     try {
@@ -34,18 +61,29 @@ export default function Home() {
         apiService.fetchLiveFriends(),
       ]);
 
-      console.log(postsData, liveFriendsData);
-
-      setPosts(postsData);
+      setAllPosts(postsData);
+      setFilteredPosts(postsData);
       setLiveFriends(liveFriendsData);
     } catch (error) {
-      console.error('Fetching data failed:', error);
+      alert('데이터를 불러오는데 실패했습니다.');
     }
   }
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (selectedCategory === '전부') {
+      setFilteredPosts(allPosts);
+      return;
+    }
+
+    const formattedCategory = categoryMap[selectedCategory];
+    setFilteredPosts(
+      allPosts.filter(({ category }) => category === formattedCategory),
+    );
+  }, [allPosts, selectedCategory]);
 
   return (
     <main className={s.container}>
@@ -68,19 +106,21 @@ export default function Home() {
       </div>
       <div className={s.categoryContainer}>
         <p>📚 카테고리</p>
-        <ul className={s.categoriesList}>
+        <ul className={s.categoriesList} onClick={handleCategoryClick}>
           {getCategories().map(({ id, name }) => (
-            <li key={id}>
-              <span>📘</span>
-              <p>{name}</p>
+            <li key={id} data-category={name}>
+              <button type="button">
+                <span>📘</span>
+                <p>{name}</p>
+              </button>
             </li>
           ))}
         </ul>
       </div>
       <div className={s.postsContainer}>
         <Post>
-          <Post.Title title="🔖 한식 Posts" />
-          <Post.PostCards posts={posts} />
+          <Post.Title title={`🔖${selectedCategory}  Posts`} />
+          <Post.PostCards posts={filteredPosts} />
         </Post>
       </div>
     </main>
@@ -89,6 +129,10 @@ export default function Home() {
 
 function getCategories() {
   return [
+    {
+      id: 'category0',
+      name: '전부',
+    },
     {
       id: 'category1',
       name: '한식',

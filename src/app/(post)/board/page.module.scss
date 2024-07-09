@@ -1,6 +1,14 @@
 @import '@styles/mixins/index.scss';
 .container {
   @include mainStyle;
+  height: 100%;
+
+  margin-bottom: 200px;
+}
+
+.wrapper {
+  width: 100%;
+  height: 100%;
 }
 
 .btnArea {
