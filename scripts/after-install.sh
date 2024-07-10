@@ -1,0 +1,1 @@
+echo "> AfterInstall Hook : install done !!"
