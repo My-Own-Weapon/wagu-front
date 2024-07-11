@@ -14,14 +14,14 @@ permissions:
 # scripts/{hook}.sh
 hooks:
   BeforeInstall:
-    - location: scripts/before_install.sh
+    - location: scripts/before-install.sh
       timeout: 300
       runas: ubuntu
   AfterInstall:
-    - location: scripts/after_install.sh
+    - location: scripts/after-install.sh
       timeout: 300
       runas: ubuntu
   ApplicationStart:
-    - location: scripts/start_server.sh
+    - location: scripts/start-server.sh
       timeout: 300
       runas: ubuntu
