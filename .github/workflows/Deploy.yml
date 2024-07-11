@@ -1,11 +1,10 @@
 # workflow 이름 설정.
 name: CI/CD
 
-# ✅ TODO : branch가 main일때 배포되도록 변경
 on:
   push:
     branches:
-      - dev
+      - main
 
 # aws에서 설정해준 이름 그대로 붙여넣기 하면됨
 env:
