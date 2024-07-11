@@ -5,7 +5,6 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "prestart": "npm run build",
     "start": "next start",
     "lint": "next lint",
     "mock": "npx tsx watch ./src/mocks/http.ts"
