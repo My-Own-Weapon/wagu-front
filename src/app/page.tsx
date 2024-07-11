@@ -91,7 +91,7 @@ export default function Home() {
   return (
     <main className={s.container}>
       <div className={s.liveFriendsContainer}>
-        <p>📺 방송중인 친구가 있어요옹오오 17:18</p>
+        <p>📺 방송중인 친구가 있어요옹오오 17:33</p>
         <ul className={s.friendsList}>
           {liveFriends.map(({ memberId, username }) => (
             <li key={memberId}>
