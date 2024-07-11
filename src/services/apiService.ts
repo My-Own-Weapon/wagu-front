@@ -1,7 +1,10 @@
 import { LoginUserInputs, SignupDetails } from '@/types';
 
 class ApiService {
-  private baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  private baseUrl =
+    process.env.NODE_ENV === 'production'
+      ? process.env.NEXT_PUBLIC_BASE_URL
+      : 'http://localhost:9090/api';
 
   private accessToken = '';
 
@@ -51,6 +54,8 @@ class ApiService {
   }
 
   async fetchPosts() {
+    console.log(this.baseUrl);
+
     const res = await fetch(`${this.baseUrl}/posts`, {
       method: 'GET',
       credentials: 'include',
@@ -112,7 +117,7 @@ class ApiService {
 
   // eslint-disable-next-line class-methods-use-this
   async fetchLiveFriends() {
-    const res = await fetch(`http://localhost:9090/api/liveFriends`, {
+    const res = await fetch(`${this.baseUrl}/liveFriends`, {
       method: 'GET',
       credentials: 'include',
     });

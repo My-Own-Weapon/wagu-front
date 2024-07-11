@@ -13,7 +13,15 @@ permissions:
 # 배포 생명주기마다 실행되는 hook
 # scripts/{hook}.sh
 hooks:
+  BeforeInstall:
+    - location: scripts/before-install.sh
+      timeout: 300
+      runas: ubuntu
   AfterInstall:
     - location: scripts/after-install.sh
       timeout: 300
-      runas: root
+      runas: ubuntu
+  ApplicationStart:
+    - location: scripts/start-server.sh
+      timeout: 300
+      runas: ubuntu
