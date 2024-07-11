@@ -18,14 +18,9 @@ interface StoreData {
 }
 
 export default function KakaoMap() {
-  // const [bounds, setBounds] = useState({ left: 0, right: 0, up: 0, down: 0 });
   const [markers, setMarkers] = useState<any[]>([]);
   const [map, setMap] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
-  const [left, setLeft] = useState(0);
-  const [right, setRight] = useState(0);
-  const [up, setUp] = useState(0);
-  const [down, setDown] = useState(0);
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -57,16 +52,12 @@ export default function KakaoMap() {
           const swLatLng = mapBounds.getSouthWest();
           const neLatLng = mapBounds.getNorthEast();
 
-          const left = swLatLng.getLat();
-          setLeft(left);
-          const down = swLatLng.getLng();
-          setDown(down);
-          const right = neLatLng.getLat();
-          setRight(right);
-          const up = neLatLng.getLng();
-          setUp(up);
-
-          fetchStoresData(mapInstance, left, down, right, up);
+          fetchStoresData(mapInstance, {
+            left: swLatLng.getLat(),
+            down: swLatLng.getLng(),
+            right: neLatLng.getLat(),
+            up: neLatLng.getLng(),
+          });
         });
       });
     };
@@ -76,26 +67,25 @@ export default function KakaoMap() {
     };
   }, []);
 
-  const fetchStoresData = (
-    mapInstance: any,
-    left: any,
-    down: any,
-    right: any,
-    up: any,
-  ) => {
-    fetch(
-      `https://wagubook.shop/map?left=${left}&right=${right}&up=${up}&down=${down}`,
-      {
-        method: 'GET',
-        credentials: 'include',
-      },
-    )
-      .then((response) => {
+  const fetchData = (url: string) => {
+    return fetch(url, { method: 'GET', credentials: 'include' }).then(
+      (response) => {
         if (!response.ok) {
           throw response;
         }
         return response.json();
-      })
+      },
+    );
+  };
+
+  const fetchStoresData = (
+    mapInstance: any,
+    bounds: { left: number; down: number; right: number; up: number },
+  ) => {
+    const { left, down, right, up } = bounds;
+    fetchData(
+      `https://wagubook.shop/map?left=${left}&right=${right}&up=${up}&down=${down}`,
+    )
       .then((data) => {
         if (Array.isArray(data)) {
           addMarkers(mapInstance, data);
@@ -103,9 +93,7 @@ export default function KakaoMap() {
           console.error('서버로부터 받은 데이터가 배열이 아닙니다:', data);
         }
       })
-      .catch((error) => {
-        handleFetchError(error);
-      });
+      .catch(handleFetchError);
   };
 
   const addMarkers = (mapInstance: any, storeData: StoreData[]) => {
@@ -127,9 +115,9 @@ export default function KakaoMap() {
       marker.setMap(mapInstance);
       console.log('Marker added:', marker);
 
-      window.kakao.maps.event.addListener(marker, 'click', () => {
-        fetchPostsData(store.storeId);
-      });
+      window.kakao.maps.event.addListener(marker, 'click', () =>
+        fetchPostsData(store.storeId),
+      );
 
       return marker;
     });
@@ -143,16 +131,7 @@ export default function KakaoMap() {
   };
 
   const fetchPostsData = (storeId: number) => {
-    fetch(`https://wagubook.shop/mapposts?storeId=${storeId}`, {
-      method: 'GET',
-      credentials: 'include',
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw response;
-        }
-        return response.json();
-      })
+    fetchData(`https://wagubook.shop/mapposts?storeId=${storeId}`)
       .then((data) => {
         if (Array.isArray(data)) {
           setPosts(data);
@@ -160,62 +139,20 @@ export default function KakaoMap() {
           console.error('Server returned data that is not an array:', data);
         }
       })
-      .catch((error) => {
-        handleFetchError(error);
-      });
+      .catch(handleFetchError);
   };
 
-  const trackMarkerPosition = (mapInstance: any, marker: any) => {
-    window.kakao.maps.event.addListener(mapInstance, 'center_changed', () => {
-      const position = marker.getPosition();
-      const bounds = mapInstance.getBounds();
-
-      if (!bounds.contain(position)) {
-        const projection = mapInstance.getProjection();
-        const anchorPoint = projection.pointFromCoords(position);
-        const newPoint = adjustPointToBounds(anchorPoint, bounds);
-        const newPosition = projection.coordsFromPoint(newPoint);
-        marker.setPosition(newPosition);
-      }
-    });
-  };
-
-  const adjustPointToBounds = (
-    point: { x: number; y: number },
-    bounds: any,
-  ) => {
-    const sw = bounds.getSouthWest();
-    const ne = bounds.getNorthEast();
-
-    point.x = Math.max(sw.getLng(), Math.min(ne.getLng(), point.x));
-    point.y = Math.max(sw.getLat(), Math.min(ne.getLat(), point.y));
-
-    return point;
-  };
-
-  const handleFetchError = (error: any) => {
-    if (error.status === 400) {
-      console.error('Bad request:', error);
-    } else if (error.status === 405) {
-      console.error('Method not allowed:', error);
-    } else if (error.status === 500) {
-      console.error('Server error:', error);
-    }
+  const handleFetchError = (error: { status: number }) => {
+    const errorMessages: { [key: number]: string } = {
+      400: 'Bad request',
+      405: 'Method not allowed',
+      500: 'Server error',
+    };
+    console.error(errorMessages[error.status] || 'Unknown error:', error);
   };
 
   const createVoteUrl = () => {
-    fetch('https://wagubook.shop/share', {
-      method: 'POST',
-      credentials: 'include',
-    })
-      .then((response) => {
-        if (!response.ok) {
-          return response.text().then((text) => {
-            throw new Error(`Request failed: ${text}`);
-          });
-        }
-        return response.text();
-      })
+    fetchData('https://wagubook.shop/share')
       .then((text) => {
         console.log('Generated URL:', text);
       })
