@@ -34,7 +34,7 @@ jobs:
 
       - name: create dotenv
         run: touch ./.env
-          echo "YOUR_KEY1=${{ secrets.NEXT_PUBLIC_BASE_URL }}" >> ./.env
+          echo "NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL }}" >> .env.production
 
       # 프로젝트 빌드.
       - name: Build next app
