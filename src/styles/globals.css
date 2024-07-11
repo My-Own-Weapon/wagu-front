@@ -1,12 +1,17 @@
+:root {
+  --mainBgColor: #ffffff;
+  --mainBorderColor: #efefef;
+  --bgColor: #fffaf3;
+}
+
 body {
-  background-color: bisque;
   font-family:
     'Pretendard Variable',
     Pretendard,
+    Roboto,
     -apple-system,
     BlinkMacSystemFont,
     system-ui,
-    Roboto,
     'Helvetica Neue',
     'Segoe UI',
     'Apple SD Gothic Neo',
@@ -16,4 +21,9 @@ body {
     'Segoe UI Emoji',
     'Segoe UI Symbol',
     sans-serif;
+
+  width: 100dvw;
+  height: 100dvh;
+
+  background-color: var(--bgColor);
 }

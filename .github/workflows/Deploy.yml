@@ -1,0 +1,67 @@
+# workflow 이름 설정.
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+# aws에서 설정해준 이름 그대로 붙여넣기 하면됨
+env:
+  S3_BUCKET_NAME: wagu-front-bucket
+  CODE_DEPLOY_APPLICATION_NAME: wagu-front-code-deploy
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: wagu-front-deploy-group
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      # 의존성 package 설치.
+      - name: Install dependencies
+        run: npm install
+
+      - name: create dotenv
+        run: echo "NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL }}" >> .env.production
+
+      # 프로젝트 빌드.
+      - name: Build next app
+        run: npm run build
+
+      # S3에 올리기 전 빌드파일을 압축해준다.
+      # $GITHUB_SHA : github 제공 환경변수.
+      # $GITHUB_SHA는 해당 워크플로우를 트리거 한 커밋의 고유값이 할당되어있다.
+      - name: Make zip file
+        run: zip -qq -r ./$GITHUB_SHA.zip . -x "node_modules/*"
+        shell: bash
+
+      # IAM을 이용해 AWS에 접근을 위한 정보
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      # Make zip file 단계에서 압축된 빌드 파일을 S3 버킷에 업로드하는 단계
+      - name: Upload to S3
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip
+
+      # S3에 업로드 된 빌드 파일을 이용해 CodeDeploy가 정의된 동작을 하도록 트리거 단계
+      - name: Code Deploy
+        run: |
+          aws deploy create-deployment \
+          --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+          --deployment-config-name CodeDeployDefault.AllAtOnce \
+          --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
+          --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=$GITHUB_SHA.zip

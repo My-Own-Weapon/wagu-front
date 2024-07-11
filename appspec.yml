@@ -1,0 +1,27 @@
+version: 0.0
+os: linux
+
+files:
+  - source: /
+    destination: /home/ubuntu/wagu-front
+    overwrite: yes
+permissions:
+  - object: /home/ubuntu/wagu-front
+    owner: ubuntu
+    group: ubuntu
+    mode: 755
+# 배포 생명주기마다 실행되는 hook
+# scripts/{hook}.sh
+hooks:
+  BeforeInstall:
+    - location: scripts/before-install.sh
+      timeout: 300
+      runas: ubuntu
+  AfterInstall:
+    - location: scripts/after-install.sh
+      timeout: 300
+      runas: ubuntu
+  ApplicationStart:
+    - location: scripts/start-server.sh
+      timeout: 300
+      runas: ubuntu

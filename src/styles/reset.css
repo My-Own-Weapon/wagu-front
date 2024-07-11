@@ -75,6 +75,8 @@ pre {
 
 a {
   background-color: transparent;
+  text-decoration: none;
+  color: black;
 }
 
 /**
@@ -351,6 +353,26 @@ template {
   display: none;
 }
 
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
 li {
   list-style-type: none;
+}
+
+input:focus {
+  outline: none;
+}
+
+div {
+  margin: 0;
+  padding: 0;
+}
+
+p {
+  margin: 0;
+  padding: 0;
 }

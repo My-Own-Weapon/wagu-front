@@ -16,6 +16,7 @@
     "plugin:react-hooks/recommended",
     "plugin:jsx-a11y/recommended",
     "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
     "eslint:recommended",
     "next/core-web-vitals"
   ],
@@ -30,22 +31,19 @@
     "array-callback-return": "error", // 4.7
     "prefer-destructuring": [
       "error",
-      {
-        "array": true,
-        "object": true
-      },
-      {
-        "enforceForRenamedProperties": false
-      }
+      { "array": true, "object": true },
+      { "enforceForRenamedProperties": false }
     ],
+    "prettier/prettier": ["warn"],
     "import/prefer-default-export": "off", // for singleton pattern
+    "no-use-before-define": "off", // 전략적 hoisting 사용을 위해
     "import/extensions": "off",
     "react-hooks/exhaustive-deps": ["warn"],
     // airbnb style guide
     "template-curly-spacing": ["error", "never"],
     "default-param-last": ["error"],
     "no-param-reassign": ["error"],
-    "function-paren-newline": ["error", { "minItems": 3 }],
+    "function-paren-newline": "off",
     "arrow-parens": ["error", "always"],
     "arrow-body-style": ["off", "as-needed"], // 명시적 return이 필요한 경우가 있어서
     "implicit-arrow-linebreak": ["error", "beside"],
@@ -71,15 +69,24 @@
     "@typescript-eslint/semi": "off",
     "react/jsx-filename-extension": ["warn", { "extensions": [".ts", ".tsx"] }],
     "no-useless-catch": "off",
-    "import/no-extraneous-dependencies": "off" //msw를 제대로 인식하지 못함
+    "import/no-extraneous-dependencies": "off" /* msw를 제대로 인식하지 못함 */,
+    /* about label, input connection with htmlfor */
+    "jsx-a11y/label-has-associated-control": [
+      "error",
+      { "required": { "some": ["nesting", "id"] } }
+    ],
+    "jsx-a11y/label-has-for": [
+      "error",
+      { "required": { "some": ["nesting", "id"] } }
+    ],
+    /* about default parameter */
+    "react/require-default-props": [2, { "functions": "defaultArguments" }],
+    "no-shadow": ["error", { "hoist": "functions" }]
   },
   "overrides": [
     {
       "files": ["__tests__/**/*.js", "*.test.js", "paramType.js"],
-      "rules": {
-        "max-lines-per-function": "off",
-        "arrow-body-style": "off"
-      }
+      "rules": { "max-lines-per-function": "off", "arrow-body-style": "off" }
     }
   ]
 }
