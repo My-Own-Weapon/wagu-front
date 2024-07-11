@@ -32,7 +32,7 @@ export default function KakaoMap() {
       window.kakao.maps.load(() => {
         const container = document.getElementById('map');
         if (!container) {
-          console.error('Map container not found');
+          console.error('지도 컨테이너를 찾을 수 없습니다.');
           return;
         }
 
@@ -63,7 +63,7 @@ export default function KakaoMap() {
     };
 
     script.onerror = () => {
-      console.error('Failed to load Kakao Maps script.');
+      console.error('카카오 지도 스크립트를 불러오지 못했습니다.');
     };
   }, []);
 
@@ -97,11 +97,11 @@ export default function KakaoMap() {
   };
 
   const addMarkers = (mapInstance: any, storeData: StoreData[]) => {
-    console.log('Adding markers for store data:', storeData);
+    console.log('상점 데이터에 마커 추가하기:', storeData);
     removeMarkers();
 
     if (!Array.isArray(storeData)) {
-      console.error('storeData is not an array:', storeData);
+      console.error('storeData가 배열이 아닙니다:', storeData);
       return;
     }
 
@@ -113,7 +113,7 @@ export default function KakaoMap() {
       const marker = new window.kakao.maps.Marker({ position: markerPosition });
 
       marker.setMap(mapInstance);
-      console.log('Marker added:', marker);
+      console.log('마커 추가됨:', marker);
 
       window.kakao.maps.event.addListener(marker, 'click', () =>
         fetchPostsData(store.storeId),
@@ -131,12 +131,12 @@ export default function KakaoMap() {
   };
 
   const fetchPostsData = (storeId: number) => {
-    fetchData(`https://wagubook.shop/mapposts?storeId=${storeId}`)
+    fetchData(`https://wagubook.shop/map/posts?storeId=${storeId}`)
       .then((data) => {
         if (Array.isArray(data)) {
           setPosts(data);
         } else {
-          console.error('Server returned data that is not an array:', data);
+          console.error('서버가 배열이 아닌 데이터를 반환했습니다:', data);
         }
       })
       .catch(handleFetchError);
@@ -154,10 +154,10 @@ export default function KakaoMap() {
   const createVoteUrl = () => {
     fetchData('https://wagubook.shop/share')
       .then((text) => {
-        console.log('Generated URL:', text);
+        console.log('생성된 URL:', text);
       })
       .catch((error) => {
-        console.error('Error generating URL:', error.message);
+        console.error('URL 생성 오류:', error.message);
       });
   };
 
