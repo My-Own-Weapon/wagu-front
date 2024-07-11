@@ -32,6 +32,10 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: create dotenv
+        run: touch ./.env
+          echo "YOUR_KEY1=${{ secrets.NEXT_PUBLIC_BASE_URL }}" >> ./.env
+
       # 프로젝트 빌드.
       - name: Build next app
         run: npm run build
