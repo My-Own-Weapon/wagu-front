@@ -59,7 +59,7 @@ class ApiService {
   }
 
   async fetchPosts() {
-    const res = await fetch(`${this.mswBaseUrl}/posts`, {
+    const res = await fetch(`${this.baseUrl}/posts`, {
       method: 'GET',
       credentials: 'include',
     });
@@ -96,7 +96,7 @@ class ApiService {
   }
 
   async fetchFollowings() {
-    const res = await fetch(`${this.mswBaseUrl}/followings`, {
+    const res = await fetch(`${this.baseUrl}/followings`, {
       method: 'GET',
       credentials: 'include',
     });
