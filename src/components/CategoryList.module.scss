@@ -1,0 +1,98 @@
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/radius.scss';
+@import '@styles/variables/textSize.scss';
+
+.container {
+  background-color: $bgColor;
+}
+
+.categoriesWrapper {
+  width: 100%;
+
+  display: flex;
+  flex-direction: row;
+
+  gap: 4px;
+
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+
+  &::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
+
+  li {
+    position: relative;
+
+    background-color: $white;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: $radiusMedium;
+
+    &:nth-child(1) {
+      border: 1.5px solid $red;
+    }
+    &:nth-child(2) {
+      border: 1.5px solid $purple;
+    }
+    &:nth-child(3) {
+      border: 1.5px solid $mint;
+    }
+    &:nth-child(4) {
+      border: 1.5px solid $coral;
+    }
+    &:nth-child(5) {
+      border: 1.5px solid $lilac;
+    }
+    &:nth-child(6) {
+      border: 1.5px solid $gray600;
+    }
+    &:nth-child(7) {
+      border: 1.5px solid $yellow;
+    }
+
+    p {
+      font-size: $textXSmall;
+    }
+  }
+}
+
+.active {
+  // 원 안에 체크 표시
+  &::after {
+    content: '';
+
+    position: absolute;
+
+    width: 12px;
+    height: 12px;
+
+    top: -4px;
+    right: -4px;
+
+    border-radius: 50%;
+    background-color: $primaryOrange;
+  }
+}
+
+.textArea {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 4px;
+
+  gap: 4px;
+}
+
+.categoryText {
+  width: auto;
+  white-space: nowrap;
+  font-size: $textXSmall;
+  color: $textSub-content;
+}
