@@ -92,9 +92,9 @@
   background: #fff;
   text-align: center;
   img {
-    width: 100%;
+    display: block; 
+    max-width: 100%;
     height: auto;
-    border-radius: 8px;
   }
   div {
     margin-top: 4px;

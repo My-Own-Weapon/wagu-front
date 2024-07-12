@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import s from './page.module.scss';
+import { error } from 'console';
 
 declare global {
   interface Window {
@@ -110,7 +111,10 @@ export default function KakaoMap() {
         store.posx,
         store.posy,
       );
-      const marker = new window.kakao.maps.Marker({ position: markerPosition });
+      const marker = new window.kakao.maps.Marker({
+        position: markerPosition,
+        key: store.storeId, // 여기 추가
+      });
 
       marker.setMap(mapInstance);
       console.log('마커 추가됨:', marker);
@@ -131,24 +135,32 @@ export default function KakaoMap() {
   };
 
   const fetchPostsData = (storeId: number) => {
+    console.log(`Fetching posts for store ID: ${storeId}`);
     fetchData(`https://wagubook.shop/map/posts?storeId=${storeId}`)
       .then((data) => {
+        console.log('Fetch response data:', data); // 서버에서 반환되는 전체 데이터 확인
         if (Array.isArray(data)) {
           setPosts(data);
         } else {
           console.error('서버가 배열이 아닌 데이터를 반환했습니다:', data);
         }
       })
-      .catch(handleFetchError);
+      .catch((error) => {
+        console.error('Fetch error:', error);
+        handleFetchError(error);
+      });
   };
 
-  const handleFetchError = (error: { status: number }) => {
-    const errorMessages: { [key: number]: string } = {
-      400: 'Bad request',
-      405: 'Method not allowed',
-      500: 'Server error',
-    };
-    console.error(errorMessages[error.status] || '알 수 없는 에러:', error);
+  const handleFetchError = async (error: Response) => {
+    let errorMessage = '알 수 없는 에러 발생';
+    try {
+      const errorData = await error.json();
+      console.error('Error data:', errorData); // 에러 데이터 확인
+      errorMessage = `Error ${errorData.status}: ${errorData.error} - ${errorData.message}`;
+    } catch (jsonError) {
+      console.error('Error parsing JSON:', jsonError);
+    }
+    console.error('Fetch error details:', errorMessage);
   };
 
   const createVoteUrl = () => {
@@ -197,11 +209,20 @@ export default function KakaoMap() {
             <h2>{posts[0].storeName} Posts</h2>
             <div className={s.posts}>
               {posts.map((post) => (
-                <div key={post.id} className={s.post}>
-                  <img src={post.image} alt={post.name} />
-                  <div>{post.name}</div>
-                  <div>{post.date}</div>
-                  <div>{post.price}</div>
+                <div key={post.postId} className={s.post}>
+                  <img
+                    src={post.menuImage.url}
+                    alt={post.postMainMenu}
+                    onError={(e) =>
+                      console.error(
+                        `Image load error: ${post.menuImage.url}`,
+                        e,
+                      )
+                    }
+                  />
+                  <div>{post.postMainMenu}</div>
+                  <div>{post.createdDate}</div>
+                  <div>{post.menuPrice}</div>
                 </div>
               ))}
             </div>
