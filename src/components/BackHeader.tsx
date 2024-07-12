@@ -17,7 +17,7 @@ const headerConfig = {
     title: null,
     goto: 'back',
   },
-  board: {
+  write: {
     title: null,
     goto: 'back',
   },

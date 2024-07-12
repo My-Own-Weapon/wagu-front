@@ -8,7 +8,7 @@ import s from './Footer.module.scss';
 const footerMap = [
   { id: 1, icon: '🏠', text: 'home', href: '/' },
   { id: 2, icon: '🗳️', text: 'vote', href: '/map' },
-  { id: 3, icon: '✍️', text: 'write', href: '/board' },
+  { id: 3, icon: '✍️', text: 'write', href: '/write' },
   { id: 4, icon: '🧭', text: 'map', href: '/map' },
   { id: 5, icon: '📺', text: 'live', href: '/live' },
 ];

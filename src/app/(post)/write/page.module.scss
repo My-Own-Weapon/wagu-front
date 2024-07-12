@@ -1,0 +1,64 @@
+@import '@styles/mixins/index.scss';
+@import '@styles/variables/radius.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/textSize.scss';
+
+.container {
+  @include mainStyle;
+  height: 100%;
+
+  margin: 0 auto;
+
+  padding-bottom: 120px;
+}
+
+.wrapper {
+  position: relative;
+
+  width: 88%;
+  height: 100%;
+
+  margin: 16px auto 0;
+
+  display: flex;
+  flex-direction: row;
+}
+
+.formContainer {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.imageArea {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 14px;
+}
+
+.btnArea {
+  width: 100%;
+
+  display: flex;
+  gap: 20px;
+}
+
+.pageControlBtn {
+  height: 80%;
+
+  background-color: transparent;
+
+  margin: auto 0;
+}
+
+.deleteAdditionalMenuBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}

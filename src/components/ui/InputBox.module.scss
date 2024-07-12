@@ -1,0 +1,81 @@
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/radius.scss';
+@import '@styles/variables/fontWeight.scss';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  label {
+    font-size: 14px;
+    font-weight: $medium;
+    color: $textTitle;
+  }
+}
+
+.inputBoxs {
+  width: 100%;
+
+  box-sizing: border-box;
+  padding-left: 12px;
+
+  background-color: $inputBgColor;
+  color: $placeholderColor;
+
+  font-size: $placeholderSize;
+
+  border: 1px solid $borderDark;
+  border-radius: $radiusMedium;
+
+  &:focus {
+    border: 1px solid $primaryOrange;
+  }
+
+  & ~ label {
+    color: $textTitle;
+  }
+}
+
+.fileInputBox {
+  display: none;
+}
+
+.overwrapLabelOfFileInput {
+  position: relative;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+
+  width: 80px;
+  height: 80px;
+
+  box-sizing: border-box;
+  padding-left: 12px;
+
+  background-color: $inputBgColor;
+  color: $placeholderColor;
+
+  font-size: $placeholderSize;
+
+  border: 1px solid $borderDark;
+  border-radius: $radiusMedium;
+
+  cursor: pointer;
+
+  &::after {
+    content: '📷';
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    pointer-events: none;
+    cursor: pointer;
+
+    font-size: 40px;
+  }
+}

@@ -3,12 +3,12 @@ $primaryOrange: #ff9900;
 $white: #fffdfb;
 
 /* secondary color */
-$purple: #540d6e;
-$lilac: #af47d2;
-$mint: #2ec4b6;
-$yellow: #f5ed15;
 $red: #e71d36;
+$purple: #540d6e;
+$mint: #2ec4b6;
 $coral: #fa6050;
+$lilac: #af47d2;
+$yellow: #f5ed15;
 
 /* text color */
 $textTitle: #444444;
@@ -20,12 +20,19 @@ $iconColor: #444444;
 
 /* buttons */
 $btnSub: #ffefd6;
-$btnHover: #ff9900;
+$btnFocus: #ff9900;
+$btnHober: #ff9900b0;
+
+/* input */
+$inputBgColor: #ece6d9;
+$placeholderColor: #979797;
+$placeholderSize: 14px;
 
 /* Etc.. */
 $bgColor: #fffaf3;
 
 $border: #d6d6d6;
+$borderDark: #aeaeae;
 $borderLight: #efefef;
 
 /* blue */

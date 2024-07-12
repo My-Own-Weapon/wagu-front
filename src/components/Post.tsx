@@ -1,22 +1,27 @@
-import Image from 'next/image';
 import Link from 'next/link';
-import { ReactNode } from 'react';
+import { Children, ReactNode } from 'react';
 
-interface PostCardProps {
+import ImageFill from '@/components/ui/ImageFill';
+import { formatNumberToKRW } from '@/utils';
+import useDragScroll from '@/hooks/useDragScroll';
+
+import s from './Post.module.scss';
+
+interface PostImage {
   id: string;
+  url: string;
+}
+
+export interface PostCardProps {
+  postId: string;
   storeName: string;
   postMainMenu: string;
-  postImage: string;
-  postPrice: string;
+  postImage: PostImage;
+  menuPrice: string;
   createDate: string;
-
-  // ✅ TODO: backend와 상의
-  // updateDate?: string | undefined;
 }
 
 interface PostProps {
-  // title: string;
-  // Posts: PostCardProps[];
   children: ReactNode;
 }
 
@@ -25,38 +30,21 @@ interface PostTitleProps {
 }
 
 export function Post({ children }: PostProps) {
-  return (
-    <div
-      style={{
-        width: '100%',
-      }}
-    >
-      {children}
-    </div>
-  );
+  return <div>{children}</div>;
 }
 
 Post.Title = function Title({ title }: PostTitleProps) {
-  return <p>{title}</p>;
+  return <h3 className={s.title}>{title}</h3>;
 };
 
 Post.PostCards = function PostList({ posts }: { posts: PostCardProps[] }) {
+  const ref = useDragScroll();
+
   return (
-    <ul
-      style={{
-        display: 'flex',
-        border: '1px solid lightpink',
-        gap: '16px',
-        overflow: 'hidden',
-      }}
-    >
+    <ul className={s.cardsContainer} ref={ref}>
       {posts.length > 0
         ? posts.map((post: PostCardProps) => (
-            <Post.PostCard
-              key={post.id}
-              {...post}
-              postImage="/images/mock-food.png"
-            />
+            <Post.PostCard key={post.postId} {...post} />
           ))
         : '등록된 포스트가 없습니다.'}
     </ul>
@@ -64,39 +52,50 @@ Post.PostCards = function PostList({ posts }: { posts: PostCardProps[] }) {
 };
 
 Post.PostCard = function PostCard({
-  id,
+  postId,
   storeName,
   postImage,
   postMainMenu,
-  postPrice,
+  menuPrice,
   createDate,
 }: PostCardProps) {
   return (
-    <li
-      style={{
-        border: '1px solid lightblue',
-      }}
-      data-id={id}
-    >
+    <li className={s.cardContainer} data-id={postId}>
       <Link
         style={{
           width: '100%',
           height: '100%',
         }}
-        href={`/posts/${id}`}
+        href={`/posts/${postId}`}
       >
-        <p>{storeName}</p>
-        <Image
-          src={postImage}
-          alt="post-image"
-          width={65}
-          height={60}
-          priority
-        />
-        <p>{postMainMenu}</p>
-        <p>{createDate}</p>
-        <p>{postPrice}</p>
+        <div className={s.cardWrapper}>
+          <p className={s.storeName}>{storeName}</p>
+          <ImageFill
+            id={postImage.id}
+            src={postImage.url}
+            height="60px"
+            fill
+            borderRadius="4px"
+            alt="post-image"
+          />
+          <div className={s.postDetailsArea}>
+            <p>{postMainMenu}</p>
+            <p>{createDate}</p>
+            <p>{formatNumberToKRW(Number(menuPrice))}</p>
+          </div>
+        </div>
       </Link>
     </li>
+  );
+};
+
+Post.Wrapper = function wrapper({ children }: { children: ReactNode }) {
+  const childrenArray = Children.toArray(children);
+  const style = childrenArray.length > 1 ? { gap: '20px' } : {};
+
+  return (
+    <div className={s.postsWrapper} style={style}>
+      {children}
+    </div>
   );
 };
