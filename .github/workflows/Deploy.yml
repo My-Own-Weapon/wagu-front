@@ -1,11 +1,10 @@
 # workflow 이름 설정.
 name: CI/CD
 
-# ✅ TODO : branch가 main일때 배포되도록 변경
 on:
   push:
     branches:
-      - dev
+      - main
 
 # aws에서 설정해준 이름 그대로 붙여넣기 하면됨
 env:
@@ -33,8 +32,7 @@ jobs:
         run: npm install
 
       - name: create dotenv
-        run: touch ./.env
-          echo "NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL }}" >> .env.production
+        run: echo "NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL }}" >> .env.production
 
       # 프로젝트 빌드.
       - name: Build next app
