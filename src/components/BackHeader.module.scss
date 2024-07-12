@@ -1,7 +1,9 @@
 @import '@/styles/variables/colors.scss';
+@import '@/styles/variables/zIndex.scss';
 
 .headerContainer {
   position: sticky;
+  z-index: $header;
   top: 0;
 
   width: 100%;
