@@ -15,3 +15,11 @@ export const getCookieValue = (name: CookieProtocols) => {
 
   return value ? value.split('=')[1] : null;
 };
+
+export const formatNumberToKRW = (price: number) => {
+  const formattedPrice = new Intl.NumberFormat('KR', {
+    currency: 'KRW',
+  }).format(price);
+
+  return `${formattedPrice}원`;
+};
