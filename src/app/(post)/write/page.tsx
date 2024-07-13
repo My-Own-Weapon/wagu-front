@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 'use client';
 
 import React, {
@@ -9,13 +7,17 @@ import React, {
   FormEventHandler,
   useRef,
   useState,
+  useEffect,
 } from 'react';
+import { useRouter } from 'next/navigation';
+
 import { apiService } from '@services/apiService';
 import { CategoriesKR } from '@/app/page';
 import InputBox from '@/components/ui/InputBox';
 import ImageFill from '@/components/ui/ImageFill';
 import Button from '@/components/ui/Button';
 import CategoryList from '@/components/CategoryList';
+import AddressInput from '@/components/AddressInput';
 
 import s from './page.module.scss';
 
@@ -44,6 +46,13 @@ type WriteCategories = Exclude<CategoriesKR, '전부'>;
 
 type PageStates = Record<number, PageState>;
 
+export interface AddressSearchDetails {
+  address: string;
+  storeName: string;
+  posx: string;
+  posy: string;
+}
+
 export default function BoardPage() {
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [reviewCount, setReviewCount] = useState<number>(1);
@@ -52,9 +61,27 @@ export default function BoardPage() {
     2: getAdditionalReviewPageState(),
     3: getAdditionalReviewPageState(),
   });
+  const [addressSearchResult, setAddressSearchResult] = useState<
+    AddressSearchDetails[] | null
+  >(null);
+  const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
 
-  console.log(reviewCount);
+  useEffect(() => {
+    console.log('addr result : ', addressSearchResult);
+    console.log('page state :', pageStates);
+  }, [addressSearchResult, pageStates]);
+
+  useEffect(() => {
+    document.forms[0].addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+      }
+    });
+  });
+
+  console.log('review Count : ', reviewCount);
+  console.log('page number : ', pageNumber);
   const [selectedCategory, setSelectedCategory] =
     useState<CategoriesKR>('전부');
 
@@ -170,7 +197,12 @@ export default function BoardPage() {
     formData.append('data', blobObj);
 
     const res = await apiService.addPost(formData);
-    console.log(res);
+
+    if (res.status === 200) router.push('/');
+  };
+
+  const handleAddressSelect = (addressSearchResult: AddressSearchDetails) => {
+    setAddressSearchResult(addressSearchResult);
   };
 
   const currentState = pageStates[pageNumber];
@@ -220,7 +252,7 @@ export default function BoardPage() {
                 selectedCategory={selectedCategory}
                 onClick={handleCategoryClick}
               />
-              <InputBox
+              {/* <InputBox
                 height="30px"
                 label="&nbsp;&nbsp;·&nbsp;&nbsp;주소"
                 name="address"
@@ -228,6 +260,11 @@ export default function BoardPage() {
                 type="text"
                 value={currentState.address}
                 onChange={handleChange}
+              /> */}
+              <label htmlFor="address">주소</label>
+              <AddressInput
+                value={currentState.address || ''}
+                onSelect={handleAddressSelect}
               />
               <InputBox
                 height="30px"
@@ -235,7 +272,7 @@ export default function BoardPage() {
                 name="storeName"
                 placeholder="가게 이름을 입력해주세요"
                 type="text"
-                value={currentState.storeName}
+                value={addressSearchResult?.storeName || ''}
                 onChange={handleChange}
               />
             </>
@@ -292,7 +329,8 @@ export default function BoardPage() {
             onClick={handleDeleteAdditionalMenu}
           />
         )}{' '}
-        {pageNumber < 3 && reviewCount > 1 && reviewCount > pageNumber && (
+        {((pageNumber < reviewCount && reviewCount > 1) ||
+          reviewCount > pageNumber) && (
           <button
             className={s.pageControlBtn}
             type="button"
