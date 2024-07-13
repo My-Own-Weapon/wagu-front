@@ -16,7 +16,7 @@ export interface PostCardProps {
   postId: string;
   storeName: string;
   postMainMenu: string;
-  postImage: PostImage;
+  menuImage: PostImage;
   menuPrice: string;
   createDate: string;
 }
@@ -40,6 +40,7 @@ Post.Title = function Title({ title }: PostTitleProps) {
 Post.PostCards = function PostList({ posts }: { posts: PostCardProps[] }) {
   const ref = useDragScroll();
 
+  // console.log('image', posts[0].menuImage);
   return (
     <ul className={s.cardsContainer} ref={ref}>
       {posts.length > 0
@@ -54,25 +55,21 @@ Post.PostCards = function PostList({ posts }: { posts: PostCardProps[] }) {
 Post.PostCard = function PostCard({
   postId,
   storeName,
-  postImage,
+  menuImage,
   postMainMenu,
   menuPrice,
   createDate,
 }: PostCardProps) {
+  if (!menuImage) return null;
+
   return (
     <li className={s.cardContainer} data-id={postId}>
-      <Link
-        style={{
-          width: '100%',
-          height: '100%',
-        }}
-        href={`/posts/${postId}`}
-      >
+      <Link href={`/posts/${postId}`}>
         <div className={s.cardWrapper}>
           <p className={s.storeName}>{storeName}</p>
           <ImageFill
-            id={postImage.id}
-            src={postImage.url}
+            id={menuImage.id}
+            src={menuImage.url}
             height="60px"
             fill
             borderRadius="4px"
