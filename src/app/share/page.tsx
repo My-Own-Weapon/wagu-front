@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { OpenVidu, Subscriber } from 'openvidu-browser';
+import { useRouter, useSearchParams } from 'next/navigation';
 import s from './page.module.scss';
 
 declare global {
@@ -21,10 +23,41 @@ export default function KakaoMap() {
   const [markers, setMarkers] = useState<any[]>([]);
   const [map, setMap] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
+  const [session, setSession] = useState<any>(null);
+  const [publisher, setPublisher] = useState<any>(null);
+  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
+  const OV = useRef<OpenVidu | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [sessionId, setSessionId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const sessionId = searchParams.get('sessionId');
+    if (sessionId) {
+      setSessionId(sessionId);
+    } else {
+      createSession();
+    }
+  }, [searchParams]);
+
+  const createSession = async () => {
+    try {
+      const response = await fetch('https://video.wagubook.shop/api/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const newSessionId = await response.text();
+      setSessionId(newSessionId);
+      router.push(`/share?sessionId=${newSessionId}`);
+    } catch (error) {
+      console.error('Error creating session:', error);
+    }
+  };
 
   useEffect(() => {
     const script = document.createElement('script');
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=948985235eb596e79f570535fd01a71e&autoload=false&libraries=services`;
+    script.src =
+      'https://dapi.kakao.com/v2/maps/sdk.js?appkey=948985235eb596e79f570535fd01a71e&autoload=false&libraries=services';
     script.async = true;
     document.head.appendChild(script);
 
@@ -110,7 +143,10 @@ export default function KakaoMap() {
         store.posx,
         store.posy,
       );
-      const marker = new window.kakao.maps.Marker({ position: markerPosition });
+      const marker = new window.kakao.maps.Marker({
+        position: markerPosition,
+        key: store.storeId,
+      });
 
       marker.setMap(mapInstance);
       console.log('마커 추가됨:', marker);
@@ -131,34 +167,95 @@ export default function KakaoMap() {
   };
 
   const fetchPostsData = (storeId: number) => {
+    console.log(`Fetching posts for store ID: ${storeId}`);
     fetchData(`https://wagubook.shop/map/posts?storeId=${storeId}`)
       .then((data) => {
+        console.log('Fetch response data:', data);
         if (Array.isArray(data)) {
           setPosts(data);
         } else {
           console.error('서버가 배열이 아닌 데이터를 반환했습니다:', data);
         }
       })
-      .catch(handleFetchError);
-  };
-
-  const handleFetchError = (error: { status: number }) => {
-    const errorMessages: { [key: number]: string } = {
-      400: 'Bad request',
-      405: 'Method not allowed',
-      500: 'Server error',
-    };
-    console.error(errorMessages[error.status] || 'Unknown error:', error);
-  };
-
-  const createVoteUrl = () => {
-    fetchData('https://wagubook.shop/share')
-      .then((text) => {
-        console.log('생성된 URL:', text);
-      })
       .catch((error) => {
-        console.error('URL 생성 오류:', error.message);
+        console.error('Fetch error:', error);
+        handleFetchError(error);
       });
+  };
+
+  const handleFetchError = async (error: Response) => {
+    let errorMessage = '알 수 없는 에러 발생';
+    try {
+      const errorData = await error.json();
+      console.error('Error data:', errorData);
+      errorMessage = `Error ${errorData.status}: ${errorData.error} - ${errorData.message}`;
+    } catch (jsonError) {
+      console.error('Error parsing JSON:', jsonError);
+    }
+    console.error('Fetch error details:', errorMessage);
+  };
+
+  const joinSession = async (sessionId: string) => {
+    OV.current = new OpenVidu();
+    const session = OV.current.initSession();
+
+    session.on('streamCreated', (event: any) => {
+      const subscriber = session.subscribe(event.stream, undefined);
+      setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
+    });
+
+    try {
+      const token = await getToken(sessionId);
+      await session.connect(token, { clientData: 'User' });
+      const publisher = OV.current.initPublisher(undefined, {
+        audioSource: undefined, // The source of audio. If undefined default microphone
+        videoSource: false, // The source of video. If undefined default webcam
+        publishAudio: true, // Whether you want to start publishing with your audio unmuted or not
+        publishVideo: false, // Whether you want to start publishing with your video enabled or not
+      });
+
+      session.publish(publisher);
+      setSession(session);
+      setPublisher(publisher);
+    } catch (error) {
+      console.error(
+        'There was an error connecting to the session:',
+        (error as Error).message,
+      );
+    }
+  };
+
+  const getToken = async (sessionId: string) => {
+    const responseToken = await fetch(
+      `https://video.wagubook.shop/api/sessions/${sessionId}/connections`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
+    const token = await responseToken.text();
+
+    console.log(`Created session ID: ${sessionId}`);
+    console.log(`Generated token: ${token}`);
+
+    return token;
+  };
+
+  const leaveSession = () => {
+    if (session) {
+      session.disconnect();
+    }
+    setSession(null);
+    setSubscribers([]);
+    setPublisher(null);
+  };
+
+  const handleJoinSession = () => {
+    if (sessionId) {
+      joinSession(sessionId);
+    } else {
+      console.error('세션 ID가 없습니다.');
+    }
   };
 
   return (
@@ -186,11 +283,20 @@ export default function KakaoMap() {
             <h2>{posts[0].storeName} Posts</h2>
             <div className={s.posts}>
               {posts.map((post) => (
-                <div key={post.id} className={s.post}>
-                  <img src={post.image} alt={post.name} />
-                  <div>{post.name}</div>
-                  <div>{post.date}</div>
-                  <div>{post.price}</div>
+                <div key={post.postId} className={s.post}>
+                  <img
+                    src={post.menuImage.url}
+                    alt={post.postMainMenu}
+                    onError={(e) =>
+                      console.error(
+                        `Image load error: ${post.menuImage.url}`,
+                        e,
+                      )
+                    }
+                  />
+                  <div>{post.postMainMenu}</div>
+                  <div>{post.createdDate}</div>
+                  <div>{post.menuPrice}</div>
                 </div>
               ))}
             </div>
@@ -198,8 +304,11 @@ export default function KakaoMap() {
         )}
       </div>
       <footer className={s.footer}>
-        <button className={s.createUrlButton} onClick={createVoteUrl}>
-          투표 URL 생성하기
+        <button className={s.joinButton} onClick={handleJoinSession}>
+          음성 채팅 시작
+        </button>
+        <button className={s.leaveButton} onClick={leaveSession}>
+          음성 채팅 종료
         </button>
       </footer>
     </main>
