@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { OpenVidu, Subscriber } from 'openvidu-browser';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import s from './page.module.scss';
 
@@ -19,14 +18,19 @@ interface StoreData {
   posy: number;
 }
 
+interface Peer {
+  id: string;
+  stream: MediaStream;
+}
+
 export default function KakaoMap() {
   const [markers, setMarkers] = useState<any[]>([]);
   const [map, setMap] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
-  const [session, setSession] = useState<any>(null);
-  const [publisher, setPublisher] = useState<any>(null);
-  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
-  const OV = useRef<OpenVidu | null>(null);
+  const [peers, setPeers] = useState<Peer[]>([]);
+  const peerConnections = useRef<{ [key: string]: RTCPeerConnection }>({});
+  const ws = useRef<WebSocket | null>(null);
+  const localStream = useRef<MediaStream | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -98,7 +102,11 @@ export default function KakaoMap() {
     script.onerror = () => {
       console.error('카카오 지도 스크립트를 불러오지 못했습니다.');
     };
-  }, []);
+
+    if (sessionId && sessionId.length === 10) {
+      startWebRTC(sessionId);
+    }
+  }, [sessionId]);
 
   const fetchData = (url: string) => {
     return fetch(url, { method: 'GET', credentials: 'include' }).then(
@@ -195,83 +203,119 @@ export default function KakaoMap() {
     console.error('Fetch error details:', errorMessage);
   };
 
-  const joinSession = async (sessionId: string) => {
-    OV.current = new OpenVidu();
-    const session = OV.current.initSession();
+  const startWebRTC = async (sessionId: string) => {
+    const wsUrl = `wss://video.wagubook.shop/openvidu?sessionId=${sessionId}`;
+    ws.current = new WebSocket(wsUrl);
+    ws.current.onmessage = handleSignalingMessage;
 
-    session.on('streamCreated', (event: any) => {
-      const subscriber = session.subscribe(event.stream, undefined);
-      setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
+    // 로컬 오디오 스트림 가져오기
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      localStream.current = stream;
+    } catch (error) {
+      console.error('Error accessing media devices.', error);
+    }
+
+    if (ws.current) {
+      ws.current.onopen = () => {
+        createOffer();
+      };
+    }
+  };
+
+  const handleSignalingMessage = (message: MessageEvent) => {
+    const data = JSON.parse(message.data);
+
+    switch (data.type) {
+      case 'offer':
+        handleOffer(data);
+        break;
+      case 'answer':
+        handleAnswer(data);
+        break;
+      case 'candidate':
+        handleCandidate(data);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const handleOffer = async (data: any) => {
+    const pc = createPeerConnection(data.from);
+    await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+    const answer = await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+
+    ws.current?.send(
+      JSON.stringify({
+        type: 'answer',
+        answer: answer,
+        to: data.from,
+      }),
+    );
+  };
+
+  const handleAnswer = async (data: any) => {
+    const pc = peerConnections.current[data.from];
+    await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+  };
+
+  const handleCandidate = (data: any) => {
+    const pc = peerConnections.current[data.from];
+    const candidate = new RTCIceCandidate(data.candidate);
+    pc.addIceCandidate(candidate);
+  };
+
+  const createPeerConnection = (id: string): RTCPeerConnection => {
+    const pc = new RTCPeerConnection({
+      iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
     });
 
-    try {
-      const token = await getToken(sessionId);
-      await session.connect(token, { clientData: 'User' });
-      const publisher = OV.current.initPublisher(undefined, {
-        audioSource: undefined, // The source of audio. If undefined default microphone
-        videoSource: false, // The source of video. If undefined default webcam
-        publishAudio: true, // Whether you want to start publishing with your audio unmuted or not
-        publishVideo: false, // Whether you want to start publishing with your video enabled or not
-      });
+    pc.onicecandidate = (event) => {
+      if (event.candidate) {
+        ws.current?.send(
+          JSON.stringify({
+            type: 'candidate',
+            candidate: event.candidate,
+            to: id,
+          }),
+        );
+      }
+    };
 
-      session.publish(publisher);
-      setSession(session);
-      setPublisher(publisher);
-    } catch (error) {
-      console.error(
-        'There was an error connecting to the session:',
-        (error as Error).message,
-      );
-    }
+    pc.ontrack = (event) => {
+      setPeers((prevPeers) => [...prevPeers, { id, stream: event.streams[0] }]);
+    };
+
+    localStream.current?.getTracks().forEach((track) => {
+      pc.addTrack(track, localStream.current!);
+    });
+
+    peerConnections.current[id] = pc;
+    return pc;
   };
 
-  const getToken = async (sessionId: string) => {
-    const responseToken = await fetch(
-      `https://video.wagubook.shop/api/sessions/${sessionId}/connections`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      },
+  const createOffer = async () => {
+    const id = Math.random().toString(36).substring(2, 15);
+    const pc = createPeerConnection(id);
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+
+    ws.current?.send(
+      JSON.stringify({
+        type: 'offer',
+        offer: offer,
+        from: id,
+      }),
     );
-    const token = await responseToken.text();
-
-    console.log(`Created session ID: ${sessionId}`);
-    console.log(`Generated token: ${token}`);
-
-    return token;
-  };
-
-  const leaveSession = () => {
-    if (session) {
-      session.disconnect();
-    }
-    setSession(null);
-    setSubscribers([]);
-    setPublisher(null);
-  };
-
-  const handleJoinSession = () => {
-    if (sessionId) {
-      joinSession(sessionId);
-    } else {
-      console.error('세션 ID가 없습니다.');
-    }
   };
 
   return (
     <main className={s.container}>
       <header className={s.header}>
-        <div className={s.profile}>
-          <img src="/profile/ProfileMale.svg" alt="profile male" />
-        </div>
         <div className={s.title}>
-          <div className={s.icon}>
-            <img src="/images/icons/icon-40x40.png" alt="star icon" />
-          </div>
           <span>WAGU BOOK</span>
-        </div>
-        <div className={s.search}>
-          <img src="/Search.svg" alt="search icon" />
         </div>
       </header>
       <div className={s.mapContainer}>
@@ -303,14 +347,7 @@ export default function KakaoMap() {
           </>
         )}
       </div>
-      <footer className={s.footer}>
-        <button className={s.joinButton} onClick={handleJoinSession}>
-          음성 채팅 시작
-        </button>
-        <button className={s.leaveButton} onClick={leaveSession}>
-          음성 채팅 종료
-        </button>
-      </footer>
+      <footer className={s.footer}></footer>
     </main>
   );
 }
