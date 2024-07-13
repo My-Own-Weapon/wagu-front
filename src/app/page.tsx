@@ -60,6 +60,9 @@ export default function Home() {
         apiService.fetchFollowings(),
       ]);
 
+      console.log('live', liveFriendsData);
+      console.log('posts', postsData);
+
       setAllPosts(postsData);
       setFilteredPosts(postsData);
       setLiveFriends(liveFriendsData);
@@ -87,9 +90,13 @@ export default function Home() {
   return (
     <main className={s.container}>
       <div className={s.liveFriendsContainer}>
-        <p>📺 방송중인 친구가 있어요옹오오 19:06</p>
+        <p>
+          {liveFriends.length > 0
+            ? '📺 방송중인 친구가 있어요 !'
+            : '😢 방송중인 친구가 없어요'}
+        </p>
         <ul className={s.friendsList}>
-          {liveFriends &&
+          {!!liveFriends &&
             liveFriends.map(({ memberId, username }) => (
               <li key={memberId}>
                 <UserIcon
@@ -119,8 +126,14 @@ export default function Home() {
       </div> */}
       <Post.Wrapper>
         <Post>
-          <Post.Title title={`🔖${selectedCategory}  Posts`} />
-          <Post.PostCards posts={filteredPosts} />
+          {filteredPosts.length === 0 ? (
+            <Post.Title
+              title={`🔖${selectedCategory} 등록된 포스트가 없습니다`}
+            />
+          ) : (
+            <Post.Title title={`🔖${selectedCategory}  Posts`} />
+          )}
+          {filteredPosts.length > 0 && <Post.PostCards posts={filteredPosts} />}
         </Post>
       </Post.Wrapper>
     </main>
