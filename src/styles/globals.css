@@ -1,3 +1,5 @@
+@import url('https://cdn.jsdelivr.net/gh/toss/tossface/dist/tossface.css');
+
 :root {
   --mainBgColor: #ffffff;
   --mainBorderColor: #efefef;
@@ -9,6 +11,7 @@ body {
     'Pretendard Variable',
     Pretendard,
     Roboto,
+    Tossface,
     -apple-system,
     BlinkMacSystemFont,
     system-ui,

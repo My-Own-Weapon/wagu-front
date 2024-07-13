@@ -7,24 +7,19 @@ import UserIcon from '@/components/UserIcon';
 
 import { MouseEventHandler, useEffect, useState } from 'react';
 import { apiService } from '@/services/apiService';
-import { Post } from '@/components/Post';
+import { Post, PostCardProps } from '@/components/Post';
 
 import s from './page.module.scss';
+
+interface PostReponse extends PostCardProps {
+  memberUsername: string;
+  category: string;
+}
 
 interface Friend {
   memberId: number;
   username: string;
   each: boolean;
-}
-
-interface PostData {
-  id: string;
-  category: CategoryCodes;
-  storeName: string;
-  postMainMenu: string;
-  postImage: string;
-  postPrice: string;
-  createDate: string;
 }
 
 const categoryMap = {
@@ -38,22 +33,23 @@ const categoryMap = {
   디저트: 'DESSERT',
 } as const;
 
-type CategoryCodes = (typeof categoryMap)[Categories];
-
-type Categories = keyof typeof categoryMap;
+export type CategoriesKR = keyof typeof categoryMap;
+export type CategoriesEN = (typeof categoryMap)[CategoriesKR];
 
 export default function Home() {
-  const [allPosts, setAllPosts] = useState<PostData[]>([]);
-  const [filteredPosts, setFilteredPosts] = useState<PostData[]>([]);
+  const [allPosts, setAllPosts] = useState<PostReponse[]>([]);
+  const [filteredPosts, setFilteredPosts] = useState<PostReponse[]>([]);
   const [liveFriends, setLiveFriends] = useState<Friend[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<Categories>('전부');
+  const [selectedCategory, setSelectedCategory] =
+    useState<CategoriesKR>('전부');
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleCategoryClick: MouseEventHandler<HTMLUListElement> = (e) => {
     const target = e.target as HTMLElement;
     const li = target.closest('li');
     if (!li?.dataset) return;
 
-    const category = li.dataset.category as Categories;
+    const category = li.dataset.category as CategoriesKR;
     setSelectedCategory(category);
   };
 
@@ -61,7 +57,7 @@ export default function Home() {
     try {
       const [postsData, liveFriendsData] = await Promise.all([
         apiService.fetchPosts(),
-        apiService.fetchLiveFriends(),
+        apiService.fetchFollowings(),
       ]);
 
       setAllPosts(postsData);
@@ -93,21 +89,22 @@ export default function Home() {
       <div className={s.liveFriendsContainer}>
         <p>📺 방송중인 친구가 있어요옹오오 19:06</p>
         <ul className={s.friendsList}>
-          {liveFriends.map(({ memberId, username }) => (
-            <li key={memberId}>
-              <UserIcon
-                imgSrc="/profile/profile-default-icon-female.svg"
-                name={username}
-                alt="profile-icon"
-                width={40}
-                height={40}
-                withText={false}
-              />
-            </li>
-          ))}
+          {liveFriends &&
+            liveFriends.map(({ memberId, username }) => (
+              <li key={memberId}>
+                <UserIcon
+                  imgSrc="/profile/profile-default-icon-female.svg"
+                  name={username}
+                  alt="profile-icon"
+                  width={40}
+                  height={40}
+                  withText={false}
+                />
+              </li>
+            ))}
         </ul>
       </div>
-      <div className={s.categoryContainer}>
+      {/* <div className={s.categoryContainer}>
         <p>📚 카테고리</p>
         <ul className={s.categoriesList} onClick={handleCategoryClick}>
           {getCategories().map(({ id, name }) => (
@@ -119,50 +116,13 @@ export default function Home() {
             </li>
           ))}
         </ul>
-      </div>
-      <div className={s.postsContainer}>
+      </div> */}
+      <Post.Wrapper>
         <Post>
           <Post.Title title={`🔖${selectedCategory}  Posts`} />
           <Post.PostCards posts={filteredPosts} />
         </Post>
-      </div>
+      </Post.Wrapper>
     </main>
   );
-}
-
-function getCategories() {
-  return [
-    {
-      id: 'category0',
-      name: '전부',
-    },
-    {
-      id: 'category1',
-      name: '한식',
-    },
-    {
-      id: 'category2',
-      name: '중식',
-    },
-    {
-      id: 'category3',
-      name: '일식',
-    },
-    {
-      id: 'category4',
-      name: '양식',
-    },
-    {
-      id: 'category5',
-      name: '분식',
-    },
-    {
-      id: 'category6',
-      name: '카페',
-    },
-    {
-      id: 'category7',
-      name: '디저트',
-    },
-  ];
 }

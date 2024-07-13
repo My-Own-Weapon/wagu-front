@@ -2,7 +2,7 @@
 import { http, HttpResponse } from 'msw';
 
 export const handlers = [
-  http.post('/api/login', () => {
+  http.post('/login', () => {
     console.log('mock Api : login sucess !!');
 
     return HttpResponse.json({
@@ -20,7 +20,7 @@ export const handlers = [
     //   });
   }),
 
-  http.post('/api/logout', () => {
+  http.post('/logout', () => {
     console.log('mock Api : 로그아웃 !!');
 
     return new HttpResponse(null, {
@@ -30,7 +30,7 @@ export const handlers = [
     });
   }),
 
-  http.post('/api/join', async () => {
+  http.post('/join', async () => {
     console.log('mock Api : 회원가입 !!');
     /* 중복된 유저 */
     // return HttpResponse.text(JSON.stringify('Already exists user'), {
@@ -44,13 +44,13 @@ export const handlers = [
     });
   }),
 
-  http.get('/api/posts', () => {
+  http.get('/posts', () => {
     console.log('fetch all post !!');
 
     return HttpResponse.json(getMockPosts());
   }),
 
-  http.get('/api/posts/:postId', ({ request }) => {
+  http.get('/posts/:postId', ({ request }) => {
     console.log('fetch post !!');
 
     const splitedUrl = request.url.split('/');
@@ -61,111 +61,133 @@ export const handlers = [
     return HttpResponse.json(getMockPostNotPossiblePatch());
   }),
 
-  http.get('/api/liveFriends', () => {
+  http.get('/followings', () => {
     console.log('fetch live friends !!');
 
-    return HttpResponse.json(getLiveFriends());
+    return HttpResponse.json(getFollowings());
   }),
 ];
 
 function getMockPosts() {
   return [
     {
-      id: 1,
+      postId: 1,
+      menuPrice: '12000',
+      storeName: '울엄 김치찜ㅇㄴㅁㅇㅁㄴㅇㅁ',
       category: 'KOREAN',
-      postMainMenu: 'KOREAN',
-      postImage: 'string',
+      postMainMenu: '김치찜',
+      postImage: { id: 23, url: '/images/mock-food.png' },
       postContent: 'string',
-      createDate: '2024-07-08T15:50:59.563Z',
-      updateDate: '2024-07-08T15:50:59.563Z',
+      createDate: '2024-07-08',
+      updateDate: '2024-07-08',
       auto: true,
     },
     {
-      id: 2,
+      postId: 2,
+      menuPrice: '12000',
+      storeName: '울엄 김치찜',
       category: 'KOREAN',
-      postMainMenu: 'KOREAN',
-      postImage: 'string',
+      postMainMenu: '김치찜',
+      postImage: { id: 23, url: '/images/mock-food.png' },
       postContent: 'string',
-      createDate: '2024-07-08T15:50:59.563Z',
-      updateDate: '2024-07-08T15:50:59.563Z',
+      createDate: '2024-07-08',
+      updateDate: '2024-07-08',
       auto: true,
     },
     {
-      id: 11123,
+      postId: 11123,
+      menuPrice: '12000',
+      storeName: '울엄 김치찜',
       category: 'KOREAN',
-      postMainMenu: 'KOREAN',
-      postImage: 'string',
+      postMainMenu: '김치찜',
+      postImage: { id: 23, url: '/images/mock-food.png' },
       postContent: 'string',
-      createDate: '2024-07-08T15:50:59.563Z',
-      updateDate: '2024-07-08T15:50:59.563Z',
+      createDate: '2024-07-08',
+      updateDate: '2024-07-08',
       auto: true,
     },
     {
-      id: 1111,
+      postId: 1111,
+      menuPrice: '12000',
+      storeName: '울엄 김치찜',
       category: 'KOREAN',
-      postMainMenu: 'KOREAN',
-      postImage: 'string',
+      postMainMenu: '김치찜',
+      postImage: { id: 23, url: '/images/mock-food.png' },
       postContent: 'string',
-      createDate: '2024-07-08T15:50:59.563Z',
-      updateDate: '2024-07-08T15:50:59.563Z',
+      createDate: '2024-07-08',
+      updateDate: '2024-07-08',
       auto: true,
     },
     {
-      id: 2222,
+      postId: 2222,
+      menuPrice: '12000',
+      storeName: '울엄 김치찜',
       category: 'JAPANESE',
-      postMainMenu: 'JAPANESE',
-      postImage: 'string',
+      postMainMenu: '김치찜',
+      postImage: { id: 23, url: '/images/mock-food.png' },
       postContent: 'string',
-      createDate: '2024-07-08T15:50:59.563Z',
-      updateDate: '2024-07-08T15:50:59.563Z',
+      createDate: '2024-07-08',
+      updateDate: '2024-07-08',
       auto: true,
     },
     {
-      id: 2223,
+      postId: 2223,
+      menuPrice: '12000',
+      storeName: '울엄 김치찜',
       category: 'JAPANESE',
-      postMainMenu: 'JAPANESE',
-      postImage: 'string',
+      postMainMenu: '김치찜',
+      postImage: { id: 23, url: '/images/mock-food.png' },
       postContent: 'string',
-      createDate: '2024-07-08T15:50:59.563Z',
-      updateDate: '2024-07-08T15:50:59.563Z',
+      createDate: '2024-07-08',
+      updateDate: '2024-07-08',
       auto: true,
     },
     {
-      id: 2225,
+      postId: 2225,
+      menuPrice: '12000',
+      storeName: '울엄 김치찜',
       category: 'JAPANESE',
-      postMainMenu: 'JAPANESE',
-      postImage: 'string',
+      postMainMenu: '김치찜',
+      postImage: { id: 23, url: '/images/mock-food.png' },
       postContent: 'string',
-      createDate: '2024-07-08T15:50:59.563Z',
-      updateDate: '2024-07-08T15:50:59.563Z',
+      createDate: '2024-07-08',
+      updateDate: '2024-07-08',
       auto: true,
     },
     {
-      id: 3331,
+      postId: 33312,
+      menuPrice: '12000',
+      storeName: '울엄 김치찜',
       category: 'CHINESE',
-      postMainMenu: 'CHINESE',
-      postImage: 'string',
+      postMainMenu: '김치찜',
+      postImage: { id: 23, url: '/images/mock-food.png' },
       postContent: 'string',
-      createDate: '2024-07-08T15:50:59.563Z',
-      updateDate: '2024-07-08T15:50:59.563Z',
+      createDate: '2024-07-08',
+      updateDate: '2024-07-08',
       auto: true,
     },
     {
-      id: 4443,
+      postId: 33313,
+      menuPrice: '12000',
+      storeName: '울엄 김치찜',
       category: 'WESTERN',
-      postMainMenu: 'WESTERN',
+      postMainMenu: '김치찜',
+      postImage: { id: 23, url: '/images/mock-food.png' },
       postContent: 'string',
-      createDate: '2024-07-08T15:50:59.563Z',
-      updateDate: '2024-07-08T15:50:59.563Z',
+      createDate: '2024-07-08',
+      updateDate: '2024-07-08',
       auto: true,
     },
     {
-      id: 4442,
+      postId: 3331,
+      menuPrice: '12000',
+      storeName: '울엄 김치찜',
       category: 'WESTERN',
-      postMainMenu: 'WESTERN',
+      postMainMenu: '김치찜',
+      postImage: { id: 23, url: '/images/mock-food.png' },
       postContent: 'string',
-      createDate: '2024-07-08T15:50:59.563Z',
-      updateDate: '2024-07-08T15:50:59.563Z',
+      createDate: '2024-07-08',
+      updateDate: '2024-07-08',
       auto: true,
     },
   ];
@@ -178,8 +200,8 @@ function getMockPostPossiblePatch() {
     postMainMenu: 'string',
     postImage: 'string',
     postContent: '호박고구마'.repeat(150),
-    createDate: '2024-07-08T15:50:59.563Z',
-    updateDate: '2024-07-08T15:50:59.563Z',
+    createDate: '2024-07-08',
+    updateDate: '2024-07-08',
     auto: true,
   };
 }
@@ -191,33 +213,43 @@ function getMockPostNotPossiblePatch() {
     postMainMenu: 'string',
     postImage: 'string',
     postContent: '호박고구마'.repeat(150),
-    createDate: '2024-07-08T15:50:59.563Z',
-    updateDate: '2024-07-08T15:50:59.563Z',
+    createDate: '2024-07-08',
+    updateDate: '2024-07-08',
     auto: true,
   };
 }
 
-function getLiveFriends() {
+function getFollowings() {
   return [
     {
       memberId: 1,
       username: '김철수',
       each: true,
+      isLive: true,
     },
     {
       memberId: 2,
       username: '신짱구',
       each: true,
+      isLive: true,
     },
     {
       memberId: 3,
       username: '이유리',
       each: true,
+      isLive: false,
     },
     {
       memberId: 4,
       username: '훈이',
       each: true,
+      isLive: true,
+    },
+    {
+      memberId: 5,
+      username: '맹구',
+      each: true,
+      isLive: false,
     },
   ];
 }
