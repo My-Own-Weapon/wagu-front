@@ -1,0 +1,147 @@
+// @import '@styles/variables/zIndex.scss';
+
+// .container {
+//   &.blur {
+//     width: 100%;
+//     height: 100%;
+
+//     position: fixed;
+
+//     z-index: $modal;
+
+//     backdrop-filter: blur(10px);
+//   }
+// }
+
+// .addressInputWrapper {
+//   position: relative;
+//   width: 100%;
+//   transition: all 0.3s ease;
+
+//   &.expanded {
+//     position: absolute;
+
+//     width: 75%;
+//     height: 80%;
+//     transform: translate(-50%, -50%);
+//     background: white;
+//     padding: 20px;
+//     border: 1px solid #ddd;
+//     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+//   }
+// }
+
+// .results {
+//   list-style: none;
+//   padding: 0;
+//   margin: 10px 0 0;
+//   max-height: 200px;
+//   overflow-y: auto;
+//   border: 1px solid #ddd;
+//   border-top: none;
+
+//   li {
+//     padding: 10px;
+//     cursor: pointer;
+
+//     &:hover {
+//       background: #f0f0f0;
+//     }
+//   }
+// }
+@import '@styles/variables/zIndex.scss';
+@import '@styles/variables/radius.scss';
+
+.container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+}
+
+.blur {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(2px);
+  z-index: $modal;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.addressInputWrapper {
+  position: fixed;
+  z-index: $modal + 1;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 1s ease;
+
+  width: 75%;
+  max-width: 600px;
+
+  padding: 20px;
+
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  border: 1px solid #ddd;
+
+  border-radius: $radiusMedium;
+
+  &.expanded {
+    width: 75%;
+
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.searchArea {
+  display: flex;
+}
+
+.results {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  max-height: 200px;
+  overflow-y: auto;
+
+  li {
+    padding: 10px;
+    cursor: pointer;
+
+    &:hover {
+      background: #f0f0f0;
+    }
+  }
+}
+
+// /* blur */
+
+// position: relative;
+// width: 375px;
+// height: 934px;
+
+// background: rgba(0, 0, 0, 0.75);
+// backdrop-filter: blur(2px);
+// /* Note: backdrop-filter has minimal browser support */
+
+// /* Frame 1000003004 */
+
+// box-sizing: border-box;
+
+// position: absolute;
+// width: 294px;
+// height: 592px;
+// left: 39px;
+// top: 180px;
+
+// background: linear-gradient(180deg, rgba(255, 253, 251, 0.675) 0%, rgba(239, 239, 239, 0.45) 100%);
+// border: 1px solid #D6D6D6;
+// border-radius: 8px;
