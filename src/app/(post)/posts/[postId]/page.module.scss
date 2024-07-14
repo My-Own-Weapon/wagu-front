@@ -10,7 +10,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  // align-items: center;
   justify-content: center;
 }
 
@@ -19,4 +19,47 @@
 
   width: 100%;
   height: 246px;
+}
+
+.content {
+  padding: 24px;
+}
+
+.contentHeader{
+  color: #747474;
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 18px;
+}
+
+.review{
+  color: #5C5C5C;
+  font-size: large;
+}
+
+.storeName{
+  color: #444444;
+  font-size: xx-large;
+  padding-bottom: 4px;
+}
+
+.address{
+  font-size: small;
+  padding-bottom: 18px;
+}
+
+.menuName{
+  font-size: medium;
+  padding-bottom: 4px;
+}
+
+.priceBox{
+  display: flex;
+  align-items: center;
+}
+
+.priceImage{
+  background-color: aqua;
+  width: 14px;
+  height: 14px;
 }

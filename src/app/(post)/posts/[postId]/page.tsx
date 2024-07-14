@@ -79,29 +79,45 @@ export default function PostPage({ params: { postId } }: Props) {
 
   return (
     <div>
-      {postModdable && <div>수정하기</div>}
+      {postModdable && <div className={s.editButton} >수정하기</div>}
       {errorMsg && <div>{errorMsg}</div>}
       {postDetails && (
         <div>
           <div className={s.container} data-id={postDetails.postId}>
-            <ImageFill
-              src={menu?.menuImage.url || '/images/mock-food.png'}
-              alt={menu?.menuName || 'food-image'}
-              fill
-              height="246px"
-            />
-            <div>{postDetails.storeName}</div>
-            <div>{address}</div>
-            <div>작성자 : {postDetails.memberUsername}</div>
-            <div>{menu?.menuName}</div>
-            <div>{menu?.menuPrice}</div>
-            <div>{menu?.menuContent}</div>
-            {postDetails.menus.length > 1 &&
-              currentMenuIndex < postDetails.menus.length - 1 && (
-                <button type="button" onClick={goToNextMenu}>
-                  다음 메뉴 보기
-                </button>
-              )}
+            <div className={s.imageWrapper}>
+              <ImageFill 
+                src={menu?.menuImage.url || '/images/mock-food.png'}
+                alt={menu?.menuName || 'food-image'}
+                fill
+                height="246px"
+              />
+            </div>
+            <div className={s.content}>
+              <div className={s.contentHeader}>
+
+                <div className={s.storeInfo}>
+                  <div className={s.storeName}>{postDetails.storeName}</div>
+                  <div className={s.address}>{address}</div>
+                  <div className={s.menuName}>{menu?.menuName}</div>
+                  <div className={s.priceBox}>
+                    <div className={s.priceImage}></div>
+                    <div className={s.menuPrice}>{menu?.menuPrice}</div>
+                  </div>
+                </div>
+
+                <div className={s.userInfo}>
+                  <div className={s.userName}>작성자 : {postDetails.memberUsername}</div>
+                </div>
+      
+              </div>
+              <div className={s.review}>{menu?.menuContent}</div>
+              {postDetails.menus.length > 1 &&
+                currentMenuIndex < postDetails.menus.length - 1 && (
+                  <button type="button" onClick={goToNextMenu}>
+                    다음 메뉴 보기
+                  </button>
+                )}
+            </div>
           </div>
         </div>
       )}
