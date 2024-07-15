@@ -1,4 +1,4 @@
 #!/bin/bash
-# cd /home/ubuntu/wagu-front
+cd /home/ubuntu/wagu-front
 
-# 권한 얻고 삭제
+rm -rf *
