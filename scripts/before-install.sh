@@ -1,4 +1,7 @@
 #!/bin/bash
 cd /home/ubuntu/wagu-front
-# 기존 파일 삭제 (선택 사항)
+
+# 권한 얻고 삭제
+sudo chmod -R u+w vendor/gems 
+
 rm -rf *
