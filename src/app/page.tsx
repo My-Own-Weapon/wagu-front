@@ -8,8 +8,11 @@ import { apiService } from '@/services/apiService';
 import { Post, PostCardProps } from '@/components/Post';
 import CategoryList from '@/components/CategoryList';
 import LiveFriends, { Friend } from '@/components/LiveFriendsList';
+import { useCheckSession } from '@/hooks/useCheckSession';
 
 import s from './page.module.scss';
+
+consoleArt();
 
 interface PostReponse extends PostCardProps {
   memberUsername: string;
@@ -31,12 +34,12 @@ export type CategoriesKR = keyof typeof categoryMap;
 export type CategoriesEN = (typeof categoryMap)[CategoriesKR];
 
 export default function Home() {
-  consoleArt();
   const [allPosts, setAllPosts] = useState<PostReponse[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<PostReponse[]>([]);
   const [liveFriends, setLiveFriends] = useState<Friend[]>([]);
   const [selectedCategory, setSelectedCategory] =
     useState<CategoriesKR>('전부');
+  useCheckSession();
   const path = usePathname();
 
   const handleCategoryClick: MouseEventHandler = (e) => {
