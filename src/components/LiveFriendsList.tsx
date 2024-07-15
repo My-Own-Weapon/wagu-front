@@ -1,7 +1,8 @@
+import Image from 'next/image';
+
 import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
 
 import s from './LiveFriendsList.module.scss';
-import Image from 'next/image';
 
 export interface Friend {
   memberId: string;
@@ -41,9 +42,9 @@ export default function LiveFriends({
           <p className={s.title}>방송중인 친구가 없어요...</p>
         </div>
       )}
-      <ul className={s.friends}>
-        {liveFriends.length > 0 &&
-          liveFriends.map(({ memberId, username, memberImageUrl }) => (
+      {liveFriends.length > 0 ? (
+        <ul className={s.friends}>
+          {liveFriends.map(({ memberId, username, memberImageUrl }) => (
             <li key={memberId}>
               <UserIconWithText
                 width={40}
@@ -61,7 +62,28 @@ export default function LiveFriends({
               </UserIconWithText>
             </li>
           ))}
-      </ul>
+        </ul>
+      ) : (
+        <Cat />
+      )}
     </div>
+  );
+}
+
+function Cat() {
+  return (
+    <pre
+      className={s.catAnimation}
+      style={{
+        margin: 0,
+        fontFamily: 'monospace',
+        whiteSpace: 'pre',
+        lineHeight: '1',
+      }}
+    >
+      {' '}
+      /\_/\
+      <br />( 8.8 )<br /> &gt; ^ &lt;
+    </pre>
   );
 }
