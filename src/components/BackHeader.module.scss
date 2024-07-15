@@ -1,4 +1,6 @@
 @import '@/styles/variables/colors.scss';
+@import '@/styles/variables/textSize.scss';
+@import '@/styles/variables/fontWeight.scss';
 @import '@/styles/variables/zIndex.scss';
 
 .headerContainer {
@@ -16,29 +18,35 @@
 
   background-color: rgba($bgColor, 0.5);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid $border;
+}
+
+.wrapper {
+  width: 100%;
+
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  margin-left: 24px;
+
+  gap: 16px;
 
   img {
     background-color: transparent;
   }
 
   button {
-    position: absolute;
-    left: 0;
-
     background-color: transparent;
-
-    margin-left: 24px;
 
     cursor: pointer;
   }
 }
 
 .headerTitle {
+  margin: 0;
+
   font-size: $textTitle;
-  font-weight: 600;
+  font-weight: $semiBold;
+
   color: $gray800;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
 }
