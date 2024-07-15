@@ -1,40 +1,59 @@
 @import '@styles/variables/colors.scss';
+@import '@styles/variables/textSize.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/radius.scss';
 
 .container {
   position: fixed;
   bottom: 0;
   left: 0;
 
-  width: calc(100% - 48px);
+  width: 100%;
   height: 60px;
 
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 10px 24px;
-  gap: 28px;
 
   background-color: $bgColor;
 
   border: 1px solid plum;
-
   border-width: 0.5px 0.5px 0px 0.5px;
   border-style: solid;
   border-color: #e6e6ea;
   box-shadow: 2px 0px 6px rgba(51, 61, 75, 0.15);
   border-radius: 16px 16px 0px 0px;
+}
 
-  div {
-    width: 100%;
-    height: auto;
+.wrapper {
+  width: 52px;
+  height: 52px;
 
-    border: 1px solid cyan;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-    p,
-    span {
-      width: 100%;
-      height: 100%;
-    }
+  &:nth-child(3) {
+    border: 1.5px solid $primaryOrange;
+    border-radius: $radiusMedium;
+    background-color: $btnSub;
+  }
+}
+
+.iconArea {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+
+  p {
+    color: $gray700;
+    font-size: $textSmall;
+    font-weight: $regular;
   }
 }
 
