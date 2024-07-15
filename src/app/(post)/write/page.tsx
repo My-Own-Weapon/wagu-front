@@ -21,6 +21,24 @@ import AddressInput, { AddressSearchDetails } from '@/components/AddressInput';
 
 import s from './page.module.scss';
 
+interface RequsetSchema {
+  postCategory: string;
+  storeName: string;
+  storeLocation: {
+    address: string;
+    posx: string;
+    posy: string;
+  };
+  menus: {
+    menuName: string;
+    menuPrice: string;
+    menuContent: string;
+  }[];
+  postMainMenu: string;
+  permission: 'PRIVATE' | 'PUBLIC';
+  auto: 'true' | 'false';
+}
+
 interface PageState {
   postCategory?: string;
   menuName: string;
@@ -28,6 +46,10 @@ interface PageState {
   menuContent: string;
   image?: File | null;
 }
+
+type WritePageCategoriesKR = Exclude<CategoriesKR, '전부'>;
+
+type PageStates = Record<number, PageState>;
 
 const categoryMap = {
   전부: 'ALL',
@@ -39,10 +61,6 @@ const categoryMap = {
   카페: 'CAFE',
   디저트: 'DESSERT',
 } as const;
-
-type WritePageCategoriesKR = Exclude<CategoriesKR, '전부'>;
-
-type PageStates = Record<number, PageState>;
 
 export default function BoardPage() {
   const [pageNumber, setPageNumber] = useState<number>(1);
@@ -131,24 +149,6 @@ export default function BoardPage() {
       },
     }));
   };
-
-  interface RequsetSchema {
-    postCategory: string;
-    storeName: string;
-    storeLocation: {
-      address: string;
-      posx: string;
-      posy: string;
-    };
-    menus: {
-      menuName: string;
-      menuPrice: string;
-      menuContent: string;
-    }[];
-    postMainMenu: string;
-    permission: 'PRIVATE' | 'PUBLIC';
-    auto: 'true' | 'false';
-  }
 
   const handleSubmit: FormEventHandler = async (e) => {
     e.preventDefault();
