@@ -4,15 +4,17 @@
 @import '@/styles/variables/zIndex.scss';
 
 .container {
-  width: 375px;
-  height: 100vh;
-  margin: 0 auto;
+  width: 100%;
+
+  margin: 32px auto;
+  padding: 0;
+
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
+
   background-color: $bgColor;
-  padding: 0;
 }
 
 .inputBox {
@@ -74,8 +76,8 @@
 }
 
 .form {
-  width: 100%;
-  max-width: 311px;
+  width: 88%;
+
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -104,6 +106,7 @@
   .signupButton {
     width: 100%;
     height: 56px;
+    margin-top: 20px;
     background-color: $primaryOrange;
     border: none;
     border-radius: $radiusMedium;
@@ -172,22 +175,12 @@
   color: $gray800;
   text-align: center;
   margin-top: 40px;
-
-  .loginLink {
-    color: $primaryOrange;
-    text-decoration: none;
-  }
+  margin-bottom: 40px;
 }
 
-.homeIndicator {
-  position: absolute;
-  bottom: 8px;
-  width: 134px;
-  height: 5px;
-  background: #3f4162;
-  border-radius: 100px;
-  left: 50%;
-  transform: translateX(-50%);
+.loginLink {
+  color: $primaryOrange;
+  text-decoration: none;
 }
 
 .error {

@@ -17,7 +17,7 @@ const headerConfig = {
     title: null,
     goto: 'back',
   },
-  board: {
+  write: {
     title: null,
     goto: 'back',
   },
@@ -32,8 +32,10 @@ export default function BackHeader() {
 
   return (
     <div className={s.headerContainer}>
-      <BackBtn goto={goto} />
-      <h2 className={s.headerTitle}>{title}</h2>
+      <div className={s.wrapper}>
+        <BackBtn goto={goto} />
+        <h2 className={s.headerTitle}>{title}</h2>
+      </div>
     </div>
   );
 }

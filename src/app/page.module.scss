@@ -5,9 +5,10 @@
 .container {
   @include mainStyle;
 
+  margin-top: 14px;
+
   display: flex;
   flex-direction: column;
-
   gap: 20px;
 }
 
@@ -64,8 +65,4 @@
     width: 40px;
     border: 1px solid $primaryOrange;
   }
-}
-
-.postsContainer {
-  margin: 0 24px;
 }

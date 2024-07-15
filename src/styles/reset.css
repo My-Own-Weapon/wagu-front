@@ -74,6 +74,7 @@ pre {
  */
 
 a {
+  display: inline-block;
   background-color: transparent;
   text-decoration: none;
   color: black;
@@ -375,4 +376,15 @@ div {
 p {
   margin: 0;
   padding: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
