@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 'use client';
 
 import React, {
@@ -9,25 +7,49 @@ import React, {
   FormEventHandler,
   useRef,
   useState,
+  useEffect,
 } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+
 import { apiService } from '@services/apiService';
 import { CategoriesKR } from '@/app/page';
 import InputBox from '@/components/ui/InputBox';
 import ImageFill from '@/components/ui/ImageFill';
 import Button from '@/components/ui/Button';
 import CategoryList from '@/components/CategoryList';
+import AddressInput, { AddressSearchDetails } from '@/components/AddressInput';
 
 import s from './page.module.scss';
 
+interface RequsetSchema {
+  postCategory: string;
+  storeName: string;
+  storeLocation: {
+    address: string;
+    posx: string;
+    posy: string;
+  };
+  menus: {
+    menuName: string;
+    menuPrice: string;
+    menuContent: string;
+  }[];
+  postMainMenu: string;
+  permission: 'PRIVATE' | 'PUBLIC';
+  auto: 'true' | 'false';
+}
+
 interface PageState {
   postCategory?: string;
-  address?: string;
-  storeName?: string;
-  menuName?: string;
+  menuName: string;
   menuPrice: string;
   menuContent: string;
   image?: File | null;
 }
+
+type WritePageCategoriesKR = Exclude<CategoriesKR, '전부'>;
+
+type PageStates = Record<number, PageState>;
 
 const categoryMap = {
   전부: 'ALL',
@@ -40,10 +62,6 @@ const categoryMap = {
   디저트: 'DESSERT',
 } as const;
 
-type WriteCategories = Exclude<CategoriesKR, '전부'>;
-
-type PageStates = Record<number, PageState>;
-
 export default function BoardPage() {
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [reviewCount, setReviewCount] = useState<number>(1);
@@ -52,22 +70,41 @@ export default function BoardPage() {
     2: getAdditionalReviewPageState(),
     3: getAdditionalReviewPageState(),
   });
+  const [addressSearchResult, setAddressSearchResult] =
+    useState<AddressSearchDetails>({
+      address: '',
+      storeName: '',
+      posx: '',
+      posy: '',
+    });
+  const path = usePathname();
+  const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
 
-  console.log(reviewCount);
+  useEffect(() => {
+    document.forms[0].addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+      }
+    });
+  });
+
   const [selectedCategory, setSelectedCategory] =
-    useState<CategoriesKR>('전부');
+    useState<WritePageCategoriesKR | null>(null);
 
   const handleCategoryClick: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.stopPropagation();
 
-    setSelectedCategory(e.currentTarget.dataset.category as CategoriesKR);
+    setSelectedCategory(
+      e.currentTarget.dataset.category as WritePageCategoriesKR,
+    );
   };
 
   const handleAddReview: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.stopPropagation();
 
     setReviewCount((prevCount) => prevCount + 1);
+    setPageNumber((prev) => Math.min(prev + 1, reviewCount + 1));
   };
 
   const handleDeleteAdditionalMenu: MouseEventHandler<
@@ -115,62 +152,61 @@ export default function BoardPage() {
 
   const handleSubmit: FormEventHandler = async (e) => {
     e.preventDefault();
+    if (!selectedCategory) {
+      alert('카테고리를 선택해주세요 !');
+      return;
+    }
 
-    const formData = new FormData();
-    const menus = [];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const obj: any = {
-      postCategory: '',
-      storeName: '',
+    const { menuName } = pageStates[1]!;
+    const { storeName, address, posx, posy } = addressSearchResult;
+    const formObj: RequsetSchema = {
+      postMainMenu: menuName,
+      postCategory: categoryMap[selectedCategory],
+      storeName,
       storeLocation: {
-        address: '',
-        posx: 0,
-        posy: 0,
+        address,
+        posx,
+        posy,
       },
-      postMainMenu: '',
-      menuPrice: '',
-      menuContent: '',
       permission: 'PRIVATE',
       auto: 'true',
+      menus: [],
     };
 
-    // eslint-disable-next-line no-plusplus
-    for (let i = 1; i <= reviewCount; i++) {
-      const currentState = pageStates[i];
+    const formData = new FormData();
 
-      if (i === 1) {
-        obj.postCategory = categoryMap[selectedCategory] || '';
-        obj.storeLocation = {
-          address: currentState.address || '',
-          posx: 37.294848851988775,
-          posy: 127.04840312421157,
-        };
-        obj.storeName = currentState.storeName || '';
-        obj.postMainMenu = currentState.menuName || '';
-      }
+    Array.from({ length: reviewCount }, (_, i) => i + 1).forEach((v) => {
+      const currentState = pageStates[v];
 
       if (currentState.image) {
         formData.append('images', currentState.image);
       }
 
-      menus.push({
+      formObj.menus.push({
         menuName: currentState.menuName,
         menuPrice: currentState.menuPrice,
         menuContent: currentState.menuContent,
       });
-    }
+    });
 
-    obj.menus = menus;
-
-    console.log(obj);
-
-    const objString = JSON.stringify(obj);
+    const objString = JSON.stringify(formObj);
     const blobObj = new Blob([objString], { type: 'application/json' });
 
     formData.append('data', blobObj);
 
-    const res = await apiService.addPost(formData);
-    console.log(res);
+    try {
+      await apiService.addPost(formData);
+      alert('포스트 작성 완료 !');
+      router.push('/');
+    } catch (e) {
+      if (e instanceof Error) {
+        alert(e.message);
+      }
+    }
+  };
+
+  const handleAddressSelect = (addressDetails: AddressSearchDetails) => {
+    setAddressSearchResult(addressDetails);
   };
 
   const currentState = pageStates[pageNumber];
@@ -217,32 +253,29 @@ export default function BoardPage() {
             <>
               <CategoryList
                 heading="카테고리"
+                path={path}
                 selectedCategory={selectedCategory}
                 onClick={handleCategoryClick}
               />
-              <InputBox
-                height="30px"
-                label="&nbsp;&nbsp;·&nbsp;&nbsp;주소"
-                name="address"
-                placeholder="주소를 입력해주세요"
-                type="text"
-                value={currentState.address}
-                onChange={handleChange}
+              <AddressInput
+                title="·&nbsp;&nbsp;주소"
+                value={addressSearchResult.address || ''}
+                onSelect={handleAddressSelect}
               />
               <InputBox
                 height="30px"
-                label="&nbsp;&nbsp;·&nbsp;&nbsp;가게 이름"
+                label="·&nbsp;&nbsp;가게 이름"
                 name="storeName"
                 placeholder="가게 이름을 입력해주세요"
                 type="text"
-                value={currentState.storeName}
+                value={addressSearchResult?.storeName || ''}
                 onChange={handleChange}
               />
             </>
           )}
           <InputBox
             height="30px"
-            label="&nbsp;&nbsp;·&nbsp;&nbsp;대표 메뉴"
+            label="·&nbsp;&nbsp;대표 메뉴"
             name="menuName"
             placeholder="대표 메뉴를 입력해주세요"
             type="text"
@@ -251,7 +284,7 @@ export default function BoardPage() {
           />
           <InputBox
             height="30px"
-            label="&nbsp;&nbsp;·&nbsp;&nbsp;가격"
+            label="·&nbsp;&nbsp;가격"
             name="menuPrice"
             placeholder="메뉴 가격을 입력해주세요"
             type="number"
@@ -260,7 +293,7 @@ export default function BoardPage() {
           />
           <InputBox
             height="200px"
-            label="&nbsp;&nbsp;·&nbsp;&nbsp;리뷰"
+            label="·&nbsp;&nbsp;리뷰"
             name="menuContent"
             placeholder="리뷰를 입력해주세요 !"
             type="textarea"
@@ -292,7 +325,8 @@ export default function BoardPage() {
             onClick={handleDeleteAdditionalMenu}
           />
         )}{' '}
-        {pageNumber < 3 && reviewCount > 1 && reviewCount > pageNumber && (
+        {((pageNumber < reviewCount && reviewCount > 1) ||
+          reviewCount > pageNumber) && (
           <button
             className={s.pageControlBtn}
             type="button"
@@ -318,8 +352,6 @@ function getAdditionalReviewPageState(): PageState {
 function getMainReviewPageState(): PageState {
   return {
     postCategory: '',
-    address: '',
-    storeName: '',
     menuName: '',
     menuPrice: '',
     menuContent: '',

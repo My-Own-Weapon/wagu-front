@@ -1,3 +1,6 @@
+// ✅ button type을 좁혔음에도 타입에러 발생
+/* eslint-disable react/button-has-type */
+
 import classNames from 'classnames';
 import { ButtonHTMLAttributes, HTMLProps, MouseEventHandler } from 'react';
 
@@ -8,7 +11,7 @@ interface Props extends HTMLProps<HTMLButtonElement> {
   height?: string;
   text: string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
-  type: ButtonHTMLAttributes<HTMLButtonElement>['type'];
+  type: Exclude<ButtonHTMLAttributes<HTMLButtonElement>['type'], undefined>;
   disabled?: boolean;
   className?: string;
   // color: 'primary' | 'primary-sub' | 'red' | 'blue';
@@ -19,14 +22,13 @@ export default function Button({
   height = 'auto',
   text,
   onClick = undefined,
-  type,
+  type = 'button',
   disabled = false,
   className = undefined,
   // color = 'primary',
 }: Props) {
   const btnClassNames = classNames({ [s.btn]: true }, className);
 
-  // const handleClick: ChangeEventHandler<HTMLButtonElement> = (e) => {
   const handleClick: MouseEventHandler<HTMLButtonElement> = (e) => {
     if (!onClick) return;
 
@@ -37,8 +39,7 @@ export default function Button({
     <button
       className={btnClassNames}
       style={{ width, height }}
-      // eslint-disable-next-line react/button-has-type
-      type={type as 'button' | 'submit' | 'reset'}
+      type={type}
       onClick={handleClick}
       disabled={disabled}
     >

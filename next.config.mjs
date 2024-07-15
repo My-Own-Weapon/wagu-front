@@ -3,10 +3,22 @@ import withPWAInit from '@ducanh2912/next-pwa';
 
 const withPWA = withPWAInit({
   dest: 'public',
+  disable: process.env.NODE_ENV === 'development',
 });
 
 const nextConfig = {
   reactStrictMode: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname:
+          'wagu-book-gitget-deploy-bucket.s3.ap-northeast-2.amazonaws.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+  },
   webpack: (config) => {
     config.module.rules.push({
       test: /\.svg$/,
@@ -19,5 +31,4 @@ const nextConfig = {
 
 export default withPWA({
   ...nextConfig,
-  reactStrictMode: true,
 });

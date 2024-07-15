@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Children, ReactNode } from 'react';
+import Image from 'next/image';
 
 import ImageFill from '@/components/ui/ImageFill';
 import { formatNumberToKRW } from '@/utils';
@@ -16,9 +17,9 @@ export interface PostCardProps {
   postId: string;
   storeName: string;
   postMainMenu: string;
-  postImage: PostImage;
+  menuImage: PostImage;
   menuPrice: string;
-  createDate: string;
+  createdDate: string;
 }
 
 interface PostProps {
@@ -34,7 +35,17 @@ export function Post({ children }: PostProps) {
 }
 
 Post.Title = function Title({ title }: PostTitleProps) {
-  return <h3 className={s.title}>{title}</h3>;
+  return (
+    <div className={s.titleArea}>
+      <Image
+        src="/images/bookmark.svg"
+        width={20}
+        height={20}
+        alt="bookmark-icon"
+      />
+      <h3 className={s.title}>{title}</h3>
+    </div>
+  );
 };
 
 Post.PostCards = function PostList({ posts }: { posts: PostCardProps[] }) {
@@ -54,25 +65,24 @@ Post.PostCards = function PostList({ posts }: { posts: PostCardProps[] }) {
 Post.PostCard = function PostCard({
   postId,
   storeName,
-  postImage,
+  menuImage,
   postMainMenu,
   menuPrice,
-  createDate,
+  createdDate,
 }: PostCardProps) {
+  if (!menuImage) return null;
+
+  const [date] = createdDate.split('T');
+  const [year, month, day] = date.split('-');
+
   return (
     <li className={s.cardContainer} data-id={postId}>
-      <Link
-        style={{
-          width: '100%',
-          height: '100%',
-        }}
-        href={`/posts/${postId}`}
-      >
+      <Link href={`/posts/${postId}`}>
         <div className={s.cardWrapper}>
           <p className={s.storeName}>{storeName}</p>
           <ImageFill
-            id={postImage.id}
-            src={postImage.url}
+            id={menuImage.id}
+            src={menuImage.url}
             height="60px"
             fill
             borderRadius="4px"
@@ -80,8 +90,8 @@ Post.PostCard = function PostCard({
           />
           <div className={s.postDetailsArea}>
             <p>{postMainMenu}</p>
-            <p>{createDate}</p>
             <p>{formatNumberToKRW(Number(menuPrice))}</p>
+            <p>{`${year}. ${month}. ${day}`}</p>
           </div>
         </div>
       </Link>

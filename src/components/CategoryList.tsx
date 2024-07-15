@@ -1,8 +1,11 @@
 import { MouseEventHandler } from 'react';
 import useDragScroll from '@/hooks/useDragScroll';
+import Image from 'next/image';
+import classNames from 'classnames';
+
 import s from './CategoryList.module.scss';
 
-type CategoriesKR = keyof typeof categoryMap;
+type CategoriesKR = keyof typeof categoryMap | null;
 // type CategoriesEN = (typeof categoryMap)[CategoriesKR];
 
 const categoryMap = {
@@ -17,35 +20,56 @@ const categoryMap = {
 } as const;
 
 interface Props {
+  path: string;
   heading: string;
   selectedCategory: CategoriesKR;
-  onClick: MouseEventHandler<HTMLButtonElement | HTMLLIElement>;
+  onClick: MouseEventHandler<HTMLButtonElement>;
 }
 
 export default function CategoryList({
+  path,
   heading,
   selectedCategory,
   onClick,
 }: Props) {
   const ref = useDragScroll();
+  const categoryBookSize = path === '/write' ? 24 : 40;
+  const containerClassName = classNames({
+    [s.mainPageContainer]: path === '/',
+    [s.writePageContainer]: path === '/write',
+  });
 
   return (
-    <div className={s.container}>
-      <p>{heading}</p>
+    <div className={containerClassName}>
+      <div className={s.titleArea}>
+        <Image
+          src="/images/books/books.svg"
+          width={20}
+          height={20}
+          alt="books-icon"
+        />
+        <p className={s.title}>{heading}</p>
+      </div>
       <ul className={s.categoriesWrapper} ref={ref}>
-        {getCategories().map(({ id, name }) => (
-          // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
-          <li
-            key={id}
-            name="postCategory"
-            data-category={name}
-            onClick={onClick}
-            className={name === selectedCategory ? s.active : ''}
-          >
-            <div className={s.textArea}>
-              <span>📘</span>
-              <p className={s.categoryText}>{name}</p>
-            </div>
+        {getCategories(path).map(({ id, name, imgUrl }) => (
+          <li key={id} className={name === selectedCategory ? s.active : ''}>
+            <button
+              type="button"
+              className={s.categoryBtn}
+              data-category={name}
+              name="postCategory"
+              onClick={onClick}
+            >
+              <Image
+                width={categoryBookSize}
+                height={categoryBookSize}
+                src={imgUrl}
+                alt="category"
+              />
+              <p
+                className={s.categoryText}
+              >{`${path === '/write' ? '#' : ''}${name}`}</p>
+            </button>
           </li>
         ))}
       </ul>
@@ -53,35 +77,53 @@ export default function CategoryList({
   );
 }
 
-function getCategories() {
-  return [
+function getCategories(path: string) {
+  const initialCategories = [
     {
       id: 'category1',
       name: '한식',
+      imgUrl: 'images/books/red-book.svg',
     },
     {
       id: 'category2',
       name: '중식',
+      imgUrl: 'images/books/purple-book.svg',
     },
     {
       id: 'category3',
       name: '일식',
+      imgUrl: 'images/books/mint-book.svg',
     },
     {
       id: 'category4',
       name: '양식',
+      imgUrl: 'images/books/yellow-book.svg',
     },
     {
       id: 'category5',
       name: '분식',
+      imgUrl: 'images/books/lilac-book.svg',
     },
     {
       id: 'category6',
       name: '카페',
+      imgUrl: 'images/books/gray-book.svg',
     },
     {
       id: 'category7',
       name: '디저트',
+      imgUrl: 'images/books/coral-book.svg',
     },
   ];
+
+  return path === '/'
+    ? [
+        {
+          id: 'category0',
+          name: '전부',
+          imgUrl: 'images/books/orange-book.svg',
+        },
+        ...initialCategories,
+      ]
+    : initialCategories;
 }

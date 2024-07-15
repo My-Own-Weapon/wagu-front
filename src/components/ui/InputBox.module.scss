@@ -5,13 +5,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-
-  label {
-    font-size: 14px;
-    font-weight: $medium;
-    color: $textTitle;
-  }
+  gap: 8px;
 }
 
 .inputBoxs {
@@ -33,8 +27,16 @@
   }
 
   & ~ label {
-    color: $textTitle;
+    color: $textTitleColor;
   }
+}
+
+.label {
+  margin-left: 8px;
+
+  font-size: 14px;
+  font-weight: $medium;
+  color: $textTitleColor;
 }
 
 .fileInputBox {

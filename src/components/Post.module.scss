@@ -2,11 +2,21 @@
 @import '@styles/variables/textSize.scss';
 @import '@styles/variables/fontWeight.scss';
 
+.titleArea {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  margin-bottom: 10px;
+}
+
 .title {
-  margin: 0 0 16px 0;
+  color: $textTitleColor;
 
   font-size: $textLarge;
   font-weight: $bold;
+
+  margin: 0;
 }
 
 .cardsContainer {
@@ -29,8 +39,6 @@
 }
 
 .cardContainer {
-  width: 100px;
-
   padding: 3px;
 
   display: flex;
@@ -44,7 +52,7 @@
   flex: none;
   order: 0;
   flex-grow: 0;
-  padding: 3px;
+
   width: 77px;
   border: 1px solid #747474;
 
@@ -55,12 +63,14 @@
 }
 
 .storeName {
-  text-align: center;
+  margin-bottom: 4px;
 
-  letter-spacing: -0.03rem;
-  color: $textContent;
-  font-size: $textMedium;
+  color: $textSub-content;
+
+  font-size: $textSmall;
   font-weight: $medium;
+  text-align: center;
+  letter-spacing: -0.03rem;
 
   /* for ellipsis */
   white-space: nowrap;

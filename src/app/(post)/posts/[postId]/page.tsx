@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import ImageFill from '@/components/ui/ImageFill';
 import { apiService } from '@/services/apiService';
 import { getCookieValue } from '@/utils';
+import { CategoriesEN } from '@/app/page';
 
 import s from './page.module.scss';
 
@@ -14,22 +15,43 @@ interface Props {
   };
 }
 
-interface PostDetails {
-  id: string;
-  writer: string;
-  createDate: string;
-  postContent: string;
-  postImage: string;
+interface PostDetailsResponse {
+  postId: number;
+  memberUsername: string;
+  storeName: string;
+  storeLocation: {
+    address: string;
+    posx: string;
+    posy: string;
+  };
   postMainMenu: string;
-  title: string;
-  content: string;
+  postCategory: Exclude<CategoriesEN, 'ALL'>;
+  permission: 'PRIVATE';
+  menus: MenuResponse[];
+  auto: boolean;
+  finished: boolean;
+}
+
+interface MenuResponse {
+  menuId: string;
+  menuImage: {
+    id: string;
+    url: string;
+  };
+  menuName: string;
+  menuPrice: string;
+  menuContent: string;
 }
 
 export default function PostPage({ params: { postId } }: Props) {
-  const [postDetails, setPostDetails] = useState<PostDetails | null>(null);
+  const [postDetails, setPostDetails] = useState<PostDetailsResponse | null>(
+    null,
+  );
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [currentMenuIndex, setCurrentMenuIndex] = useState(0); // 추가된 상태
+
   const usernameFromCookie = getCookieValue('username');
-  const postModdable = postDetails?.writer === usernameFromCookie;
+  const postModdable = postDetails?.memberUsername === usernameFromCookie;
 
   useEffect(() => {
     apiService
@@ -42,7 +64,14 @@ export default function PostPage({ params: { postId } }: Props) {
       });
   }, [postId]);
 
-  const { id, postContent, postMainMenu, writer } = postDetails || {};
+  const goToNextMenu = () => {
+    if (postDetails && postDetails.menus.length > currentMenuIndex + 1) {
+      setCurrentMenuIndex(currentMenuIndex + 1);
+    }
+  };
+
+  const menu = postDetails?.menus[currentMenuIndex];
+  const { address } = postDetails?.storeLocation || {};
 
   return (
     <div>
@@ -50,18 +79,38 @@ export default function PostPage({ params: { postId } }: Props) {
       {errorMsg && <div>{errorMsg}</div>}
       {postDetails && (
         <div>
-          <div className={s.container} data-id={id}>
-            <ImageFill
-              src="/images/mock-food.png"
-              alt={postMainMenu || 'food-image'}
-              fill
-              height="246px"
-            />
-            <div>울엄 김치찜 광교역점</div>
-            <div>서울 역삼 어딘가</div>
-            <div>작성자 : {writer}</div>
-            <div>12,000원</div>
-            <div>{postContent}</div>
+          <div className={s.container} data-id={postDetails.postId}>
+            <div className={s.imageWrapper}>
+              <ImageFill
+                src={menu?.menuImage.url || '/images/mock-food.png'}
+                alt={menu?.menuName || 'food-image'}
+                fill
+                height="246px"
+              />
+            </div>
+            <div className={s.content}>
+              <div className={s.contentHeader}>
+                <div>
+                  <div className={s.storeName}>{postDetails.storeName}</div>
+                  <div className={s.address}>{address}</div>
+                  <div className={s.menuName}>{menu?.menuName}</div>
+                  <div className={s.priceBox}>
+                    <div>{menu?.menuPrice}</div>
+                  </div>
+                </div>
+
+                <div>
+                  <div>작성자 : {postDetails.memberUsername}</div>
+                </div>
+              </div>
+              <div className={s.review}>{menu?.menuContent}</div>
+              {postDetails.menus.length > 1 &&
+                currentMenuIndex < postDetails.menus.length - 1 && (
+                  <button type="button" onClick={goToNextMenu}>
+                    다음 메뉴 보기
+                  </button>
+                )}
+            </div>
           </div>
         </div>
       )}

@@ -84,13 +84,10 @@ export default function SignupPage() {
       </div>
       <div className={s.footer}>
         계정이 이미 있나요?{' '}
-        <Link href="/login" passHref legacyBehavior>
-          <a className={s.loginLink} href="/">
-            로그인
-          </a>
+        <Link className={s.loginLink} href="/login" passHref legacyBehavior>
+          로그인
         </Link>
       </div>
-      <div className={s.homeIndicator} />
     </main>
   );
 }

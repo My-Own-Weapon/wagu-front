@@ -1,17 +1,17 @@
 import { LoginUserInputs, SignupDetails } from '@/types';
 
 class ApiService {
+  private mswBaseUrl = 'http://localhost:9090';
+
   private baseUrl =
     process.env.NODE_ENV === 'production'
       ? process.env.NEXT_PUBLIC_BASE_URL
-      : 'http://localhost:9090';
-
-  private mswBaseUrl = 'http://localhost:9090';
+      : this.mswBaseUrl;
 
   private kakaoBaseUrl =
-    'https://dapi.kakao.com/v2/local/search/keyword.json?query=';
+    'https://dapi.kakao.com/v2/local/search/keyword.json?page=1&size=15&sort=accuracy&query=';
 
-  private accessToken = '';
+  private sessionId = '';
 
   async login({ username, password }: LoginUserInputs) {
     const res = await fetch(`${this.baseUrl}/login`, {
@@ -76,9 +76,6 @@ class ApiService {
     return res.json();
   }
 
-  /* ✅ TODO 
-    parameter로 데이터를 받도록 수정 또한, swagger에 맞게 param type 생성 */
-  // async addPost(postData: AddPostProps) {
   async addPost(formData: FormData) {
     const res = await fetch(`${this.baseUrl}/posts`, {
       method: 'POST',
@@ -92,7 +89,8 @@ class ApiService {
       throw new Error(`[${status}, ${error}] ${message}`);
     }
 
-    return res.json();
+    /* ✅ TODO: response 변경시 수정 */
+    return res;
   }
 
   async fetchFollowings() {
@@ -104,7 +102,6 @@ class ApiService {
     return res.json();
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async fetchKAKAOStoreInfo(name: string) {
     const url = `${this.kakaoBaseUrl}${encodeURIComponent(name)}`;
     const res = await fetch(url, {

@@ -1,0 +1,88 @@
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/radius.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/textSize.scss';
+
+.container {
+  margin: 0 24px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+
+  overflow: hidden;
+
+  .titleArea {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    gap: 4px;
+
+    margin-bottom: 12px;
+
+    .title {
+      font-weight: $semiBold;
+      font-size: $textSmall;
+    }
+  }
+
+  .friends {
+    padding: 12px 12px 10px 12px;
+
+    display: flex;
+    gap: 16px;
+
+    /* 무지개 그라데이션 */
+    border: 1.5px solid transparent;
+    border-radius: $radiusMedium;
+    background-image: linear-gradient($white, $white),
+      linear-gradient(
+        to bottom right,
+        red,
+        orange,
+        yellow,
+        green,
+        blue,
+        indigo,
+        violet
+      );
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+  }
+}
+
+@keyframes colorChange {
+  0% {
+    color: #ff0000;
+  }
+  14% {
+    color: #ff7f00;
+  }
+  28% {
+    color: #ffff00;
+  }
+  42% {
+    color: #00ff00;
+  }
+  57% {
+    color: #0000ff;
+  }
+  71% {
+    color: #4b0082;
+  }
+  85% {
+    color: #9400d3;
+  }
+  100% {
+    color: #ff0000;
+  }
+}
+
+.catAnimation {
+  font-weight: $bold;
+  font-size: $textSmall;
+
+  animation: colorChange 4s infinite;
+}

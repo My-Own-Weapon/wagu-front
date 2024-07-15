@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import { createMiddleware } from '@mswjs/http-middleware';
 import express from 'express';
 import cors from 'cors';

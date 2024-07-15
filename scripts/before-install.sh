@@ -1,4 +1,8 @@
 #!/bin/bash
 cd /home/ubuntu/wagu-front
-# 기존 파일 삭제 (선택 사항)
-rm -rf *
+
+cd /home/ubuntu/wagu-front
+
+# 모든 파일과 디렉토리를 삭제, 숨김 파일 포함
+sudo rm -rf .[^.]* *
+sudo rm -rf *
