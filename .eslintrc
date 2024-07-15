@@ -83,8 +83,11 @@
     "react/require-default-props": [2, { "functions": "defaultArguments" }],
     "no-shadow": [
       "error",
-      { "hoist": "never" },
-      { "allow": ["query", "mutation", "state", "dispatch"] }
+      {
+        "allow": ["query", "x", "y", "e"],
+        "hoist": "never",
+        "ignoreOnInitialization": true
+      }
     ],
     /* ✅ TODO : remove */
     "no-alert": "off"
