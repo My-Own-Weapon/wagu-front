@@ -6,7 +6,6 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 4px;
 
   margin-bottom: 10px;
 }
@@ -64,12 +63,14 @@
 }
 
 .storeName {
-  text-align: center;
+  margin-bottom: 4px;
 
-  letter-spacing: -0.03rem;
-  color: $textContent;
-  font-size: $textMedium;
+  color: $textSub-content;
+
+  font-size: $textSmall;
   font-weight: $medium;
+  text-align: center;
+  letter-spacing: -0.03rem;
 
   /* for ellipsis */
   white-space: nowrap;

@@ -10,7 +10,6 @@
 .container {
   display: flex;
   flex-direction: column;
-  // align-items: center;
   justify-content: center;
 }
 
@@ -25,40 +24,40 @@
   padding: 24px;
 }
 
-.contentHeader{
+.contentHeader {
   color: #747474;
   display: flex;
   justify-content: space-between;
   padding-bottom: 18px;
 }
 
-.review{
-  color: #5C5C5C;
+.review {
+  color: #5c5c5c;
   font-size: large;
 }
 
-.storeName{
+.storeName {
   color: #444444;
   font-size: xx-large;
   padding-bottom: 4px;
 }
 
-.address{
+.address {
   font-size: small;
   padding-bottom: 18px;
 }
 
-.menuName{
+.menuName {
   font-size: medium;
   padding-bottom: 4px;
 }
 
-.priceBox{
+.priceBox {
   display: flex;
   align-items: center;
 }
 
-.priceImage{
+.priceImage {
   background-color: aqua;
   width: 14px;
   height: 14px;
