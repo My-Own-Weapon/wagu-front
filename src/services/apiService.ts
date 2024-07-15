@@ -58,6 +58,23 @@ class ApiService {
     return res.text();
   }
 
+  async checkSession() {
+    const res = await fetch(`${this.baseUrl}/session`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const { status, error } = await res.json();
+
+      throw new Error(
+        `[${status}: ${error}] 세션이 만료되었습니다. 다시 로그인해주세요`,
+      );
+    }
+
+    return res.text();
+  }
+
   async fetchPosts() {
     const res = await fetch(`${this.baseUrl}/posts`, {
       method: 'GET',
