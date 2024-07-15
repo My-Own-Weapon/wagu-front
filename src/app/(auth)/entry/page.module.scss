@@ -1,55 +1,102 @@
 @import '@/styles/variables/colors.scss';
+@import '@/styles/variables/textSize.scss';
+@import '@/styles/variables/fontWeight.scss';
+@import '@/styles/variables/radius.scss';
 
 @mixin button-styles($background, $color, $border) {
   width: 100%;
-  max-width: 300px;
-  margin: 1rem 0;
-  padding: 1rem;
+  height: 56px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
   background-color: $background;
-  border: $border;
-  border-radius: 8px;
   color: $color;
-  font-size: 1.2rem;
+
+  border: $border;
+  border-radius: $radiusMedium;
+
+  font-size: $textLarge;
+
   cursor: pointer;
 }
 
 .container {
-  width: 375px;
-  height: 100dvh;
-  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: $bgColor;
+}
+
+.wrapper {
+  width: 88%;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background-color: $bgColor;
-  text-align: center;
 
-  .logo {
-    margin-bottom: 2rem;
-  }
+  gap: 120px;
+}
 
-  h1 {
-    color: $primaryOrange;
-    margin: 0;
-    font-size: 2rem;
-    font-weight: bold;
-  }
+.logoTitleArea {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 
-  p {
-    color: $textContent;
-    margin: 0 0 2rem 0;
-    font-weight: bold;
-  }
+  gap: 20px;
+}
 
-  .button {
-    @include button-styles($primaryOrange, $white, none);
-    font-weight: bold;
-  }
+.logoWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 
-  .buttonOutline {
-    @include button-styles($btnSub, $primaryOrange, 1px solid $primaryOrange);
-    font-weight: bold;
-    color: $textTitle;
-  }
+  gap: 8px;
+}
+
+.title {
+  margin: 0;
+
+  color: $primaryOrange;
+
+  font-size: 36px;
+  font-weight: $bold;
+}
+
+.subTitle {
+  margin: 0;
+
+  color: $textTitleColor;
+  font-size: $textLarge;
+}
+
+.btnArea {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.signupBtn {
+  width: 100%;
+
+  @include button-styles($primaryOrange, $white, none);
+  font-weight: $semiBold;
+}
+
+.loginBtn {
+  @include button-styles($btnSub, $textTitleColor, 1px solid $primaryOrange);
+  font-weight: $semiBold;
 }
