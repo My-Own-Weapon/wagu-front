@@ -5,56 +5,22 @@
 
 .container {
   width: 375px;
-  height: 100dvh;
+  height: 100%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   background: $bgColor;
-  overflow: hidden;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  height: 60px;
-  padding: 0 24px;
-  background: rgba(255, 250, 243, 0.5);
-  backdrop-filter: blur(5px);
-}
-
-.profile {
-  width: 40px;
-  height: 40px;
-  border: 1px solid $primaryOrange;
-  border-radius: 8px;
-}
-
-.title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  span {
-    font-family: 'NATS';
-    font-size: 20px;
-    color: $primaryOrange;
-  }
-}
-
-.search {
-  width: 24px;
-  height: 24px;
+  overflow-y: auto; /* 수정: 스크롤을 허용하도록 변경 */
 }
 
 .mapContainer {
   width: 100%;
-  flex: 1;
   padding: 0 24px;
   box-sizing: border-box;
   display: flex;
   justify-content: center;
+  flex-shrink: 0; /* 추가: 요소가 줄어들지 않도록 설정 */
 }
 
 .map {
@@ -65,103 +31,51 @@
   overflow: hidden;
 }
 
-.postsContainer {
+.postsContainer,
+.voteContainer {
   width: 100%;
   padding: 16px 24px;
   box-sizing: border-box;
   background: #fffdfb;
   border-top: 1px solid #dddddd;
+  flex-shrink: 0; /* 추가: 요소가 줄어들지 않도록 설정 */
 }
 
-.posts {
+.posts,
+.voteStores {
   display: flex;
-  gap: 12px;
-  overflow-x: scroll;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: scroll;
   padding-bottom: 8px;
-  scrollbar-width: none; // For Firefox
+  scrollbar-width: none; /* For Firefox */
   &::-webkit-scrollbar {
-    display: none; // For Chrome, Safari, and Opera
+    display: none; /* For Chrome, Safari, and Opera */
   }
 }
 
-.post {
-  min-width: 140px;
-  border: 1px solid #dddddd;
-  border-radius: 8px;
-  padding: 8px;
-  background: #fff;
+.post,
+.voteStore {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3px;
+  width: 83px;
+  height: 123px;
+  background: #fff6ea;
+  border-radius: 4px;
   text-align: center;
+
   img {
     width: 100%;
     height: auto;
-    border-radius: 8px;
+    border-radius: 4px;
   }
+
   div {
     margin-top: 4px;
     font-family: 'Pretendard';
     font-size: 12px;
   }
-}
-
-.footer {
-  width: 100%;
-  padding: 19px 0;
-  background: #fff;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-  border-radius: 20px 20px 0 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.navigation {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  width: 100%;
-  height: 60px;
-  background: $white;
-  border-top: 1px solid $border;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.navItem {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  font-family: 'Pretendard';
-  font-size: 10px;
-  color: $textSub-content;
-  img {
-    width: 20px;
-    height: 20px;
-  }
-}
-
-.joinButton {
-  width: 311px;
-  height: 56px;
-  background: $primaryOrange;
-  border: none;
-  border-radius: 8px;
-  font-family: 'Roboto';
-  font-size: 16px;
-  color: $white;
-  margin-bottom: 16px;
-  cursor: pointer;
-}
-
-.leaveButton {
-  width: 311px;
-  height: 56px;
-  background: $purple;
-  border: none;
-  border-radius: 8px;
-  font-family: 'Roboto';
-  font-size: 16px;
-  color: $white;
-  margin-bottom: 16px;
-  cursor: pointer;
 }
