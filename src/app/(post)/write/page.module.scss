@@ -5,9 +5,6 @@
 
 .container {
   @include mainStyle;
-  height: 100%;
-
-  margin: 0 auto;
 
   padding-bottom: 120px;
 }
@@ -31,8 +28,12 @@
   flex-direction: column;
   gap: 20px;
 
-  margin-top: 20px;
   margin-bottom: 20px;
+}
+
+.disableInteraction {
+  pointer-events: none;
+  opacity: 0.5;
 }
 
 .imageArea {

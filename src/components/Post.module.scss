@@ -2,11 +2,22 @@
 @import '@styles/variables/textSize.scss';
 @import '@styles/variables/fontWeight.scss';
 
+.titleArea {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 4px;
+
+  margin-bottom: 10px;
+}
+
 .title {
-  margin: 0 0 16px 0;
+  color: $textTitleColor;
 
   font-size: $textLarge;
   font-weight: $bold;
+
+  margin: 0;
 }
 
 .cardsContainer {
@@ -29,8 +40,6 @@
 }
 
 .cardContainer {
-  width: 100px;
-
   padding: 3px;
 
   display: flex;
@@ -44,7 +53,7 @@
   flex: none;
   order: 0;
   flex-grow: 0;
-  padding: 3px;
+
   width: 77px;
   border: 1px solid #747474;
 

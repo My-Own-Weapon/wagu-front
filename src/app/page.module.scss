@@ -5,9 +5,10 @@
 .container {
   @include mainStyle;
 
+  margin-top: 14px;
+
   display: flex;
   flex-direction: column;
-
   gap: 20px;
 }
 

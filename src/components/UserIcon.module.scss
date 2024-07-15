@@ -1,0 +1,57 @@
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/textSize.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/radius.scss';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  gap: 4px;
+
+  .smallUserName {
+    color: $textContent;
+    font-size: $textSmall;
+    font-weight: $regular;
+  }
+
+  .largeUserName {
+    color: $textContent;
+    font-size: $textSmall;
+    font-weight: $regular;
+  }
+}
+
+.circleIcon {
+  width: 40px;
+  height: 40px;
+
+  background-color: transparent;
+
+  border: 1px solid $primaryOrange;
+  border-radius: 50%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+}
+
+.squareIcon {
+  width: 40px;
+  height: 40px;
+
+  background-color: transparent;
+
+  border: 1px solid $primaryOrange;
+  border-radius: $radiusMedium;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+}

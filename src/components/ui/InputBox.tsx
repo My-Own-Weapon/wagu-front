@@ -14,6 +14,7 @@ type InputBoxProps = {
   accept?: 'image/*' | 'video/*' | 'audio/*' | 'application/pdf';
   value?: string;
   name: string;
+  onFocus?: () => void;
   onChange?: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   readOnly?: boolean;
 };
@@ -29,6 +30,7 @@ export default function InputBox({
   accept = undefined,
   name,
   value = undefined,
+  onFocus = undefined,
   onChange = undefined,
   readOnly = false,
 }: InputBoxProps) {
@@ -42,6 +44,7 @@ export default function InputBox({
   );
   const labelClassNames = classNames({
     [s.overwrapLabelOfFileInput]: type === 'file',
+    [s.label]: type !== 'file',
   });
 
   const handleChange: ChangeEventHandler<
@@ -89,6 +92,7 @@ export default function InputBox({
           accept={accept}
           value={value}
           onChange={handleChange}
+          onFocus={onFocus}
           readOnly={readOnly}
           required
         />

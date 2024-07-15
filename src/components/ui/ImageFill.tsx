@@ -24,6 +24,8 @@ export default function ImageFill({
 }: props) {
   if ((!fill && width === '100%') || !height) return null;
 
+  console.log(src);
+
   return (
     <div
       style={{

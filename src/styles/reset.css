@@ -74,6 +74,7 @@ pre {
  */
 
 a {
+  display: inline-block;
   background-color: transparent;
   text-decoration: none;
   color: black;
