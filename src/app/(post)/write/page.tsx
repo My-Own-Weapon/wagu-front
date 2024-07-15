@@ -17,7 +17,7 @@ import InputBox from '@/components/ui/InputBox';
 import ImageFill from '@/components/ui/ImageFill';
 import Button from '@/components/ui/Button';
 import CategoryList from '@/components/CategoryList';
-import AddressInput from '@/components/AddressInput';
+import AddressInput, { AddressSearchDetails } from '@/components/AddressInput';
 
 import s from './page.module.scss';
 
@@ -40,16 +40,9 @@ const categoryMap = {
   디저트: 'DESSERT',
 } as const;
 
-type WriteCategories = Exclude<CategoriesKR, '전부'>;
+type WritePageCategoriesKR = Exclude<CategoriesKR, '전부'>;
 
 type PageStates = Record<number, PageState>;
-
-export interface AddressSearchDetails {
-  address: string;
-  storeName: string;
-  posx: string;
-  posy: string;
-}
 
 export default function BoardPage() {
   const [pageNumber, setPageNumber] = useState<number>(1);
@@ -71,11 +64,6 @@ export default function BoardPage() {
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    console.log('addr result : ', addressSearchResult);
-    console.log('page state :', pageStates);
-  }, [addressSearchResult, pageStates]);
-
-  useEffect(() => {
     document.forms[0].addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -83,16 +71,15 @@ export default function BoardPage() {
     });
   });
 
-  console.log('review Count : ', reviewCount);
-  console.log('page number : ', pageNumber);
-  const [selectedCategory, setSelectedCategory] = useState<CategoriesKR | null>(
-    null,
-  );
+  const [selectedCategory, setSelectedCategory] =
+    useState<WritePageCategoriesKR | null>(null);
 
   const handleCategoryClick: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.stopPropagation();
-    console.log(e.currentTarget.dataset.category);
-    setSelectedCategory(e.currentTarget.dataset.category as CategoriesKR);
+
+    setSelectedCategory(
+      e.currentTarget.dataset.category as WritePageCategoriesKR,
+    );
   };
 
   const handleAddReview: MouseEventHandler<HTMLButtonElement> = (e) => {
@@ -188,9 +175,8 @@ export default function BoardPage() {
 
     const formData = new FormData();
 
-    // eslint-disable-next-line no-plusplus
-    for (let i = 1; i <= reviewCount; i++) {
-      const currentState = pageStates[i];
+    Array.from({ length: reviewCount }, (_, i) => i + 1).forEach((v) => {
+      const currentState = pageStates[v];
 
       if (currentState.image) {
         formData.append('images', currentState.image);
@@ -201,9 +187,8 @@ export default function BoardPage() {
         menuPrice: currentState.menuPrice,
         menuContent: currentState.menuContent,
       });
-    }
+    });
 
-    console.log(formObj);
     const objString = JSON.stringify(formObj);
     const blobObj = new Blob([objString], { type: 'application/json' });
 
@@ -213,7 +198,6 @@ export default function BoardPage() {
       await apiService.addPost(formData);
       alert('포스트 작성 완료 !');
       router.push('/');
-      // eslint-disable-next-line no-shadow
     } catch (e) {
       if (e instanceof Error) {
         alert(e.message);
@@ -221,9 +205,8 @@ export default function BoardPage() {
     }
   };
 
-  // eslint-disable-next-line no-shadow
-  const handleAddressSelect = (addressSearchResult: AddressSearchDetails) => {
-    setAddressSearchResult(addressSearchResult);
+  const handleAddressSelect = (addressDetails: AddressSearchDetails) => {
+    setAddressSearchResult(addressDetails);
   };
 
   const currentState = pageStates[pageNumber];

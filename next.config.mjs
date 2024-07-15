@@ -9,9 +9,14 @@ const withPWA = withPWAInit({
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: [
-      'images.unsplash.com',
-      'wagu-book-gitget-deploy-bucket.s3.ap-northeast-2.amazonaws.com',
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname:
+          'wagu-book-gitget-deploy-bucket.s3.ap-northeast-2.amazonaws.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   webpack: (config) => {

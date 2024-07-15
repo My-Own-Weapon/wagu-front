@@ -1,12 +1,12 @@
 import Link from 'next/link';
 import { Children, ReactNode } from 'react';
+import Image from 'next/image';
 
 import ImageFill from '@/components/ui/ImageFill';
 import { formatNumberToKRW } from '@/utils';
 import useDragScroll from '@/hooks/useDragScroll';
 
 import s from './Post.module.scss';
-import Image from 'next/image';
 
 interface PostImage {
   id: string;
@@ -19,7 +19,7 @@ export interface PostCardProps {
   postMainMenu: string;
   menuImage: PostImage;
   menuPrice: string;
-  createDate: string;
+  createdDate: string;
 }
 
 interface PostProps {
@@ -51,7 +51,6 @@ Post.Title = function Title({ title }: PostTitleProps) {
 Post.PostCards = function PostList({ posts }: { posts: PostCardProps[] }) {
   const ref = useDragScroll();
 
-  // console.log('image', posts[0].menuImage);
   return (
     <ul className={s.cardsContainer} ref={ref}>
       {posts.length > 0
@@ -69,9 +68,12 @@ Post.PostCard = function PostCard({
   menuImage,
   postMainMenu,
   menuPrice,
-  createDate,
+  createdDate,
 }: PostCardProps) {
   if (!menuImage) return null;
+
+  const [date] = createdDate.split('T');
+  const [year, month, day] = date.split('-');
 
   return (
     <li className={s.cardContainer} data-id={postId}>
@@ -88,8 +90,8 @@ Post.PostCard = function PostCard({
           />
           <div className={s.postDetailsArea}>
             <p>{postMainMenu}</p>
-            <p>{createDate}</p>
             <p>{formatNumberToKRW(Number(menuPrice))}</p>
+            <p>{`${year}. ${month}. ${day}`}</p>
           </div>
         </div>
       </Link>

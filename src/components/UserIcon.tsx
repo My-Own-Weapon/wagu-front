@@ -1,6 +1,10 @@
+/* eslint-disable react/no-unused-prop-types */
+/* eslint-disable react/display-name */
+/* eslint-disable react/function-component-definition */ // for comosition
+
 import classNames from 'classnames';
 import Image from 'next/image';
-import { ReactElement } from 'react';
+import React, { ReactElement } from 'react';
 
 import s from './UserIcon.module.scss';
 
@@ -17,8 +21,7 @@ export interface UserIconProps {
 export function UserIcon({
   width,
   height,
-  size,
-  shape,
+  shape = 'circle',
   imgSrc,
   alt,
 }: UserIconProps) {
@@ -40,7 +43,7 @@ export function UserIcon({
 
 interface WithTextProps {
   children?: ReactElement | string;
-  size: 'small' | 'large'; // size 속성 추가
+  size: 'small' | 'large';
 }
 
 export function WithText<T extends WithTextProps>(

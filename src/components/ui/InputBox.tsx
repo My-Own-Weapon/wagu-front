@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, ChangeEventHandler, useId } from 'react';
+import { ChangeEventHandler, useId } from 'react';
 import classNames from 'classnames';
 import s from './InputBox.module.scss';
 
@@ -15,7 +15,7 @@ type InputBoxProps = {
   value?: string;
   name: string;
   onFocus?: () => void;
-  onChange?: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onChange?: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
   readOnly?: boolean;
 };
 

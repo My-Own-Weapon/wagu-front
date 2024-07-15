@@ -3,6 +3,7 @@
 import { MouseEventHandler, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
+import { consoleArt } from '@/utils';
 import { apiService } from '@/services/apiService';
 import { Post, PostCardProps } from '@/components/Post';
 import CategoryList from '@/components/CategoryList';
@@ -30,14 +31,13 @@ export type CategoriesKR = keyof typeof categoryMap;
 export type CategoriesEN = (typeof categoryMap)[CategoriesKR];
 
 export default function Home() {
+  consoleArt();
   const [allPosts, setAllPosts] = useState<PostReponse[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<PostReponse[]>([]);
   const [liveFriends, setLiveFriends] = useState<Friend[]>([]);
   const [selectedCategory, setSelectedCategory] =
     useState<CategoriesKR>('전부');
   const path = usePathname();
-
-  console.log(path);
 
   const handleCategoryClick: MouseEventHandler = (e) => {
     e.stopPropagation();

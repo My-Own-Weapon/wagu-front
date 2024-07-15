@@ -1,8 +1,9 @@
 import { MouseEventHandler } from 'react';
 import useDragScroll from '@/hooks/useDragScroll';
-import s from './CategoryList.module.scss';
 import Image from 'next/image';
 import classNames from 'classnames';
+
+import s from './CategoryList.module.scss';
 
 type CategoriesKR = keyof typeof categoryMap | null;
 // type CategoriesEN = (typeof categoryMap)[CategoriesKR];

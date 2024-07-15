@@ -1,16 +1,17 @@
 import { LoginUserInputs, SignupDetails } from '@/types';
 
 class ApiService {
-  private baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-
-  // private baseUrl = 'http://localhost:9090';
-
   private mswBaseUrl = 'http://localhost:9090';
+
+  private baseUrl =
+    process.env.NODE_ENV === 'production'
+      ? process.env.NEXT_PUBLIC_BASE_URL
+      : this.mswBaseUrl;
 
   private kakaoBaseUrl =
     'https://dapi.kakao.com/v2/local/search/keyword.json?page=1&size=15&sort=accuracy&query=';
 
-  private accessToken = '';
+  private sessionId = '';
 
   async login({ username, password }: LoginUserInputs) {
     const res = await fetch(`${this.baseUrl}/login`, {
@@ -101,7 +102,6 @@ class ApiService {
     return res.json();
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async fetchKAKAOStoreInfo(name: string) {
     const url = `${this.kakaoBaseUrl}${encodeURIComponent(name)}`;
     const res = await fetch(url, {
