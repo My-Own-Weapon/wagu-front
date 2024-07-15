@@ -276,20 +276,31 @@ export default function KakaoMap() {
     setPublisher(null);
   };
 
-  const handleJoinSession = () => {
+  const handleJoinSession = async () => {
     if (sessionId) {
-      joinSession(sessionId);
+      await joinSession(sessionId);
+
+      // publisher의 오디오 스트림을 audio 태그에 연결
+      if (publisher) {
+        const audioElement = document.getElementById(
+          'publisherAudio',
+        ) as HTMLAudioElement;
+        if (audioElement) {
+          audioElement.srcObject = publisher.stream.getMediaStream();
+        }
+      }
+
+      // subscribers의 오디오 스트림을 각각의 audio 태그에 연결
+      subscribers.forEach((subscriber, index) => {
+        const audioElement = document.getElementById(
+          `subscriberAudio${index}`,
+        ) as HTMLAudioElement;
+        if (audioElement) {
+          audioElement.srcObject = subscriber.stream.getMediaStream();
+        }
+      });
     } else {
       console.error('세션 ID가 없습니다.');
-    }
-  };
-
-  const sendLocation = (lat: number, lng: number) => {
-    if (session) {
-      session.signal({
-        data: JSON.stringify({ userId: 'User', lat, lng }),
-        type: 'userLocation',
-      });
     }
   };
 
@@ -310,6 +321,17 @@ export default function KakaoMap() {
     }
 
     console.log('사용자 위치 마커 업데이트:', marker);
+  };
+
+  // 누락된 sendLocation 함수 추가
+  const sendLocation = (lat: number, lng: number) => {
+    if (session) {
+      session.signal({
+        data: JSON.stringify({ userId: 'User', lat, lng }),
+        to: [],
+        type: 'userLocation',
+      });
+    }
   };
 
   const updateCenterLocation = () => {
@@ -382,6 +404,28 @@ export default function KakaoMap() {
         <button className={s.leaveButton} onClick={leaveSession}>
           음성 채팅 종료
         </button>
+        <audio
+          id="publisherAudio"
+          autoPlay
+          ref={(audio) => {
+            if (audio && publisher) {
+              audio.srcObject = publisher.stream.getMediaStream();
+            }
+          }}
+        />
+
+        {subscribers.map((subscriber, index) => (
+          <audio
+            key={index}
+            id={`subscriberAudio${index}`}
+            autoPlay
+            ref={(audio) => {
+              if (audio) {
+                audio.srcObject = subscriber.stream.getMediaStream();
+              }
+            }}
+          />
+        ))}
       </footer>
     </main>
   );
