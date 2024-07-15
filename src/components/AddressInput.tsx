@@ -3,6 +3,7 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
+
 /* eslint-disable camelcase */ // for KAKAO API response
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -10,8 +11,6 @@ import Image from 'next/image';
 
 import { apiService } from '@/services/apiService';
 import InputBox from '@/components/ui/InputBox';
-
-import { AddressSearchDetails } from '@/app/(post)/write/page';
 
 import s from './AddressInput.module.scss';
 
@@ -28,6 +27,13 @@ interface KAKAOSearchAddressResponse {
   x: string;
   y: string;
   place_url: string;
+}
+
+export interface AddressSearchDetails {
+  address: string;
+  storeName: string;
+  posx: string;
+  posy: string;
 }
 
 export default function AddressInput({
@@ -91,8 +97,9 @@ export default function AddressInput({
   };
 
   const handleSearchClick = async () => {
-    const fetchedResults = await fetchKakaoAddress(query);
+    if (!query) return;
 
+    const fetchedResults = await fetchKakaoAddress(query);
     setResults(fetchedResults);
   };
 
@@ -136,9 +143,8 @@ export default function AddressInput({
               </button>
             </div>
             <ul className={s.results} onWheel={(e) => e.stopPropagation()}>
-              {results.map(
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                ({ id, address_name, place_name, x, y }) => (
+              {results.length > 0 && !!results ? (
+                results.map(({ id, address_name, place_name, x, y }) => (
                   <li
                     key={id}
                     onClick={() => {
@@ -158,7 +164,9 @@ export default function AddressInput({
                       </div>
                     </div>
                   </li>
-                ),
+                ))
+              ) : (
+                <p>검색결과가 없습니다.</p>
               )}
             </ul>
           </div>
