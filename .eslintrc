@@ -81,7 +81,13 @@
     ],
     /* about default parameter */
     "react/require-default-props": [2, { "functions": "defaultArguments" }],
-    "no-shadow": ["error", { "hoist": "functions" }]
+    "no-shadow": [
+      "error",
+      { "hoist": "never" },
+      { "allow": ["query", "mutation", "state", "dispatch"] }
+    ],
+    /* ✅ TODO : remove */
+    "no-alert": "off"
   },
   "overrides": [
     {
