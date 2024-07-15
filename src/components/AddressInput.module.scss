@@ -1,61 +1,11 @@
-// @import '@styles/variables/zIndex.scss';
-
-// .container {
-//   &.blur {
-//     width: 100%;
-//     height: 100%;
-
-//     position: fixed;
-
-//     z-index: $modal;
-
-//     backdrop-filter: blur(10px);
-//   }
-// }
-
-// .addressInputWrapper {
-//   position: relative;
-//   width: 100%;
-//   transition: all 0.3s ease;
-
-//   &.expanded {
-//     position: absolute;
-
-//     width: 75%;
-//     height: 80%;
-//     transform: translate(-50%, -50%);
-//     background: white;
-//     padding: 20px;
-//     border: 1px solid #ddd;
-//     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-//   }
-// }
-
-// .results {
-//   list-style: none;
-//   padding: 0;
-//   margin: 10px 0 0;
-//   max-height: 200px;
-//   overflow-y: auto;
-//   border: 1px solid #ddd;
-//   border-top: none;
-
-//   li {
-//     padding: 10px;
-//     cursor: pointer;
-
-//     &:hover {
-//       background: #f0f0f0;
-//     }
-//   }
-// }
 @import '@styles/variables/zIndex.scss';
+@import '@styles/variables/colors.scss';
 @import '@styles/variables/radius.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/textSize.scss';
 
 .container {
   position: relative;
-  width: 100%;
-  height: 100vh;
 }
 
 .blur {
@@ -103,18 +53,83 @@
 
 .searchArea {
   display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+
+  .addressInput {
+    flex-grow: 1;
+
+    position: relative;
+
+    padding: 8px 12px;
+
+    border: none;
+    border-bottom: 1px solid $gray400;
+
+    font-size: $textMedium;
+    font-weight: $medium;
+    color: $textTitleColor;
+
+    &::placeholder {
+      color: $placeholderColor;
+      font-size: $textSmall;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 2px;
+
+      background: $primaryOrangeLight;
+      border-bottom: 1px solid $gray200;
+
+      transition: width 0.3s;
+    }
+  }
+
+  .searchBtn {
+    width: auto;
+    height: auto;
+
+    padding: 0;
+
+    background-color: transparent;
+  }
+}
+
+.searchItem {
+  padding: 0;
 }
 
 .results {
   list-style: none;
   padding: 0;
-  margin: 10px 0 0;
   max-height: 200px;
   overflow-y: auto;
+  margin-top: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 
   li {
-    padding: 10px;
+    position: relative;
     cursor: pointer;
+
+    &:not(:last-child)::after {
+      content: '';
+      width: 100%;
+
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+
+      border-bottom: 1px solid $gray200;
+    }
 
     &:hover {
       background: #f0f0f0;
@@ -122,26 +137,50 @@
   }
 }
 
-// /* blur */
+.searchResult {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
 
-// position: relative;
-// width: 375px;
-// height: 934px;
+  gap: 8px;
 
-// background: rgba(0, 0, 0, 0.75);
-// backdrop-filter: blur(2px);
-// /* Note: backdrop-filter has minimal browser support */
+  .storeName {
+    font-size: $textMedium;
+    font-weight: $medium;
+    color: $textTitleColor;
+  }
+}
 
-// /* Frame 1000003004 */
+.loadNameArea {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 
-// box-sizing: border-box;
+  gap: 6px;
 
-// position: absolute;
-// width: 294px;
-// height: 592px;
-// left: 39px;
-// top: 180px;
+  .badge {
+    width: 30px;
 
-// background: linear-gradient(180deg, rgba(255, 253, 251, 0.675) 0%, rgba(239, 239, 239, 0.45) 100%);
-// border: 1px solid #D6D6D6;
-// border-radius: 8px;
+    border: 1px solid $border;
+    border-radius: $radiusSmall;
+
+    padding: 2px;
+
+    color: $primaryOrangeLight;
+    font-size: $textXSmall;
+    font-weight: $medium;
+    text-align: center;
+  }
+
+  .loadName {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    margin-bottom: 2px;
+
+    font-size: $textSmall;
+    color: $textContent;
+  }
+}
