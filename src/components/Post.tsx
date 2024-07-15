@@ -6,6 +6,7 @@ import { formatNumberToKRW } from '@/utils';
 import useDragScroll from '@/hooks/useDragScroll';
 
 import s from './Post.module.scss';
+import Image from 'next/image';
 
 interface PostImage {
   id: string;
@@ -34,7 +35,17 @@ export function Post({ children }: PostProps) {
 }
 
 Post.Title = function Title({ title }: PostTitleProps) {
-  return <h3 className={s.title}>{title}</h3>;
+  return (
+    <div className={s.titleArea}>
+      <Image
+        src="/images/bookmark.svg"
+        width={20}
+        height={20}
+        alt="bookmark-icon"
+      />
+      <h3 className={s.title}>{title}</h3>
+    </div>
+  );
 };
 
 Post.PostCards = function PostList({ posts }: { posts: PostCardProps[] }) {
