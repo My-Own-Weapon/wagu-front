@@ -19,6 +19,12 @@ interface StoreData {
   posy: number;
 }
 
+interface UserLocation {
+  userId: string;
+  lat: number;
+  lng: number;
+}
+
 export default function KakaoMap() {
   const [markers, setMarkers] = useState<any[]>([]);
   const [map, setMap] = useState<any>(null);
@@ -30,6 +36,8 @@ export default function KakaoMap() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [userLocations, setUserLocations] = useState<UserLocation[]>([]);
+  const userMarkers = useRef<Map<string, any>>(new Map());
 
   useEffect(() => {
     const sessionId = searchParams.get('sessionId');
@@ -50,7 +58,7 @@ export default function KakaoMap() {
       setSessionId(newSessionId);
       router.push(`/share?sessionId=${newSessionId}`);
     } catch (error) {
-      console.error('Error creating session:', error);
+      console.error('세션 생성 중 오류 발생:', error);
     }
   };
 
@@ -167,10 +175,10 @@ export default function KakaoMap() {
   };
 
   const fetchPostsData = (storeId: number) => {
-    console.log(`Fetching posts for store ID: ${storeId}`);
+    console.log(`상점 ID: ${storeId}에 대한 게시물 가져오기`);
     fetchData(`https://wagubook.shop/map/posts?storeId=${storeId}`)
       .then((data) => {
-        console.log('Fetch response data:', data);
+        console.log('가져온 데이터:', data);
         if (Array.isArray(data)) {
           setPosts(data);
         } else {
@@ -178,7 +186,7 @@ export default function KakaoMap() {
         }
       })
       .catch((error) => {
-        console.error('Fetch error:', error);
+        console.error('데이터 가져오기 중 오류:', error);
         handleFetchError(error);
       });
   };
@@ -187,12 +195,12 @@ export default function KakaoMap() {
     let errorMessage = '알 수 없는 에러 발생';
     try {
       const errorData = await error.json();
-      console.error('Error data:', errorData);
-      errorMessage = `Error ${errorData.status}: ${errorData.error} - ${errorData.message}`;
+      console.error('오류 데이터:', errorData);
+      errorMessage = `오류 ${errorData.status}: ${errorData.error} - ${errorData.message}`;
     } catch (jsonError) {
-      console.error('Error parsing JSON:', jsonError);
+      console.error('JSON 파싱 오류:', jsonError);
     }
-    console.error('Fetch error details:', errorMessage);
+    console.error('Fetch 오류 세부 사항:', errorMessage);
   };
 
   const joinSession = async (sessionId: string) => {
@@ -204,46 +212,59 @@ export default function KakaoMap() {
       setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
     });
 
+    session.on('signal:userLocation', (event: any) => {
+      const userLocation = JSON.parse(event.data);
+      console.log('수신된 사용자 위치:', userLocation); // 디버깅 용 로그 추가
+      setUserLocations((prevLocations) => [...prevLocations, userLocation]);
+      updateUserMarker(userLocation);
+    });
+
     try {
       const token = await getToken(sessionId);
       if (!token) {
-        throw new Error('Token is undefined');
+        throw new Error('토큰이 정의되지 않았습니다');
       }
       await session.connect(token, { clientData: 'User' });
       const publisher = OV.current.initPublisher(undefined, {
-        audioSource: undefined, // The source of audio. If undefined default microphone
-        videoSource: false, // The source of video. If undefined default webcam
-        publishAudio: true, // Whether you want to start publishing with your audio unmuted or not
-        publishVideo: false, // Whether you want to start publishing with your video enabled or not
+        audioSource: undefined, // 오디오 소스. undefined일 경우 기본 마이크 사용
+        videoSource: false, // 비디오 소스. undefined일 경우 기본 웹캠 사용
+        publishAudio: true, // 오디오를 무음 상태로 시작할지 여부
+        publishVideo: false, // 비디오를 비활성화 상태로 시작할지 여부
       });
 
       session.publish(publisher);
       setSession(session);
       setPublisher(publisher);
 
-      console.log(`Joined session ID: ${sessionId}`);
+      console.log(`세션 ID에 참여: ${sessionId}`);
     } catch (error) {
-      console.error(
-        'There was an error connecting to the session:',
-        (error as Error).message,
-      );
+      console.error('세션 연결 중 오류 발생:', (error as Error).message);
     }
   };
 
   const getToken = async (sessionId: string) => {
-    const responseToken = await fetch(
-      `https://video.wagubook.shop/api/sessions/${sessionId}/connections`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      },
-    );
-    const token = await responseToken.text();
+    try {
+      const responseToken = await fetch(
+        `https://video.wagubook.shop/api/sessions/${sessionId}/connections`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
 
-    console.log(`Created session ID: ${sessionId}`);
-    console.log(`Generated token: ${token}`);
+      if (!responseToken.ok) {
+        throw new Error(`토큰 요청 실패: ${responseToken.statusText}`);
+      }
 
-    return token;
+      const token = await responseToken.text();
+      console.log(`생성된 세션 ID: ${sessionId}`);
+      console.log(`생성된 토큰: ${token}`);
+
+      return token;
+    } catch (error) {
+      console.error('토큰 생성 중 오류 발생:', error);
+      return null;
+    }
   };
 
   const leaveSession = () => {
@@ -262,6 +283,61 @@ export default function KakaoMap() {
       console.error('세션 ID가 없습니다.');
     }
   };
+
+  const sendLocation = (lat: number, lng: number) => {
+    if (session) {
+      session.signal({
+        data: JSON.stringify({ userId: 'User', lat, lng }),
+        type: 'userLocation',
+      });
+    }
+  };
+
+  const updateUserMarker = ({ userId, lat, lng }: UserLocation) => {
+    const markerPosition = new window.kakao.maps.LatLng(lat, lng);
+    let marker = userMarkers.current.get(userId);
+
+    if (marker) {
+      marker.setPosition(markerPosition);
+    } else {
+      marker = new window.kakao.maps.Marker({
+        position: markerPosition,
+        map: map,
+        title: userId,
+      });
+      marker.setMap(map);
+      userMarkers.current.set(userId, marker);
+    }
+
+    console.log('사용자 위치 마커 업데이트:', marker);
+  };
+
+  const updateCenterLocation = () => {
+    if (map) {
+      const center = map.getCenter();
+      sendLocation(center.getLat(), center.getLng());
+    }
+  };
+
+  useEffect(() => {
+    if (map) {
+      window.kakao.maps.event.addListener(
+        map,
+        'center_changed',
+        updateCenterLocation,
+      );
+    }
+  }, [map]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (map) {
+        updateCenterLocation();
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [map]);
 
   return (
     <main className={s.container}>
@@ -285,7 +361,7 @@ export default function KakaoMap() {
                     alt={post.postMainMenu}
                     onError={(e) =>
                       console.error(
-                        `Image load error: ${post.menuImage.url}`,
+                        `이미지 로드 오류: ${post.menuImage.url}`,
                         e,
                       )
                     }
