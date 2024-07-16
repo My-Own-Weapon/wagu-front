@@ -107,7 +107,7 @@ export default function KakaoMap() {
     const { left, down, right, up } = bounds;
     console.log('Fetching stores data with bounds:', bounds);
     fetchData(
-      `https://wagubook.shop/map?left=${left}&right=${right}&up=${up}&down=${down}`,
+      `https://api.wagubook.shop:8080/map?left=${left}&right=${right}&up=${up}&down=${down}`,
     )
       .then((data) => {
         console.log('Fetched stores data:', data);
@@ -161,7 +161,7 @@ export default function KakaoMap() {
   const fetchPostsData = (storeId: number, page: number, size: number) => {
     console.log(`Fetching posts for store ID: ${storeId}`);
     fetchData(
-      `https://wagubook.shop/map/posts?storeId=${storeId}&page=${page}&size=${size}`,
+      `https://api.wagubook.shop:8080/map/posts?storeId=${storeId}&page=${page}&size=${size}`,
     )
       .then((data) => {
         console.log('Fetched posts data:', data);
