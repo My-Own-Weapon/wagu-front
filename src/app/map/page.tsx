@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import s from './page.module.scss';
 import { Post } from '@/components/Post';
 import useDragScroll from '@/hooks/useDragScroll';
-import LiveFriends from '@/components/LiveFriendsList';
+import LiveFriends, { Friend } from '@/components/LiveFriendsList';
 
 declare global {
   interface Window {
