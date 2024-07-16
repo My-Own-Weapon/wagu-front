@@ -5,22 +5,9 @@ import Image from 'next/image';
 import ImageFill from '@/components/ui/ImageFill';
 import { formatNumberToKRW } from '@/utils';
 import useDragScroll from '@/hooks/useDragScroll';
+import { PostCardProps } from '@/types';
 
 import s from './Post.module.scss';
-
-interface PostImage {
-  id: string;
-  url: string;
-}
-
-export interface PostCardProps {
-  postId: string;
-  storeName: string;
-  postMainMenu: string;
-  menuImage: PostImage;
-  menuPrice: string;
-  createdDate: string;
-}
 
 interface PostProps {
   children: ReactNode;
@@ -50,7 +37,7 @@ Post.Title = function Title({ title }: PostTitleProps) {
 
 Post.PostCards = function PostList({ posts }: { posts: PostCardProps[] }) {
   const ref = useDragScroll();
-
+  console.log('posts', posts);
   return (
     <ul className={s.cardsContainer} ref={ref}>
       {posts.length > 0
