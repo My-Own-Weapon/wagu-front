@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import { User } from '@/components/UserCard';
 import { http, HttpResponse } from 'msw';
 
 export const handlers = [
@@ -66,7 +67,144 @@ export const handlers = [
 
     return HttpResponse.json(getFollowings());
   }),
+
+  http.get('/members', ({ request }) => {
+    console.log('fetch members !!');
+
+    const url = new URL(request.url);
+    const query = url.searchParams.get('username');
+
+    if (!query) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    if (query.includes('a')) {
+      return HttpResponse.json(getUserIncludeA());
+    }
+
+    return HttpResponse.json(getUserNotIncludeA());
+  }),
 ];
+
+function getUserIncludeA(): User[] {
+  return [
+    {
+      memberId: '1',
+      memberUsername: 'a김철수',
+      memberImage: {
+        id: '1',
+        url: '/profile/profile-default-icon-male.svg',
+      },
+      to: true,
+      from: true,
+      isEach: true,
+    },
+    {
+      memberId: '2',
+      memberUsername: 'a신짱구',
+      memberImage: {
+        id: '2',
+        url: '/profile/profile-default-icon-male.svg',
+      },
+      to: false,
+      from: true,
+      isEach: false,
+    },
+    {
+      memberId: '3',
+      memberUsername: 'a이유리',
+      memberImage: {
+        id: '3',
+        url: null,
+      },
+      to: true,
+      from: false,
+      isEach: false,
+    },
+    {
+      memberId: '4',
+      memberUsername: 'a훈이',
+      memberImage: {
+        id: '4',
+        url: '/profile/profile-default-icon-male.svg',
+      },
+      to: true,
+      from: true,
+      isEach: true,
+    },
+    {
+      memberId: '5',
+      memberUsername: 'a맹구',
+      memberImage: {
+        id: '5',
+        url: null,
+      },
+      to: true,
+      from: false,
+      isEach: false,
+    },
+  ];
+}
+
+function getUserNotIncludeA(): User[] {
+  return [
+    {
+      memberId: '1',
+      memberUsername: 'bc김철수',
+      memberImage: {
+        id: '1',
+        url: '/profile/profile-default-icon-male.svg',
+      },
+      to: false,
+      from: true,
+      isEach: false,
+    },
+    {
+      memberId: '2',
+      memberUsername: 'bc신짱구',
+      memberImage: {
+        id: '2',
+        url: '/profile/profile-default-icon-male.svg',
+      },
+      to: false,
+      from: true,
+      isEach: false,
+    },
+    {
+      memberId: '3',
+      memberUsername: 'bcd훈이',
+      memberImage: {
+        id: '3',
+        url: null,
+      },
+      to: true,
+      from: false,
+      isEach: false,
+    },
+    {
+      memberId: '4',
+      memberUsername: 'bcde이유리',
+      memberImage: {
+        id: '4',
+        url: '/profile/profile-default-icon-male.svg',
+      },
+      to: true,
+      from: false,
+      isEach: false,
+    },
+    {
+      memberId: '5',
+      memberUsername: 'bcdef맹구',
+      memberImage: {
+        id: '5',
+        url: null,
+      },
+      to: true,
+      from: false,
+      isEach: false,
+    },
+  ];
+}
 
 function getMockPosts() {
   return [
