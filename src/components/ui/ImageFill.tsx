@@ -22,7 +22,9 @@ export default function ImageFill({
   fill = false,
   borderRadius = '0',
 }: props) {
-  if ((!fill && width === '100%') || !height) return null;
+  if ((!fill && width === '100%') || !height) {
+    throw new Error('fill이 false일 때 width를 100%로 설정할 수 없습니다.');
+  }
 
   return (
     <div
