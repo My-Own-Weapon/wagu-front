@@ -1,3 +1,6 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable react/no-array-index-key */
 /* eslint-disable no-shadow */
 /* eslint-disable react/jsx-filename-extension */
 /* eslint-disable max-depth */
@@ -12,7 +15,9 @@ import UserVideoComponent from './UserVideoComponent';
 import './index.css';
 
 const APPLICATION_SERVER_URL =
-  process.env.NODE_ENV === 'production' ? '' : 'https://demos.openvidu.io/';
+  process.env.NODE_ENV === 'production'
+    ? 'https://wagubook.shop/'
+    : 'https://demos.openvidu.io/';
 
 function App() {
   const [mySessionId, setMySessionId] = useState('SessionA');
@@ -30,7 +35,7 @@ function App() {
   const [OV, setOV] = useState(undefined);
 
   useEffect(() => {
-    const handleBeforeUnload = (event) => {
+    const handleBeforeUnload = () => {
       leaveSession();
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -308,7 +313,6 @@ function App() {
             )}
           </div>
           <div id="video-container" className="col-md-6">
-            //
             {publisher !== undefined && isStreamer ? (
               <div
                 className="stream-container col-md-6 col-xs-6"
@@ -317,7 +321,7 @@ function App() {
                 <UserVideoComponent streamManager={publisher} />
               </div>
             ) : null}
-            {subscribers.map((sub, i) => (
+            {subscribers.map((sub) => (
               <div
                 key={sub.id}
                 className="stream-container col-md-6 col-xs-6"
@@ -332,7 +336,7 @@ function App() {
           <div id="chat-container" className="col-md-6">
             <div id="chat-box">
               {messages.map((message, i) => (
-                <div key={i} className="chat-message">
+                <div key={`msg-${i}`} className="chat-message">
                   <strong>{message.user}</strong>: {message.text}
                 </div>
               ))}

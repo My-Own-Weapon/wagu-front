@@ -1,11 +1,18 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import s from './page.module.scss';
-import { Post } from '@/components/Post';
+
+import { Post, PostCardProps } from '@/components/Post';
 import useDragScroll from '@/hooks/useDragScroll';
 import LiveFriends, { Friend } from '@/components/LiveFriendsList';
+
+import s from './page.module.scss';
 
 declare global {
   interface Window {
@@ -24,8 +31,8 @@ interface StoreData {
 interface PostData {
   postId: number;
   storeName: string;
-  menuImage: { url: string };
   postMainMenu: string;
+  menuImage: { url: string };
   createdDate: string;
   menuPrice: string;
 }
@@ -33,7 +40,7 @@ interface PostData {
 export default function KakaoMap() {
   const [markers, setMarkers] = useState<any[]>([]);
   const [map, setMap] = useState<any>(null);
-  const [posts, setPosts] = useState<PostData[]>([]);
+  const [posts, setPosts] = useState<PostCardProps[]>([]);
   const router = useRouter();
   const ref = useDragScroll();
   const [liveFriends, setLiveFriends] = useState<Friend[]>([]);
@@ -136,9 +143,9 @@ export default function KakaoMap() {
       marker.setMap(mapInstance);
       console.log('마커 추가됨:', marker);
 
-      window.kakao.maps.event.addListener(marker, 'click', () =>
-        fetchPostsData(store.storeId),
-      );
+      window.kakao.maps.event.addListener(marker, 'click', () => {
+        fetchPostsData(store.storeId, 1, 10);
+      });
 
       return marker;
     });
@@ -154,7 +161,7 @@ export default function KakaoMap() {
   const fetchPostsData = (storeId: number, page: number, size: number) => {
     console.log(`Fetching posts for store ID: ${storeId}`);
     fetchData(
-      `https://wagubook.shop/map/posts?storeId=${storeId}&page=1&size=10`,
+      `https://wagubook.shop/map/posts?storeId=${storeId}&page=${page}&size=${size}`,
     )
       .then((data) => {
         console.log('Fetched posts data:', data);
@@ -208,7 +215,6 @@ export default function KakaoMap() {
   const renderPost = (post: PostData) => (
     <div
       key={post.postId}
-      className={s.post}
       onClick={() => {
         if (post.postId) {
           router.push(`http://www.wagubook.shop:3000/posts/${post.postId}`);
@@ -220,9 +226,9 @@ export default function KakaoMap() {
       <img
         src={post.menuImage?.url || '/images/default-image.png'}
         alt={post.postMainMenu}
-        onError={(e) =>
-          console.error(`Image load error: ${post.menuImage?.url}`, e)
-        }
+        onError={(e) => {
+          console.error(`Image load error: ${post.menuImage?.url}`, e);
+        }}
       />
       <div>{post.postMainMenu}</div>
       <div>{post.createdDate}</div>
@@ -233,7 +239,7 @@ export default function KakaoMap() {
   return (
     <main className={s.container}>
       <div className={s.mapContainer}>
-        <div id="map" className={s.map}></div>
+        <div id="map" className={s.map} />
       </div>
       <div>
         <LiveFriends liveFriends={liveFriends} />
@@ -241,15 +247,7 @@ export default function KakaoMap() {
           <Post.Wrapper>
             <Post>
               {posts.length === 0 ? (
-                <Post.Title
-                  title={
-                    <>
-                      현재 선택된 post가 없어요!
-                      <br />
-                      Post를 선택해보세요!
-                    </>
-                  }
-                />
+                <Post.Title title="현재 선택된 post가 없어요! Post를 선택해보세요!" />
               ) : (
                 <Post.Title title={`${posts[0].storeName}  Posts`} />
               )}
@@ -259,7 +257,11 @@ export default function KakaoMap() {
         </div>
       </div>
       <div className={s.urlContainer}>
-        <button className={s.createUrlButton} onClick={createVoteUrl}>
+        <button
+          className={s.createUrlButton}
+          type="button"
+          onClick={createVoteUrl}
+        >
           투표 URL 생성하기
         </button>
       </div>

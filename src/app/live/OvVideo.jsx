@@ -1,3 +1,6 @@
+/* eslint-disable react/jsx-filename-extension */
+/* eslint-disable jsx-a11y/media-has-caption */
+
 'use client';
 
 import React, { useEffect, useRef } from 'react';
@@ -13,7 +16,7 @@ function OpenViduVideoComponent({ streamManager }) {
     }
   }, [streamManager]);
 
-  return <video autoPlay={true} ref={videoRef} />;
+  return <video autoPlay ref={videoRef} />;
 }
 
 export default OpenViduVideoComponent;

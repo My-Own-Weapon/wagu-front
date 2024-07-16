@@ -1,3 +1,12 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable jsx-a11y/media-has-caption */
+/* eslint-disable max-depth */
+/* eslint-disable no-shadow */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable import/no-unresolved */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -25,7 +34,7 @@ interface UserLocation {
   lng: number;
 }
 
-export default function KakaoMap() {
+export default function SharePage() {
   const [markers, setMarkers] = useState<any[]>([]);
   const [map, setMap] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
@@ -159,9 +168,9 @@ export default function KakaoMap() {
       marker.setMap(mapInstance);
       console.log('마커 추가됨:', marker);
 
-      window.kakao.maps.event.addListener(marker, 'click', () =>
-        fetchPostsData(store.storeId),
-      );
+      window.kakao.maps.event.addListener(marker, 'click', () => {
+        fetchPostsData(store.storeId);
+      });
 
       return marker;
     });
@@ -313,7 +322,7 @@ export default function KakaoMap() {
     } else {
       marker = new window.kakao.maps.Marker({
         position: markerPosition,
-        map: map,
+        map,
         title: userId,
       });
       marker.setMap(map);
@@ -363,13 +372,13 @@ export default function KakaoMap() {
 
   return (
     <main className={s.container}>
-      <header className={s.header}>
-        <div className={s.title}>
+      <header>
+        <div>
           <span>WAGU BOOK</span>
         </div>
       </header>
       <div className={s.mapContainer}>
-        <div id="map" className={s.map}></div>
+        <div id="map" className={s.map} />
       </div>
       <div className={s.postsContainer}>
         {posts.length > 0 && (
@@ -381,12 +390,12 @@ export default function KakaoMap() {
                   <img
                     src={post.menuImage.url}
                     alt={post.postMainMenu}
-                    onError={(e) =>
+                    onError={(e) => {
                       console.error(
                         `이미지 로드 오류: ${post.menuImage.url}`,
                         e,
-                      )
-                    }
+                      );
+                    }}
                   />
                   <div>{post.postMainMenu}</div>
                   <div>{post.createdDate}</div>
@@ -397,11 +406,11 @@ export default function KakaoMap() {
           </>
         )}
       </div>
-      <footer className={s.footer}>
-        <button className={s.joinButton} onClick={handleJoinSession}>
+      <footer>
+        <button type="button" onClick={handleJoinSession}>
           음성 채팅 시작
         </button>
-        <button className={s.leaveButton} onClick={leaveSession}>
+        <button type="button" onClick={leaveSession}>
           음성 채팅 종료
         </button>
         <audio
