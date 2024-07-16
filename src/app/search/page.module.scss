@@ -1,0 +1,114 @@
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/zIndex.scss';
+@import '@styles/variables/radius.scss';
+@import '@styles/variables/textSize.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/mixins/index.scss';
+
+$tabDiff: 32px;
+
+.container {
+  height: calc(100% - 40px);
+  overflow: auto;
+}
+
+.tabWrapper {
+  width: 100%;
+
+  .tabBtnArea {
+    width: 100%;
+    height: $tabDiff;
+
+    position: fixed;
+    z-index: $header;
+
+    background-color: $bgColor;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .tab {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      color: $textSub-content;
+      font-size: $textMedium;
+      font-weight: $medium;
+      background-color: transparent;
+
+      &.active {
+        color: $textTitleColor;
+
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 4px;
+          left: 50%;
+          width: 50%;
+          height: 2px;
+          background-color: $primaryOrangeLight;
+          border-radius: 2px;
+          transform: translateX(-50%);
+        }
+      }
+    }
+  }
+
+  .searchArea {
+    padding-top: $tabDiff;
+    padding: calc($tabDiff + 8px) 24px 16px 24px;
+
+    border-bottom: 1px solid red;
+    border-radius: 0 0 $radiusLarge $radiusLarge;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: $bgColor;
+
+    border: 1px solid $border;
+    border-width: 0.5px 0.5px 0px 0.5px;
+    border-style: solid;
+    border-color: #e6e6ea;
+    box-shadow: 2px 1px 6px rgba(51, 61, 75, 0.15);
+
+    .searchForm {
+      width: 100%;
+      height: 100%;
+
+      padding: 0 8px 0 16px;
+
+      @include flexCenter;
+      gap: 4px;
+
+      background-color: $white;
+
+      border-radius: $radiusSmall;
+      border: 0.5px solid $gray300;
+      box-shadow: 0px 2px 4px rgba(51, 61, 75, 0.1);
+
+      .searchInput {
+        width: 100%;
+        height: 28px;
+
+        color: $textTitleColor;
+        font-size: $textSmall;
+
+        border: none;
+        background-color: transparent;
+
+        &::placeholder {
+          color: $textSub-content;
+        }
+      }
+
+      .submitBtn {
+        background-color: transparent;
+
+        @include flexCenter;
+      }
+    }
+  }
+}
