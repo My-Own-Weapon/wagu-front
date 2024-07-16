@@ -40,14 +40,23 @@ export default function Header() {
         </Link>
       </div>
       <div>
-        <Link href="/search">
-          <Image
-            src="/images/search-glass.svg"
-            alt="search-btn"
-            width={24}
-            height={24}
+        {segment !== 'search' ? (
+          <Link href="/search">
+            <Image
+              src="/images/search-glass.svg"
+              alt="search-btn"
+              width={24}
+              height={24}
+            />
+          </Link>
+        ) : (
+          <div
+            style={{
+              width: 24,
+              height: 24,
+            }}
           />
-        </Link>
+        )}
       </div>
     </header>
   );
