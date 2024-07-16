@@ -131,6 +131,36 @@ class ApiService {
 
     return data;
   }
+
+  async searchPostsOfStore(storeName: string) {
+    const res = await fetch(`${this.baseUrl}/stores?keyword=${storeName}`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
+    return res.json();
+  }
+
+  async searchUsers(username: string) {
+    const res = await fetch(`${this.mswBaseUrl}/members?username=${username}`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
+    return res.json();
+  }
 }
 
 export const apiService = new ApiService();
