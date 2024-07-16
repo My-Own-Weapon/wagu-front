@@ -1,0 +1,30 @@
+@import '@styles/mixins/index.scss';
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/radius.scss';
+
+.cardsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+}
+
+.container {
+  @include flexCenter;
+
+  padding: 8px;
+
+  background-color: $white;
+
+  border: 1px solid $borderDark;
+  border-radius: $radiusMedium;
+
+  .wrapper {
+    @include flexColumnCenter;
+
+    .profileImgArea {
+      background-color: $gray400;
+
+      border-radius: $radiusMedium;
+    }
+  }
+}
