@@ -1,8 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import s from './page.module.scss';
-import { error } from 'console';
+import { Post } from '@/components/Post';
+import useDragScroll from '@/hooks/useDragScroll';
+import LiveFriends from '@/components/LiveFriendsList';
 
 declare global {
   interface Window {
@@ -18,11 +21,22 @@ interface StoreData {
   posy: number;
 }
 
+interface PostData {
+  postId: number;
+  storeName: string;
+  menuImage: { url: string };
+  postMainMenu: string;
+  createdDate: string;
+  menuPrice: string;
+}
+
 export default function KakaoMap() {
   const [markers, setMarkers] = useState<any[]>([]);
   const [map, setMap] = useState<any>(null);
-  const [posts, setPosts] = useState<any[]>([]);
-
+  const [posts, setPosts] = useState<PostData[]>([]);
+  const router = useRouter();
+  const ref = useDragScroll();
+  const [liveFriends, setLiveFriends] = useState<Friend[]>([]);
   useEffect(() => {
     const script = document.createElement('script');
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=948985235eb596e79f570535fd01a71e&autoload=false&libraries=services`;
@@ -84,12 +98,15 @@ export default function KakaoMap() {
     bounds: { left: number; down: number; right: number; up: number },
   ) => {
     const { left, down, right, up } = bounds;
+    console.log('Fetching stores data with bounds:', bounds);
     fetchData(
       `https://wagubook.shop/map?left=${left}&right=${right}&up=${up}&down=${down}`,
     )
       .then((data) => {
+        console.log('Fetched stores data:', data);
         if (Array.isArray(data)) {
           addMarkers(mapInstance, data);
+          console.log(data);
         } else {
           console.error('서버로부터 받은 데이터가 배열이 아닙니다:', data);
         }
@@ -113,7 +130,7 @@ export default function KakaoMap() {
       );
       const marker = new window.kakao.maps.Marker({
         position: markerPosition,
-        key: store.storeId, // 여기 추가
+        key: store.storeId,
       });
 
       marker.setMap(mapInstance);
@@ -134,12 +151,15 @@ export default function KakaoMap() {
     setMarkers([]);
   };
 
-  const fetchPostsData = (storeId: number) => {
+  const fetchPostsData = (storeId: number, page: number, size: number) => {
     console.log(`Fetching posts for store ID: ${storeId}`);
-    fetchData(`https://wagubook.shop/map/posts?storeId=${storeId}`)
+    fetchData(
+      `https://wagubook.shop/map/posts?storeId=${storeId}&page=1&size=10`,
+    )
       .then((data) => {
-        console.log('Fetch response data:', data); // 서버에서 반환되는 전체 데이터 확인
+        console.log('Fetched posts data:', data);
         if (Array.isArray(data)) {
+          console.log(data);
           setPosts(data);
         } else {
           console.error('서버가 배열이 아닌 데이터를 반환했습니다:', data);
@@ -151,11 +171,12 @@ export default function KakaoMap() {
       });
   };
 
+  // Error handling
   const handleFetchError = async (error: Response) => {
     let errorMessage = '알 수 없는 에러 발생';
     try {
       const errorData = await error.json();
-      console.error('Error data:', errorData); // 에러 데이터 확인
+      console.error('Error data:', errorData);
       errorMessage = `Error ${errorData.status}: ${errorData.error} - ${errorData.message}`;
     } catch (jsonError) {
       console.error('Error parsing JSON:', jsonError);
@@ -184,56 +205,64 @@ export default function KakaoMap() {
       });
   };
 
+  const renderPost = (post: PostData) => (
+    <div
+      key={post.postId}
+      className={s.post}
+      onClick={() => {
+        if (post.postId) {
+          router.push(`http://www.wagubook.shop:3000/posts/${post.postId}`);
+        } else {
+          console.error('postId가 정의되지 않았습니다.');
+        }
+      }}
+    >
+      <img
+        src={post.menuImage?.url || '/images/default-image.png'}
+        alt={post.postMainMenu}
+        onError={(e) =>
+          console.error(`Image load error: ${post.menuImage?.url}`, e)
+        }
+      />
+      <div>{post.postMainMenu}</div>
+      <div>{post.createdDate}</div>
+      <div>{post.menuPrice}</div>
+    </div>
+  );
+
   return (
     <main className={s.container}>
-      <header className={s.header}>
-        <div className={s.profile}>
-          <img src="/profile/ProfileMale.svg" alt="profile male" />
-        </div>
-        <div className={s.title}>
-          <div className={s.icon}>
-            <img src="/images/icons/icon-40x40.png" alt="star icon" />
-          </div>
-          <span>WAGU BOOK</span>
-        </div>
-        <div className={s.search}>
-          <img src="/Search.svg" alt="search icon" />
-        </div>
-      </header>
       <div className={s.mapContainer}>
         <div id="map" className={s.map}></div>
       </div>
-      <div className={s.postsContainer}>
-        {posts.length > 0 && (
-          <>
-            <h2>{posts[0].storeName} Posts</h2>
-            <div className={s.posts}>
-              {posts.map((post) => (
-                <div key={post.postId} className={s.post}>
-                  <img
-                    src={post.menuImage.url}
-                    alt={post.postMainMenu}
-                    onError={(e) =>
-                      console.error(
-                        `Image load error: ${post.menuImage.url}`,
-                        e,
-                      )
-                    }
-                  />
-                  <div>{post.postMainMenu}</div>
-                  <div>{post.createdDate}</div>
-                  <div>{post.menuPrice}</div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
+      <div>
+        <LiveFriends liveFriends={liveFriends} />
+        <div className={s.postContainer}>
+          <Post.Wrapper>
+            <Post>
+              {posts.length === 0 ? (
+                <Post.Title
+                  title={
+                    <>
+                      현재 선택된 post가 없어요!
+                      <br />
+                      Post를 선택해보세요!
+                    </>
+                  }
+                />
+              ) : (
+                <Post.Title title={`${posts[0].storeName}  Posts`} />
+              )}
+              {posts.length > 0 && <Post.PostCards posts={posts} />}
+            </Post>
+          </Post.Wrapper>
+        </div>
       </div>
-      <footer className={s.footer}>
+      <div className={s.urlContainer}>
         <button className={s.createUrlButton} onClick={createVoteUrl}>
           투표 URL 생성하기
         </button>
-      </footer>
+      </div>
     </main>
   );
 }
