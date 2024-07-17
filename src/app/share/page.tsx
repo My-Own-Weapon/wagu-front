@@ -1,3 +1,5 @@
+/* eslint-disable no-var */
+/* eslint-disable vars-on-top */
 /* eslint-disable no-param-reassign */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable jsx-a11y/media-has-caption */
@@ -13,8 +15,6 @@ import { useEffect, useState, useRef } from 'react';
 import { OpenVidu, Subscriber } from 'openvidu-browser';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Post } from '@/components/Post';
-import s from './page.module.scss';
-
 import s from './page.module.scss';
 
 declare global {
