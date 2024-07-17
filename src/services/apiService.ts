@@ -131,7 +131,7 @@ class ApiService {
 
   async searchStore(storeName: string) {
     const res = await fetch(
-      `${this.mswBaseUrl}/stores?keyword=${storeName}&page=1&size=12`,
+      `${this.baseUrl}/stores?keyword=${storeName}&page=0&size=12`,
       {
         method: 'GET',
         credentials: 'include',
@@ -149,7 +149,7 @@ class ApiService {
 
   async searchUsers(username: string) {
     const res = await fetch(
-      `${this.mswBaseUrl}/members?username=${username}&page=1&size=12`,
+      `${this.baseUrl}/members?username=${username}&page=0&size=12`,
       {
         method: 'GET',
         credentials: 'include',
@@ -167,7 +167,7 @@ class ApiService {
 
   async fetchPostsOfStore(storeId: number) {
     const res = await fetch(
-      `${this.baseUrl}/map/posts?storeId=${storeId}&page=1&size=12`,
+      `${this.baseUrl}/map/posts?storeId=${storeId}&page=0&size=12`,
       {
         method: 'GET',
         credentials: 'include',
