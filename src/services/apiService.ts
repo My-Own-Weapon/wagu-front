@@ -106,7 +106,7 @@ class ApiService {
       throw new Error(`[${status}, ${error}] ${message}`);
     }
 
-    /* ✅ TODO: response 변경시 수정 */
+    /* ✅ TODO: response 변경시 수정  */
     return res;
   }
 
