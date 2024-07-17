@@ -1,9 +1,12 @@
+'use client';
+
 import { useState } from 'react';
 import classNames from 'classnames';
 
 import ImageFill from '@/components/ui/ImageFill';
 
 import s from './UserCard.module.scss';
+import { useMutation } from '@tanstack/react-query';
 
 export interface User {
   memberId: string;
@@ -51,7 +54,7 @@ function UserCard({
           />
           <p className={s.userName}>{memberUsername}</p>
         </div>
-        <FollowButton to={to} from={from} isEach={isEach} />
+        <FollowButton to={to} from={from} isEach={isEach} memberId={memberId} />
       </div>
     </li>
   );
@@ -59,8 +62,28 @@ function UserCard({
 
 type FollowButtonText = 'Follow' | 'Unfollow' | 'EachFollow';
 
-function FollowButton({ to, isEach }: Pick<User, 'to' | 'from' | 'isEach'>) {
+function FollowButton({
+  to,
+  isEach,
+  memberId,
+}: Pick<User, 'to' | 'from' | 'isEach' | 'memberId'>) {
   const [isHover, setIsHover] = useState(false);
+  const follow = useMutation(
+    {mutationFn: () =>{},
+    onMutate: async () => {},
+    onError: () => {},
+  }
+  )
+
+  const unfollow = useMutation((memberId: string) => {
+    return fetch(`/api/unfollow/${memberId}`, {
+      method: 'POST',
+    });
+  })
+
+
+  
+  
   const btnClassName = classNames(s.followBtn, {
     [s.follow]: !to,
     [s.unFollow]: to,
@@ -76,13 +99,17 @@ function FollowButton({ to, isEach }: Pick<User, 'to' | 'from' | 'isEach'>) {
     text = 'Follow';
   }
 
+  const handleFollow = 
+
   return (
     <button
+      data-member-id={memberId}
       type="button"
       className={btnClassName}
       onMouseEnter={() => setIsHover(true)}
       onMouseOut={() => setIsHover(false)}
       onBlur={() => setIsHover(false)}
+      onClick={}
     >
       {text}
     </button>

@@ -182,6 +182,36 @@ class ApiService {
 
     return res.json();
   }
+
+  async followUser(memberId: number) {
+    const res = await fetch(`${this.baseUrl}/fmembers/${memberId}/follow`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
+    return res.text();
+  }
+
+  async unFollowUSer(memberId: number) {
+    const res = await fetch(`${this.baseUrl}/fmembers/${memberId}/follow`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
+    return res.text();
+  }
 }
 
 export const apiService = new ApiService();
