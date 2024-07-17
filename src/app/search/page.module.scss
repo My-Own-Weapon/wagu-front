@@ -10,6 +10,10 @@ $tabDiff: 32px;
 .container {
   height: calc(100% - 40px);
   overflow: auto;
+
+  .searchResultWrapper {
+    margin: 0 16px;
+  }
 }
 
 .tabWrapper {
