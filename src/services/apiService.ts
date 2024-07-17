@@ -184,7 +184,7 @@ class ApiService {
   }
 
   async followUser(memberId: number) {
-    const res = await fetch(`${this.baseUrl}/fmembers/${memberId}/follow`, {
+    const res = await fetch(`${this.baseUrl}/members/${memberId}/follow`, {
       method: 'POST',
       credentials: 'include',
     });
@@ -198,8 +198,8 @@ class ApiService {
     return res.text();
   }
 
-  async unFollowUSer(memberId: number) {
-    const res = await fetch(`${this.baseUrl}/fmembers/${memberId}/follow`, {
+  async unFollowUser(memberId: number) {
+    const res = await fetch(`${this.baseUrl}/members/${memberId}/follow`, {
       method: 'DELETE',
       credentials: 'include',
     });
