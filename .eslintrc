@@ -84,7 +84,7 @@
     "no-shadow": [
       "error",
       {
-        "allow": ["query", "x", "y", "e"],
+        "allow": ["query", "x", "y", "e", "from"],
         "hoist": "never",
         "ignoreOnInitialization": true
       }
