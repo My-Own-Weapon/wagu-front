@@ -1,11 +1,17 @@
 @import '@styles/mixins/index.scss';
 @import '@styles/variables/colors.scss';
 @import '@styles/variables/radius.scss';
+@import '@styles/variables/textSize.scss';
+@import '@styles/variables/fontWeight.scss';
 
 .cardsContainer {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 12px;
+
+  margin-top: 16px;
+
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 16px;
+  row-gap: 12px;
 }
 
 .container {
@@ -15,16 +21,68 @@
 
   background-color: $white;
 
-  border: 1px solid $borderDark;
+  border: 2px solid $borderDark;
   border-radius: $radiusMedium;
 
   .wrapper {
+    flex-grow: 1;
+
     @include flexColumnCenter;
+    gap: 10px;
 
-    .profileImgArea {
-      background-color: $gray400;
+    .profileInfoArea {
+      width: 100%;
+      @include flexColumnStart;
+      gap: 8px;
 
-      border-radius: $radiusMedium;
+      .userName {
+        color: $textTitleColor;
+        font-size: $textSmall;
+        font-weight: $semiBold;
+      }
+    }
+
+    .followBtn {
+      width: 100%;
+      height: 20px;
+
+      transition: background-color 0.3s ease;
+
+      color: $white;
+      font-size: $textXSmall;
+      font-weight: $semiBold;
+
+      border: 1.5px solid transparent;
+      border-radius: $radiusSmall;
+
+      cursor: pointer;
+
+      &.follow {
+        background-color: $blue600;
+
+        &:hover {
+          background-color: $blue300;
+          border: 1.5px solid $blue600;
+        }
+      }
+
+      &.unFollow {
+        background-color: $red600;
+
+        &:hover {
+          background-color: $red300;
+          border: 1.5px solid $red600;
+        }
+      }
+
+      &.eachFollow {
+        background-color: $primaryOrange;
+
+        &:hover {
+          background-color: $red300;
+          border: 1.5px solid $red600;
+        }
+      }
     }
   }
 }
