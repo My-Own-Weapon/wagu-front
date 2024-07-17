@@ -3,10 +3,7 @@ import { LoginUserInputs, SignupDetails } from '@/types';
 class ApiService {
   private mswBaseUrl = 'http://localhost:9090';
 
-  private baseUrl =
-    process.env.NODE_ENV === 'production'
-      ? process.env.NEXT_PUBLIC_BASE_URL
-      : this.mswBaseUrl;
+  private baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   private kakaoBaseUrl =
     'https://dapi.kakao.com/v2/local/search/keyword.json?page=1&size=15&sort=accuracy&query=';
@@ -132,11 +129,14 @@ class ApiService {
     return data;
   }
 
-  async searchPostsOfStore(storeName: string) {
-    const res = await fetch(`${this.baseUrl}/stores?keyword=${storeName}`, {
-      method: 'GET',
-      credentials: 'include',
-    });
+  async searchStore(storeName: string) {
+    const res = await fetch(
+      `${this.mswBaseUrl}/stores?keyword=${storeName}&page=1&size=12`,
+      {
+        method: 'GET',
+        credentials: 'include',
+      },
+    );
 
     if (!res.ok) {
       const { status, message, error } = await res.json();
@@ -148,10 +148,31 @@ class ApiService {
   }
 
   async searchUsers(username: string) {
-    const res = await fetch(`${this.mswBaseUrl}/members?username=${username}`, {
-      method: 'GET',
-      credentials: 'include',
-    });
+    const res = await fetch(
+      `${this.mswBaseUrl}/members?username=${username}&page=1&size=12`,
+      {
+        method: 'GET',
+        credentials: 'include',
+      },
+    );
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
+    return res.json();
+  }
+
+  async fetchPostsOfStore(storeId: number) {
+    const res = await fetch(
+      `${this.baseUrl}/map/posts?storeId=${storeId}&page=1&size=12`,
+      {
+        method: 'GET',
+        credentials: 'include',
+      },
+    );
 
     if (!res.ok) {
       const { status, message, error } = await res.json();
