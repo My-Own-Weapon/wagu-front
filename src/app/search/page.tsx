@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  FormEventHandler,
-  MouseEventHandler,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { FormEventHandler, MouseEventHandler, useRef, useState } from 'react';
 import Image from 'next/image';
 
 import { apiService } from '@/services/apiService';
@@ -26,15 +20,11 @@ export default function SearchPage() {
   async function fetchStorePosts(userInput: string) {
     const data = await apiService.searchStore(userInput);
 
-    console.log(data);
-
     setSearchStores(data);
   }
 
   async function fetchUsers(userInput: string) {
     const data = await apiService.searchUsers(userInput);
-
-    console.log(data);
 
     setSearchUsers(data);
   }
@@ -62,16 +52,8 @@ export default function SearchPage() {
     }
   };
 
-  // console.log(searchResult);
-  console.log(users);
-
   return (
-    <div
-      className={s.container}
-      style={{
-        backgroundColor: 'pink',
-      }}
-    >
+    <div className={s.container}>
       <nav className={s.tabWrapper}>
         <div className={s.tabBtnArea}>
           <button
