@@ -1,0 +1,65 @@
+@import '@styles/mixins/index.scss';
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/radius.scss';
+@import '@styles/variables/textSize.scss';
+@import '@styles/variables/fontWeight.scss';
+
+.cardsContainer {
+  display: grid;
+
+  margin-top: 16px;
+
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 16px;
+  row-gap: 12px;
+}
+
+.container {
+  @include flexCenter;
+
+  padding: 8px;
+
+  background-color: $white;
+
+  border: 2px solid $borderDark;
+  border-radius: $radiusMedium;
+
+  .linkArea {
+    width: 100%;
+    height: 100%;
+    @include flexCenter;
+    cursor: pointer;
+  }
+
+  .wrapper {
+    flex-grow: 1;
+
+    @include flexColumnCenter;
+    gap: 10px;
+
+    .storeInfoArea {
+      width: 100%;
+      @include flexColumnStart;
+      gap: 8px;
+
+      .storeName {
+        color: $textTitleColor;
+        font-size: $textSmall;
+        font-weight: $semiBold;
+      }
+    }
+    .storePostCount {
+      width: calc(100% - 8px);
+      padding: 4px;
+
+      background-color: $yellow300;
+
+      border: 1.5px solid $border;
+      border-radius: $radiusSmall;
+
+      color: $textTitleColor;
+      font-size: $textSmall;
+      font-weight: $semiBold;
+    }
+  }
+}
