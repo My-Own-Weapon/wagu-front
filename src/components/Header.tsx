@@ -14,6 +14,7 @@ import s from './Header.module.scss';
 export default function Header() {
   const segment = useSelectedLayoutSegment();
   const segments = useSelectedLayoutSegments();
+  console.log(segment);
 
   if (segment === '(auth)' || segment === '(post)') {
     return null;
@@ -25,7 +26,10 @@ export default function Header() {
   }
 
   return (
-    <header className={s.container}>
+    <header
+      className={s.container}
+      style={segment === 'search' ? { backgroundColor: '#fffaf3' } : {}}
+    >
       <div className={s.profileArea}>
         <Image
           src="/profile/profile-default-icon-male.svg"
