@@ -8,8 +8,10 @@
 $tabDiff: 32px;
 
 .container {
-  height: calc(100% - 40px);
   overflow: auto;
+
+  background-color: $bgColor;
+  padding-bottom: 88px;
 
   .searchResultWrapper {
     margin: 0 16px;
