@@ -22,7 +22,7 @@ export default function StorePage({ params }: Props) {
       .catch((e) => {
         alert(e.message);
       });
-  });
+  }, []);
 
   return (
     <div>
