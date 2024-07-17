@@ -152,6 +152,8 @@ a:hover .demo-logo {
 
 #session-header {
   margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
 }
 
 #session-title {
@@ -164,10 +166,18 @@ a:hover .demo-logo {
   margin-top: 20px;
 }
 
+#video-container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 #video-container video {
   position: relative;
   float: left;
   cursor: pointer;
+  height: 100vh;width: auto;
+  /* width: auto; height: auto; */
 }
 
 #video-container p {
@@ -180,10 +190,6 @@ a:hover .demo-logo {
   border-bottom-right-radius: 4px;
 }
 
-/*video {
-	width: 100%;
-	height: auto;
-}*/
 
 #main-video p {
   position: absolute;

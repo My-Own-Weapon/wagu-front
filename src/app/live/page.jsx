@@ -295,24 +295,27 @@ function App() {
         <div id="session">
           <div id="session-header">
             <h1 id="session-title">{mySessionId}</h1>
-            <input
-              className="btn btn-large btn-danger"
-              type="button"
-              id="buttonLeaveSession"
-              onClick={leaveSession}
-              value="Leave session"
-            />
-            {isStreamer && (
+            <div>
               <input
-                className="btn btn-large btn-success"
+                className="btn btn-large btn-danger"
                 type="button"
-                id="buttonSwitchCamera"
-                onClick={switchCamera}
-                value="Switch Camera"
+                id="buttonLeaveSession"
+                onClick={leaveSession}
+                value="Leave session"
               />
-            )}
+              {isStreamer && (
+                <input
+                  className="btn btn-large btn-success"
+                  type="button"
+                  id="buttonSwitchCamera"
+                  onClick={switchCamera}
+                  value="Switch Camera"
+                />
+              )}
+            </div>
           </div>
           <div id="video-container" className="col-md-6">
+            
             {publisher !== undefined && isStreamer ? (
               <div
                 className="stream-container col-md-6 col-xs-6"
@@ -334,6 +337,7 @@ function App() {
           </div>
 
           <div id="chat-container" className="col-md-6">
+            <h1>여기가 chat-container</h1>
             <div id="chat-box">
               {messages.map((message, i) => (
                 <div key={`msg-${i}`} className="chat-message">
