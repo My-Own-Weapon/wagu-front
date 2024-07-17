@@ -1,3 +1,4 @@
+/* eslint-disable prefer-template */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -10,9 +11,10 @@ import { useRouter } from 'next/navigation';
 import { Post, PostCardProps } from '@/components/Post';
 import useDragScroll from '@/hooks/useDragScroll';
 import LiveFriends, { Friend } from '@/components/LiveFriendsList';
-import s from './page.module.scss';
 import VoteUrlModal from '@/components/VoteUrlModal';
 import { application } from 'express';
+
+import s from './page.module.scss';
 
 declare global {
   interface Window {
