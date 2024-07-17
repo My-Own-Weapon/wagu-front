@@ -1,15 +1,14 @@
-'use client';
-
 import { useState } from 'react';
 import classNames from 'classnames';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import ImageFill from '@/components/ui/ImageFill';
+import { apiService } from '@/services/apiService';
 
 import s from './UserCard.module.scss';
-import { useMutation } from '@tanstack/react-query';
 
 export interface User {
-  memberId: string;
+  memberId: number;
   memberUsername: string;
   memberImage: {
     id: string;
@@ -17,7 +16,7 @@ export interface User {
   };
   to: boolean;
   from: boolean;
-  isEach: boolean;
+  each: boolean;
 }
 
 export default function UserCards({ users }: { users: User[] }) {
@@ -30,15 +29,15 @@ export default function UserCards({ users }: { users: User[] }) {
 }
 
 function UserCard({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   memberId,
   memberUsername,
   memberImage,
   to,
   from,
-  isEach,
+  each,
 }: User) {
   const { url } = memberImage;
+  const [saveFrom, setSaveFrom] = useState(from);
 
   return (
     <li className={s.container}>
@@ -54,7 +53,14 @@ function UserCard({
           />
           <p className={s.userName}>{memberUsername}</p>
         </div>
-        <FollowButton to={to} from={from} isEach={isEach} memberId={memberId} />
+        <FollowButton
+          saveFrom={saveFrom}
+          to={to}
+          from={from}
+          each={each}
+          memberId={memberId}
+          setSaveFrom={setSaveFrom}
+        />
       </div>
     </li>
   );
@@ -62,54 +68,106 @@ function UserCard({
 
 type FollowButtonText = 'Follow' | 'Unfollow' | 'EachFollow';
 
+type FollowButtonProps = Pick<User, 'memberId' | 'to' | 'from' | 'each'> & {
+  saveFrom: boolean;
+  setSaveFrom: (from: boolean) => void;
+};
+
 function FollowButton({
   to,
-  isEach,
+  from,
+  each,
+  saveFrom,
   memberId,
-}: Pick<User, 'to' | 'from' | 'isEach' | 'memberId'>) {
+  setSaveFrom: setLocalTo,
+}: FollowButtonProps) {
+  const queryClient = useQueryClient();
   const [isHover, setIsHover] = useState(false);
-  const follow = useMutation(
-    {mutationFn: () =>{},
-    onMutate: async () => {},
-    onError: () => {},
-  }
-  )
 
-  const unfollow = useMutation((memberId: string) => {
-    return fetch(`/api/unfollow/${memberId}`, {
-      method: 'POST',
-    });
-  })
+  const followMutation = useMutation({
+    mutationFn: () => apiService.followUser(memberId),
 
+    onMutate: async () => {
+      // await queryClient.cancelQueries(['user', memberId]);
+      const previousUser = queryClient.getQueryData(['user', memberId]);
+      setLocalTo(true);
+      queryClient.setQueryData(['user', memberId], (old: { from: string }) => ({
+        ...old,
+        from: true,
+      }));
 
-  
-  
-  const btnClassName = classNames(s.followBtn, {
-    [s.follow]: !to,
-    [s.unFollow]: to,
-    [s.eachFollow]: isEach,
+      return { previousUser };
+    },
+    onError: (err, variables, context) => {
+      queryClient.setQueryData(['user', memberId], context?.previousUser);
+      setLocalTo(false);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['user', memberId] });
+    },
   });
+
+  const unfollowMutation = useMutation({
+    mutationFn: () => apiService.unFollowUser(memberId),
+
+    onMutate: async () => {
+      // await queryClient.cancelQueries(['user', memberId]);
+      const previousUser = queryClient.getQueryData(['user', memberId]);
+      setLocalTo(false);
+      queryClient.setQueryData(['user', memberId], (old: { from: string }) => ({
+        ...old,
+        from: false,
+      }));
+
+      return { previousUser };
+    },
+
+    onError: (err, variables, context) => {
+      queryClient.setQueryData(['user', memberId], context?.previousUser);
+
+      setLocalTo(true);
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['user', memberId] });
+    },
+  });
+
+  const handleClick = () => {
+    console.log(`to : ${to}, from : ${from}`);
+
+    if (saveFrom) {
+      unfollowMutation.mutate();
+    } else {
+      followMutation.mutate();
+    }
+  };
+
+  const btnClassName = classNames(s.followBtn, {
+    [s.eachFollow]: (saveFrom && each) || (saveFrom && to),
+    [s.follow]: !saveFrom,
+    [s.unFollow]: saveFrom,
+  });
+
   let text: FollowButtonText;
 
-  if (isEach) {
+  if ((saveFrom && each) || (saveFrom && to)) {
     text = isHover ? 'Unfollow' : 'EachFollow';
-  } else if (to) {
+  } else if (saveFrom) {
     text = 'Unfollow';
   } else {
     text = 'Follow';
   }
 
-  const handleFollow = 
-
   return (
     <button
-      data-member-id={memberId}
       type="button"
       className={btnClassName}
+      data-member-id={memberId}
       onMouseEnter={() => setIsHover(true)}
       onMouseOut={() => setIsHover(false)}
       onBlur={() => setIsHover(false)}
-      onClick={}
+      onClick={handleClick}
     >
       {text}
     </button>
