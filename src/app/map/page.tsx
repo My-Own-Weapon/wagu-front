@@ -220,7 +220,7 @@ export default function KakaoMap() {
             throw new Error('세션 생성 실패');
           }
           console.log('생성된 URL:', text);
-          setVoteUrl('https://wagubook.shop/share?sessionId=' + text); // 생성된 URL 설정
+          setVoteUrl('https://www.wagubook.shop/share?sessionId=' + text); // 생성된 URL 설정
           setModalIsOpen(true);
         });
       })
