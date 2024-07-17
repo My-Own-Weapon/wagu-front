@@ -30,3 +30,17 @@ export interface AddPostProps {
   ];
   auto: true;
 }
+
+export interface PostCardProps {
+  postId: string;
+  storeName: string;
+  postMainMenu: string;
+  menuImage: PostImage;
+  menuPrice: string;
+  createdDate: string;
+}
+
+export interface PostImage {
+  id: string;
+  url: string;
+}

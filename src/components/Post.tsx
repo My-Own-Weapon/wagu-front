@@ -5,22 +5,9 @@ import Image from 'next/image';
 import ImageFill from '@/components/ui/ImageFill';
 import { formatNumberToKRW } from '@/utils';
 import useDragScroll from '@/hooks/useDragScroll';
+import { PostCardProps } from '@/types';
 
 import s from './Post.module.scss';
-
-interface PostImage {
-  id: string;
-  url: string;
-}
-
-export interface PostCardProps {
-  postId: string;
-  storeName: string;
-  postMainMenu: string;
-  menuImage: PostImage;
-  menuPrice: string;
-  createdDate: string;
-}
 
 interface PostProps {
   children: ReactNode;
