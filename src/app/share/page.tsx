@@ -12,8 +12,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { OpenVidu, Subscriber } from 'openvidu-browser';
 import { useRouter, useSearchParams } from 'next/navigation';
-import s from './page.module.scss';
 import { Post } from '@/components/Post';
+
+import s from './page.module.scss';
 
 declare global {
   interface Window {
