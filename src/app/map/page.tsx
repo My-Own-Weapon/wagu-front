@@ -7,12 +7,12 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-
 import { Post, PostCardProps } from '@/components/Post';
 import useDragScroll from '@/hooks/useDragScroll';
 import LiveFriends, { Friend } from '@/components/LiveFriendsList';
-
 import s from './page.module.scss';
+import VoteUrlModal from '@/components/VoteUrlModal';
+import { application } from 'express';
 
 declare global {
   interface Window {
@@ -41,6 +41,8 @@ export default function KakaoMap() {
   const [markers, setMarkers] = useState<any[]>([]);
   const [map, setMap] = useState<any>(null);
   const [posts, setPosts] = useState<PostCardProps[]>([]);
+  const [modalIsOpen, setModalIsOpen] = useState(false); // 모달 상태 관리
+  const [voteUrl, setVoteUrl] = useState(''); // 생성된 URL 저장
   const router = useRouter();
   const ref = useDragScroll();
   const [liveFriends, setLiveFriends] = useState<Friend[]>([]);
@@ -192,7 +194,7 @@ export default function KakaoMap() {
   };
 
   const createVoteUrl = () => {
-    fetch('https://wagubook.shop/share', {
+    fetch('https://api.wagubook.shop:8080/share', {
       method: 'POST',
       credentials: 'include',
     })
@@ -204,8 +206,23 @@ export default function KakaoMap() {
         }
         return response.text();
       })
+
       .then((text) => {
-        console.log('생성된 URL:', text);
+        fetch('https://api.wagubook.shop:8080/api/sessions', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customSessionId: text,
+          }),
+        }).then((res) => {
+          if (!res.ok) {
+            throw new Error('세션 생성 실패');
+          }
+          console.log('생성된 URL:', text);
+          setVoteUrl('https://wagubook.shop/share?sessionId=' + text); // 생성된 URL 설정
+          setModalIsOpen(true);
+        });
       })
       .catch((error) => {
         console.error('URL 생성 오류:', error.message);
@@ -265,6 +282,11 @@ export default function KakaoMap() {
           투표 URL 생성하기
         </button>
       </div>
+      <VoteUrlModal
+        isOpen={modalIsOpen}
+        onRequestClose={() => setModalIsOpen(false)}
+        voteUrl={voteUrl}
+      />
     </main>
   );
 }
