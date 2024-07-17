@@ -168,7 +168,7 @@ export default function BoardPage() {
         posx,
         posy,
       },
-      permission: 'PRIVATE',
+      permission: 'PUBLIC',
       auto: 'true',
       menus: [],
     };
