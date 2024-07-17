@@ -179,7 +179,7 @@ export default function SharePage() {
       console.log('마커 추가됨:', marker);
 
       window.kakao.maps.event.addListener(marker, 'click', () => {
-        fetchPostsData(store.storeId, 1, 10);
+        fetchPostsData(store.storeId, 0, 10);
       });
 
       return marker;
