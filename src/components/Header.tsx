@@ -14,7 +14,6 @@ import s from './Header.module.scss';
 export default function Header() {
   const segment = useSelectedLayoutSegment();
   const segments = useSelectedLayoutSegments();
-  console.log(segment);
 
   if (segment === '(auth)' || segment === '(post)') {
     return null;

@@ -8,11 +8,11 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Post, PostCardProps } from '@/components/Post';
+import { Post } from '@/components/Post';
 import useDragScroll from '@/hooks/useDragScroll';
 import LiveFriends, { Friend } from '@/components/LiveFriendsList';
 import VoteUrlModal from '@/components/VoteUrlModal';
-import { application } from 'express';
+import { PostCardProps } from '@/types';
 
 import s from './page.module.scss';
 

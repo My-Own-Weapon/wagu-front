@@ -1,5 +1,5 @@
-import classNames from 'classnames';
 import { useState } from 'react';
+import classNames from 'classnames';
 
 import ImageFill from '@/components/ui/ImageFill';
 
@@ -18,9 +18,6 @@ export interface User {
 }
 
 export default function UserCards({ users }: { users: User[] }) {
-  // const { memberId, memberUsername, memberImage } = users;
-  // const { id: imageId, url } = memberImage;
-
   return (
     <div className={s.cardsContainer}>
       {users.length > 0 &&
@@ -30,6 +27,7 @@ export default function UserCards({ users }: { users: User[] }) {
 }
 
 function UserCard({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   memberId,
   memberUsername,
   memberImage,
@@ -37,10 +35,7 @@ function UserCard({
   from,
   isEach,
 }: User) {
-  const { id: imageId, url } = memberImage;
-
-  console.log(memberId, memberUsername, imageId, url);
-  console.log(url);
+  const { url } = memberImage;
 
   return (
     <li className={s.container}>
@@ -54,7 +49,7 @@ function UserCard({
             borderRadius="8px"
             backgroundColor="#aeaeae"
           />
-          <p className={s.storeName}>{memberUsername}</p>
+          <p className={s.userName}>{memberUsername}</p>
         </div>
         <FollowButton to={to} from={from} isEach={isEach} />
       </div>
@@ -64,11 +59,7 @@ function UserCard({
 
 type FollowButtonText = 'Follow' | 'Unfollow' | 'EachFollow';
 
-function FollowButton({
-  to,
-  from,
-  isEach,
-}: Pick<User, 'to' | 'from' | 'isEach'>) {
+function FollowButton({ to, isEach }: Pick<User, 'to' | 'from' | 'isEach'>) {
   const [isHover, setIsHover] = useState(false);
   const btnClassName = classNames(s.followBtn, {
     [s.follow]: !to,

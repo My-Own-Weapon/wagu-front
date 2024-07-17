@@ -37,7 +37,7 @@ Post.Title = function Title({ title }: PostTitleProps) {
 
 Post.PostCards = function PostList({ posts }: { posts: PostCardProps[] }) {
   const ref = useDragScroll();
-  console.log('posts', posts);
+
   return (
     <ul className={s.cardsContainer} ref={ref}>
       {posts.length > 0

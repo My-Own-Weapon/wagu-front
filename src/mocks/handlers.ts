@@ -92,8 +92,6 @@ export const handlers = [
     const url = new URL(request.url);
     const query = url.searchParams.get('keyword');
 
-    console.log(query);
-
     if (!query) {
       return new HttpResponse(null, { status: 404 });
     }
