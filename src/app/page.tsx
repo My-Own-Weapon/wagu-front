@@ -5,10 +5,11 @@ import { usePathname } from 'next/navigation';
 
 import { consoleArt } from '@/utils';
 import { apiService } from '@/services/apiService';
-import { Post, PostCardProps } from '@/components/Post';
+import { Post } from '@/components/Post';
 import CategoryList from '@/components/CategoryList';
 import LiveFriends, { Friend } from '@/components/LiveFriendsList';
 import { useCheckSession } from '@/hooks/useCheckSession';
+import { PostCardProps } from '@/types';
 
 import s from './page.module.scss';
 

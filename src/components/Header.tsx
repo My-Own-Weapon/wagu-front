@@ -25,7 +25,10 @@ export default function Header() {
   }
 
   return (
-    <header className={s.container}>
+    <header
+      className={s.container}
+      style={segment === 'search' ? { backgroundColor: '#fffaf3' } : {}}
+    >
       <div className={s.profileArea}>
         <Image
           src="/profile/profile-default-icon-male.svg"
@@ -40,14 +43,23 @@ export default function Header() {
         </Link>
       </div>
       <div>
-        <Link href="/search">
-          <Image
-            src="/images/search-glass.svg"
-            alt="search-btn"
-            width={24}
-            height={24}
+        {segment !== 'search' ? (
+          <Link href="/search">
+            <Image
+              src="/images/search-glass.svg"
+              alt="search-btn"
+              width={24}
+              height={24}
+            />
+          </Link>
+        ) : (
+          <div
+            style={{
+              width: 24,
+              height: 24,
+            }}
           />
-        </Link>
+        )}
       </div>
     </header>
   );

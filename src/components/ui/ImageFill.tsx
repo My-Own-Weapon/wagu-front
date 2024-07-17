@@ -5,9 +5,10 @@ interface props {
   width?: string;
   src: string;
   alt: string;
-  fill?: boolean | undefined;
+  fill?: boolean;
   height: string;
   borderRadius?: string;
+  backgroundColor?: string;
 }
 
 /**
@@ -21,8 +22,11 @@ export default function ImageFill({
   alt,
   fill = false,
   borderRadius = '0',
+  backgroundColor = 'transparent',
 }: props) {
-  if ((!fill && width === '100%') || !height) return null;
+  if ((!fill && width === '100%') || !height) {
+    throw new Error('fill이 false일 때 width를 100%로 설정할 수 없습니다.');
+  }
 
   return (
     <div
@@ -31,6 +35,7 @@ export default function ImageFill({
         width,
         height,
         borderRadius,
+        backgroundColor,
       }}
     >
       <Image

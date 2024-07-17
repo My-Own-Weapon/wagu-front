@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import RQProvider from '@/components/RQProvider';
 
 import '@/styles/reset.css';
 import '@/styles/globals.css';
@@ -61,7 +62,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Header />
-        {children}
+        <RQProvider>{children}</RQProvider>
         <Footer />
       </body>
     </html>
