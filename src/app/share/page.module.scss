@@ -11,7 +11,7 @@
   flex-direction: column;
   align-items: center;
   background: $bgColor;
-  overflow-y: auto; /* 수정: 스크롤을 허용하도록 변경 */
+  overflow-y: auto;
 }
 
 .mapContainer {
@@ -20,7 +20,7 @@
   box-sizing: border-box;
   display: flex;
   justify-content: center;
-  flex-shrink: 0; /* 추가: 요소가 줄어들지 않도록 설정 */
+  flex-shrink: 0;
 }
 
 .map {
@@ -31,51 +31,6 @@
   overflow: hidden;
 }
 
-.postsContainer,
-.voteContainer {
-  width: 100%;
-  padding: 16px 24px;
-  box-sizing: border-box;
-  background: #fffdfb;
-  border-top: 1px solid #dddddd;
-  flex-shrink: 0; /* 추가: 요소가 줄어들지 않도록 설정 */
-}
-
-.posts,
-.voteStores {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  overflow-y: scroll;
-  padding-bottom: 8px;
-  scrollbar-width: none; /* For Firefox */
-  &::-webkit-scrollbar {
-    display: none; /* For Chrome, Safari, and Opera */
-  }
-}
-
-.post,
-.voteStore {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 3px;
-  width: 83px;
-  height: 123px;
-  background: #fff6ea;
-  border-radius: 4px;
-  text-align: center;
-
-  img {
-    width: 100%;
-    height: auto;
-    border-radius: 4px;
-  }
-
-  div {
-    margin-top: 4px;
-    font-family: 'Pretendard';
-    font-size: 12px;
-  }
+.postContainer {
+  padding-top: 27px;
 }

@@ -13,6 +13,7 @@ import { useEffect, useState, useRef } from 'react';
 import { OpenVidu, Subscriber } from 'openvidu-browser';
 import { useRouter, useSearchParams } from 'next/navigation';
 import s from './page.module.scss';
+import { Post } from '@/components/Post';
 
 declare global {
   interface Window {
@@ -57,15 +58,23 @@ export default function SharePage() {
     }
   }, [searchParams]);
 
+  console.log(sessionId);
+
   const createSession = async () => {
     try {
-      const response = await fetch('https://video.wagubook.shop/api/sessions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
+      const response = await fetch(
+        'https://api.wagubook.shop:8080/api/sessions',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customSessionId: 'asdasd',
+          }),
+        },
+      );
       const newSessionId = await response.text();
       setSessionId(newSessionId);
-      router.push(`/share?sessionId=${newSessionId}`);
+      router.push('/share?sessionId=asdasd');
     } catch (error) {
       console.error('세션 생성 중 오류 발생:', error);
     }
@@ -134,7 +143,7 @@ export default function SharePage() {
   ) => {
     const { left, down, right, up } = bounds;
     fetchData(
-      `https://wagubook.shop/map?left=${left}&right=${right}&up=${up}&down=${down}`,
+      `https://api.wagubook.shop:8080/map?left=${left}&right=${right}&up=${up}&down=${down}`,
     )
       .then((data) => {
         if (Array.isArray(data)) {
@@ -169,7 +178,7 @@ export default function SharePage() {
       console.log('마커 추가됨:', marker);
 
       window.kakao.maps.event.addListener(marker, 'click', () => {
-        fetchPostsData(store.storeId);
+        fetchPostsData(store.storeId, 1, 10);
       });
 
       return marker;
@@ -183,19 +192,22 @@ export default function SharePage() {
     setMarkers([]);
   };
 
-  const fetchPostsData = (storeId: number) => {
-    console.log(`상점 ID: ${storeId}에 대한 게시물 가져오기`);
-    fetchData(`https://wagubook.shop/map/posts?storeId=${storeId}`)
+  const fetchPostsData = (storeId: number, page: number, size: number) => {
+    console.log(`Fetching posts for store ID: ${storeId}`);
+    fetchData(
+      `https://api.wagubook.shop:8080/map/posts?storeId=${storeId}&page=${page}&size=${size}`,
+    )
       .then((data) => {
-        console.log('가져온 데이터:', data);
+        console.log('Fetched posts data:', data);
         if (Array.isArray(data)) {
+          console.log(data);
           setPosts(data);
         } else {
           console.error('서버가 배열이 아닌 데이터를 반환했습니다:', data);
         }
       })
       .catch((error) => {
-        console.error('데이터 가져오기 중 오류:', error);
+        console.error('Fetch error:', error);
         handleFetchError(error);
       });
   };
@@ -254,9 +266,9 @@ export default function SharePage() {
   const getToken = async (sessionId: string) => {
     try {
       const responseToken = await fetch(
-        `https://video.wagubook.shop/api/sessions/${sessionId}/connections`,
+        `https://api.wagubook.shop:8080/api/sessions/${sessionId}/connections`,
         {
-          method: 'POST',
+          method: 'GET',
           headers: { 'Content-Type': 'application/json' },
         },
       );
@@ -380,31 +392,17 @@ export default function SharePage() {
       <div className={s.mapContainer}>
         <div id="map" className={s.map} />
       </div>
-      <div className={s.postsContainer}>
-        {posts.length > 0 && (
-          <>
-            <h2>{posts[0].storeName} Posts</h2>
-            <div className={s.posts}>
-              {posts.map((post) => (
-                <div key={post.postId} className={s.post}>
-                  <img
-                    src={post.menuImage.url}
-                    alt={post.postMainMenu}
-                    onError={(e) => {
-                      console.error(
-                        `이미지 로드 오류: ${post.menuImage.url}`,
-                        e,
-                      );
-                    }}
-                  />
-                  <div>{post.postMainMenu}</div>
-                  <div>{post.createdDate}</div>
-                  <div>{post.menuPrice}</div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
+      <div className={s.postContainer}>
+        <Post.Wrapper>
+          <Post>
+            {posts.length === 0 ? (
+              <Post.Title title="현재 선택된 post가 없어요! Post를 선택해보세요!" />
+            ) : (
+              <Post.Title title={`${posts[0].storeName}  Posts`} />
+            )}
+            {posts.length > 0 && <Post.PostCards posts={posts} />}
+          </Post>
+        </Post.Wrapper>
       </div>
       <footer>
         <button type="button" onClick={handleJoinSession}>
