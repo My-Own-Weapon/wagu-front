@@ -12,8 +12,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { OpenVidu, Subscriber } from 'openvidu-browser';
 import { useRouter, useSearchParams } from 'next/navigation';
-import s from './page.module.scss';
 import { Post } from '@/components/Post';
+import s from './page.module.scss';
 
 declare global {
   interface Window {
@@ -36,16 +36,19 @@ interface UserLocation {
 }
 
 export default function SharePage() {
+  const router = useRouter();
+
   const [markers, setMarkers] = useState<any[]>([]);
   const [map, setMap] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
+
   const [session, setSession] = useState<any>(null);
   const [publisher, setPublisher] = useState<any>(null);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const OV = useRef<OpenVidu | null>(null);
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [stores, setStores] = useState<any[]>([]);
   const [userLocations, setUserLocations] = useState<UserLocation[]>([]);
   const userMarkers = useRef<Map<string, any>>(new Map());
 
@@ -57,8 +60,6 @@ export default function SharePage() {
       createSession();
     }
   }, [searchParams]);
-
-  console.log(sessionId);
 
   const createSession = async () => {
     try {
@@ -212,6 +213,10 @@ export default function SharePage() {
       });
   };
 
+  const voteAdd = () => {};
+  // const voteRemove = () => {};
+  // const voteStart = () => {};
+
   const handleFetchError = async (error: Response) => {
     let errorMessage = '알 수 없는 에러 발생';
     try {
@@ -235,7 +240,9 @@ export default function SharePage() {
 
     session.on('signal:userLocation', (event: any) => {
       const userLocation = JSON.parse(event.data);
-      console.log('수신된 사용자 위치:', userLocation); // 디버깅 용 로그 추가
+      console.log(event.data); // 디버깅 용 로그 추가
+      console.log(event.from); // Connection object of the sender
+      console.log(event.type); // The type of message ("my-chat")
       setUserLocations((prevLocations) => [...prevLocations, userLocation]);
       updateUserMarker(userLocation);
     });
@@ -245,7 +252,8 @@ export default function SharePage() {
       if (!token) {
         throw new Error('토큰이 정의되지 않았습니다');
       }
-      await session.connect(token, { clientData: 'User' });
+      const [_, username] = document.cookie.split('=');
+      await session.connect(token, { clientData: username });
       const publisher = OV.current.initPublisher(undefined, {
         audioSource: undefined, // 오디오 소스. undefined일 경우 기본 마이크 사용
         videoSource: false, // 비디오 소스. undefined일 경우 기본 웹캠 사용
@@ -262,7 +270,8 @@ export default function SharePage() {
       console.error('세션 연결 중 오류 발생:', (error as Error).message);
     }
   };
-
+  const [_, username] = document.cookie.split('=');
+  console.log('안녕', username);
   const getToken = async (sessionId: string) => {
     try {
       const responseToken = await fetch(
@@ -331,6 +340,7 @@ export default function SharePage() {
 
     if (marker) {
       marker.setPosition(markerPosition);
+      console.log('[ set position ] userId : ', userId);
     } else {
       marker = new window.kakao.maps.Marker({
         position: markerPosition,
@@ -338,17 +348,18 @@ export default function SharePage() {
         title: userId,
       });
       marker.setMap(map);
+      console.log('[ set position ] userId : ', userId);
       userMarkers.current.set(userId, marker);
     }
 
     console.log('사용자 위치 마커 업데이트:', marker);
   };
 
-  // 누락된 sendLocation 함수 추가
   const sendLocation = (lat: number, lng: number) => {
     if (session) {
+      console.log('[ sendLocation ] username : ', username);
       session.signal({
-        data: JSON.stringify({ userId: 'User', lat, lng }),
+        data: JSON.stringify({ userId: username, lat, lng }),
         to: [],
         type: 'userLocation',
       });
@@ -356,8 +367,8 @@ export default function SharePage() {
   };
 
   const updateCenterLocation = () => {
-    if (map) {
-      const center = map.getCenter();
+    if (markers) {
+      var center = map.getCenter();
       sendLocation(center.getLat(), center.getLng());
     }
   };
@@ -374,21 +385,18 @@ export default function SharePage() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (map) {
-        updateCenterLocation();
-      }
-    }, 2000);
+      console.log('10초');
+      updateCenterLocation();
+    }, 1000);
 
     return () => clearInterval(interval);
-  }, [map]);
+  }, [markers]);
 
   return (
     <main className={s.container}>
-      <header>
-        <div>
-          <span>WAGU BOOK</span>
-        </div>
-      </header>
+      <div>
+        <span>WAGU BOOK</span>
+      </div>
       <div className={s.mapContainer}>
         <div id="map" className={s.map} />
       </div>
@@ -404,36 +412,48 @@ export default function SharePage() {
           </Post>
         </Post.Wrapper>
       </div>
-      <footer>
-        <button type="button" onClick={handleJoinSession}>
-          음성 채팅 시작
+      <button type="button" onClick={handleJoinSession}>
+        음성 채팅 시작
+      </button>
+      <button type="button" onClick={leaveSession}>
+        음성 채팅 종료
+      </button>
+      {/* <div className={s.voteAdd}>
+        <button type="button" onClick={}>
+          투표 시작
         </button>
-        <button type="button" onClick={leaveSession}>
-          음성 채팅 종료
+      </div>
+      <div className={s.voteRemove}>
+        <button type="button" onClick={}>
+          투표 삭제
         </button>
+      </div>
+      <div className={s.voteStart}>
+        <button type="button" onClick={}>
+          투표 삭제
+        </button>
+      </div> */}
+      <audio
+        id="publisherAudio"
+        autoPlay
+        ref={(audio) => {
+          if (audio && publisher) {
+            audio.srcObject = publisher.stream.getMediaStream();
+          }
+        }}
+      />
+      {subscribers.map((subscriber, index) => (
         <audio
-          id="publisherAudio"
+          key={index}
+          id={`subscriberAudio${index}`}
           autoPlay
           ref={(audio) => {
-            if (audio && publisher) {
-              audio.srcObject = publisher.stream.getMediaStream();
+            if (audio) {
+              audio.srcObject = subscriber.stream.getMediaStream();
             }
           }}
         />
-
-        {subscribers.map((subscriber, index) => (
-          <audio
-            key={index}
-            id={`subscriberAudio${index}`}
-            autoPlay
-            ref={(audio) => {
-              if (audio) {
-                audio.srcObject = subscriber.stream.getMediaStream();
-              }
-            }}
-          />
-        ))}
-      </footer>
+      ))}
     </main>
   );
 }
