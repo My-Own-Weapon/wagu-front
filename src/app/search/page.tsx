@@ -10,9 +10,8 @@ import {
 import Image from 'next/image';
 
 import { apiService } from '@/services/apiService';
-import { PostCardProps } from '@/types';
-import { Post } from '@/components/Post';
 import UserCards, { User } from '@/components/UserCard';
+import StoreCards, { Store } from '@/components/StoreCard';
 
 import s from './page.module.scss';
 
@@ -20,13 +19,16 @@ type Tab = 'store' | 'user';
 
 export default function SearchPage() {
   const [selectedTab, setSelectedTab] = useState<Tab>('store');
-  const [storePosts, setSearchStorePosts] = useState<PostCardProps[]>([]);
+  const [searchStores, setSearchStores] = useState<Store[]>([]);
   const [users, setSearchUsers] = useState<User[]>([]);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   async function fetchStorePosts(userInput: string) {
-    // const data = await apiService.searchPostsOfStore(userInput);
-    // setSearchStorePosts(data);
+    const data = await apiService.searchStore(userInput);
+
+    console.log(data);
+
+    setSearchStores(data);
   }
 
   async function fetchUsers(userInput: string) {
@@ -110,13 +112,11 @@ export default function SearchPage() {
         </div>
       </nav>
       <ul className={s.searchResultWrapper}>
-        <UserCards users={users} />
-
-        {/* {selectedTab === 'store' ? (
-          <Post.PostCards posts={storePosts} />
+        {selectedTab === 'store' ? (
+          <StoreCards stores={searchStores} />
         ) : (
           <UserCards users={users} />
-        )} */}
+        )}
       </ul>
     </div>
   );
