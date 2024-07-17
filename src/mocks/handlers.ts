@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import { Store } from '@/components/StoreCard';
 import { User } from '@/components/UserCard';
 import { http, HttpResponse } from 'msw';
 
@@ -84,7 +85,126 @@ export const handlers = [
 
     return HttpResponse.json(getUserNotIncludeA());
   }),
+
+  http.get('/stores', ({ request }) => {
+    console.log('fetch members !!');
+
+    const url = new URL(request.url);
+    const query = url.searchParams.get('keyword');
+
+    console.log(query);
+
+    if (!query) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    if (query.includes('a')) {
+      return HttpResponse.json(getStoresIncludeA());
+    }
+
+    return HttpResponse.json(getStoresNotIncludeA());
+  }),
 ];
+
+function getStoresIncludeA(): Store[] {
+  return [
+    {
+      storeId: 1,
+      storeName: 'a김치찜',
+      menuImage: {
+        id: 1,
+        url: '/images/mock-food.png',
+      },
+      postCount: 1,
+    },
+    {
+      storeId: 2,
+      storeName: 'a김치찜',
+      menuImage: {
+        id: 2,
+        url: '/images/mock-food.png',
+      },
+      postCount: 1,
+    },
+    {
+      storeId: 3,
+      storeName: 'a김치찜',
+      menuImage: {
+        id: 3,
+        url: '/images/mock-food.png',
+      },
+      postCount: 1,
+    },
+    {
+      storeId: 4,
+      storeName: 'a김치찜',
+      menuImage: {
+        id: 4,
+        url: '/images/mock-food.png',
+      },
+      postCount: 1,
+    },
+    {
+      storeId: 5,
+      storeName: 'a김치찜',
+      menuImage: {
+        id: 5,
+        url: '/images/mock-food.png',
+      },
+      postCount: 1,
+    },
+  ];
+}
+
+function getStoresNotIncludeA(): Store[] {
+  return [
+    {
+      storeId: 1,
+      storeName: 'bc김치찜',
+      menuImage: {
+        id: 1,
+        url: '/images/mock-food.png',
+      },
+      postCount: 1,
+    },
+    {
+      storeId: 2,
+      storeName: 'bc김치찜',
+      menuImage: {
+        id: 2,
+        url: '/images/mock-food.png',
+      },
+      postCount: 1,
+    },
+    {
+      storeId: 3,
+      storeName: 'bcd김치찜',
+      menuImage: {
+        id: 3,
+        url: '/images/mock-food.png',
+      },
+      postCount: 1,
+    },
+    {
+      storeId: 4,
+      storeName: 'bcde김치찜',
+      menuImage: {
+        id: 4,
+        url: '/images/mock-food.png',
+      },
+      postCount: 1,
+    },
+    {
+      storeId: 5,
+      storeName: 'bcdef김치찜',
+      menuImage: {
+        id: 5,
+        url: '/images/mock-food.png',
+      },
+      postCount: 1,
+    },
+  ];
+}
 
 function getUserIncludeA(): User[] {
   return [
