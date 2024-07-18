@@ -231,30 +231,6 @@ export default function KakaoMap() {
       });
   };
 
-  const renderPost = (post: PostData) => (
-    <div
-      key={post.postId}
-      onClick={() => {
-        if (post.postId) {
-          router.push(`http://www.wagubook.shop:3000/posts/${post.postId}`);
-        } else {
-          console.error('postId가 정의되지 않았습니다.');
-        }
-      }}
-    >
-      <img
-        src={post.menuImage?.url || '/images/default-image.png'}
-        alt={post.postMainMenu}
-        onError={(e) => {
-          console.error(`Image load error: ${post.menuImage?.url}`, e);
-        }}
-      />
-      <div>{post.postMainMenu}</div>
-      <div>{post.createdDate}</div>
-      <div>{post.menuPrice}</div>
-    </div>
-  );
-
   return (
     <main className={s.container}>
       <div className={s.mapContainer}>
