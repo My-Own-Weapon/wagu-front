@@ -2,7 +2,7 @@ import React from 'react';
 import OpenViduVideoComponent from './OvVideo';
 
 function UserVideoComponent({ streamManager }) {
-  console.log('@UserVideoComponent - streamManager:', streamManager);
+  // console.log('@UserVideoComponent - streamManager:', streamManager);
 
   const getNicknameTag = () => {
     // Assuming `streamManager` and `stream` are properly checked for null/undefined elsewhere in the application
