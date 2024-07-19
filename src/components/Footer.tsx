@@ -16,7 +16,7 @@ const footerMap = [
 
 export default function Footer() {
   const segment = useSelectedLayoutSegment();
-  if (segment === '(auth)') {
+  if (segment === '(auth)' || segment === 'live') {
     return null;
   }
 

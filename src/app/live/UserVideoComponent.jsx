@@ -1,6 +1,5 @@
 import React from 'react';
 import OpenViduVideoComponent from './OvVideo';
-import './UserVideo.css';
 
 function UserVideoComponent({ streamManager }) {
   console.log('@UserVideoComponent - streamManager:', streamManager);
