@@ -207,7 +207,7 @@ function getStoresNotIncludeA(): Store[] {
 function getUserIncludeA(): User[] {
   return [
     {
-      memberId: '1',
+      memberId: 1,
       memberUsername: 'a김철수',
       memberImage: {
         id: '1',
@@ -215,10 +215,10 @@ function getUserIncludeA(): User[] {
       },
       to: true,
       from: true,
-      isEach: true,
+      each: true,
     },
     {
-      memberId: '2',
+      memberId: 2,
       memberUsername: 'a신짱구',
       memberImage: {
         id: '2',
@@ -226,10 +226,10 @@ function getUserIncludeA(): User[] {
       },
       to: false,
       from: true,
-      isEach: false,
+      each: false,
     },
     {
-      memberId: '3',
+      memberId: 3,
       memberUsername: 'a이유리',
       memberImage: {
         id: '3',
@@ -237,10 +237,10 @@ function getUserIncludeA(): User[] {
       },
       to: true,
       from: false,
-      isEach: false,
+      each: false,
     },
     {
-      memberId: '4',
+      memberId: 4,
       memberUsername: 'a훈이',
       memberImage: {
         id: '4',
@@ -248,10 +248,10 @@ function getUserIncludeA(): User[] {
       },
       to: true,
       from: true,
-      isEach: true,
+      each: true,
     },
     {
-      memberId: '5',
+      memberId: 5,
       memberUsername: 'a맹구',
       memberImage: {
         id: '5',
@@ -259,7 +259,7 @@ function getUserIncludeA(): User[] {
       },
       to: true,
       from: false,
-      isEach: false,
+      each: false,
     },
   ];
 }
@@ -267,7 +267,7 @@ function getUserIncludeA(): User[] {
 function getUserNotIncludeA(): User[] {
   return [
     {
-      memberId: '1',
+      memberId: 1,
       memberUsername: 'bc김철수',
       memberImage: {
         id: '1',
@@ -275,10 +275,10 @@ function getUserNotIncludeA(): User[] {
       },
       to: false,
       from: true,
-      isEach: false,
+      each: false,
     },
     {
-      memberId: '2',
+      memberId: 2,
       memberUsername: 'bc신짱구',
       memberImage: {
         id: '2',
@@ -286,10 +286,10 @@ function getUserNotIncludeA(): User[] {
       },
       to: false,
       from: true,
-      isEach: false,
+      each: false,
     },
     {
-      memberId: '3',
+      memberId: 3,
       memberUsername: 'bcd훈이',
       memberImage: {
         id: '3',
@@ -297,10 +297,10 @@ function getUserNotIncludeA(): User[] {
       },
       to: true,
       from: false,
-      isEach: false,
+      each: false,
     },
     {
-      memberId: '4',
+      memberId: 4,
       memberUsername: 'bcde이유리',
       memberImage: {
         id: '4',
@@ -308,10 +308,10 @@ function getUserNotIncludeA(): User[] {
       },
       to: true,
       from: false,
-      isEach: false,
+      each: false,
     },
     {
-      memberId: '5',
+      memberId: 5,
       memberUsername: 'bcdef맹구',
       memberImage: {
         id: '5',
@@ -319,7 +319,7 @@ function getUserNotIncludeA(): User[] {
       },
       to: true,
       from: false,
-      isEach: false,
+      each: false,
     },
   ];
 }
