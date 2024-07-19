@@ -1,3 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-console */
+/* eslint-disable no-useless-return */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-shadow */
 /* eslint-disable react/no-array-index-key */
@@ -22,11 +25,10 @@ import UserVideoComponent from '../UserVideoComponent';
 
 export default function StreamingPage({ params }) {
   const { sessionId } = params;
-  console.log('params sessionId : ', sessionId);
 
   const userName = localStorageApi.getUserName();
 
-  const [myUserName, setMyUserName] = useState(localStorageApi.getUserName());
+  // const [myUserName, setMyUserName] = useState(localStorageApi.getUserName());
   const [session, setSession] = useState(undefined);
   const [mainStreamManager, setMainStreamManager] = useState(undefined);
   const [publisher, setPublisher] = useState(undefined);
@@ -41,15 +43,19 @@ export default function StreamingPage({ params }) {
       const { isCreator } =
         await apiService.checkIsStreamerUserOfSession(sessionId);
 
-      console.log('isStreamer :', isCreator);
+      console.log('@@@@@ 1');
+      console.log('isCreator :', isCreator);
 
       setIsStreamer(isCreator);
+      await joinSession();
     };
 
     checkStreamer();
   }, []);
 
   useEffect(() => {
+    console.log('@@@@@ 2');
+
     const handleBeforeUnload = () => {
       leaveSession();
     };
@@ -73,29 +79,42 @@ export default function StreamingPage({ params }) {
 
   const joinSession = useCallback(async () => {
     if (!sessionId) return;
+    console.log('@@@@@ 3');
 
     const OVInstance = new OpenVidu();
     setOV(OVInstance);
 
     const mySession = OVInstance.initSession();
     setSession(mySession);
+    console.log('@@@@@ 4');
 
     mySession.on('signal:chat', (event) => {
       const message = {
         user: event.from.data,
         text: event.data,
       };
+      console.log('@@@@@ 5');
+
       setMessages((prevMessages) => [...prevMessages, message]);
     });
 
     mySession.on('streamCreated', (event) => {
+      console.log('streamCreated event!!!! isCreator :', isStreamer);
+      console.log('@@@@@ 6');
+
       if (!isStreamer) {
+        console.log('_-----------------subscrib로 등록');
+
         const subscriber = mySession.subscribe(event.stream, undefined);
         setMainStreamManager(subscriber); // 스트리머의 스트림을 메인 스트림 매니저로 설정
+        return;
       }
+      console.log('_---------------나 퍼블리셔임 ㅋ');
     });
 
     mySession.on('streamDestroyed', (event) => {
+      console.log('@@@@@ 8');
+
       if (!isStreamer && mainStreamManager === event.stream.streamManager) {
         setMainStreamManager(undefined);
       }
@@ -106,45 +125,52 @@ export default function StreamingPage({ params }) {
     });
 
     // streamer, participant 구분
-    const isStreamer = await apiService.checkIsStreamerUserOfSession(sessionId);
-    console.log('isStreamer :', isStreamer);
+    const { isCreator } =
+      await apiService.checkIsStreamerUserOfSession(sessionId);
+    // console.log('isStreamer :', isStreamer);
+    console.log('@@@@@ 9');
 
     apiService.fetchToken(sessionId).then(({ token }) => {
+      // First param is the token got from the OpenVidu deployment. Second param can be retrieved by every user on event
+      // 'streamCreated' (property Stream.connection.data), and will be appended to DOM as the user's nickname
+      console.log(token);
       mySession
-        .connect(token, { clientData: myUserName })
+        .connect(token, { clientData: userName })
         .then(async () => {
-          if (isStreamer) {
-            console.log('@@@ 실행됨');
+          // --- 5) Get your own camera stream ---
 
-            const publisher = await OVInstance.initPublisherAsync(undefined, {
-              audioSource: undefined,
-              videoSource: undefined,
-              publishAudio: true,
-              publishVideo: true,
-              resolution: '640x480',
-              frameRate: 30,
-              insertMode: 'APPEND',
-              mirror: false,
-            });
+          // Init a publisher passing undefined as targetElement (we don't want OpenVidu to insert a video
+          // element: we will manage it on our own) and with the desired properties
+          const publisher = await OVInstance.initPublisherAsync(undefined, {
+            audioSource: undefined, // The source of audio. If undefined default microphone
+            videoSource: undefined, // The source of video. If undefined default webcam
+            publishAudio: true, // Whether you want to start publishing with your audio unmuted or not
+            publishVideo: true, // Whether you want to start publishing with your video enabled or not
+            resolution: '640x480', // The resolution of your video
+            frameRate: 30, // The frame rate of your video
+            insertMode: 'APPEND', // How the video is inserted in the target element 'video-container'
+            mirror: false, // Whether to mirror your local video or not
+          });
 
-            mySession.publish(publisher);
+          // --- 6) Publish your stream ---
 
-            const devices = await OVInstance.getDevices();
-            const videoDevices = devices.filter((device) => {
-              return device.kind === 'videoinput';
-            });
-            const currentVideoDeviceId = publisher.stream
-              .getMediaStream()
-              .getVideoTracks()[0]
-              .getSettings().deviceId;
-            const currentVideoDevice = videoDevices.find(
-              (device) => device.deviceId === currentVideoDeviceId,
-            );
+          mySession.publish(publisher);
+          const devices = await OVInstance.getDevices();
+          const videoDevices = devices.filter((device) => {
+            return device.kind === 'videoinput';
+          });
+          const currentVideoDeviceId = publisher.stream
+            .getMediaStream()
+            .getVideoTracks()[0]
+            .getSettings().deviceId;
+          const currentVideoDevice = videoDevices.find(
+            (device) => device.deviceId === currentVideoDeviceId,
+          );
 
-            setCurrentVideoDevice(currentVideoDevice);
-            setMainStreamManager(publisher);
-            setPublisher(publisher);
-          }
+          // Set the main video in the page to display our webcam and store our Publisher
+          setCurrentVideoDevice(currentVideoDevice);
+          setMainStreamManager(publisher);
+          setPublisher(publisher);
         })
         .catch((error) => {
           console.log(
@@ -154,6 +180,47 @@ export default function StreamingPage({ params }) {
           );
         });
     });
+    // .then(({ token }) => {
+    // mySession.connect(token, { clientData: userName })
+    //   .then(async () => {
+    //     if (isCreator) {
+    //       const publisher = await OVInstance.initPublisherAsync(undefined, {
+    //         audioSource: undefined,
+    //         videoSource: undefined,
+    //         publishAudio: true,
+    //         publishVideo: true,
+    //         resolution: '640x480',
+    //         frameRate: 30,
+    //         insertMode: 'APPEND',
+    //         mirror: false,
+    //       });
+    //     }});
+
+    //     mySession.publish(publisher);
+    //     const devices = await OVInstance.getDevices();
+    //     const videoDevices = devices.filter((device) => {
+    //       return device.kind === 'videoinput';
+    //     });
+    //     const currentVideoDeviceId = publisher.stream
+    //       .getMediaStream()
+    //       .getVideoTracks()[0]
+    //       .getSettings().deviceId;
+    //     const currentVideoDevice = videoDevices.find(
+    //       (device) => device.deviceId === currentVideoDeviceId,
+    //     );
+
+    //     setCurrentVideoDevice(currentVideoDevice);
+    //     setMainStreamManager(publisher);
+    //     setPublisher(publisher);
+
+    // });
+    // // .catch((error) => {
+    // //   console.log(
+    // //     'There was an error connecting to the session:',
+    // //     error.code,
+    // //     error.message,
+    // //   );
+    // // });
   }, []);
 
   const leaveSession = useCallback(() => {
@@ -166,7 +233,7 @@ export default function StreamingPage({ params }) {
     setPublisher(undefined);
     setMessage('');
     setMessages([]);
-    setMyUserName('');
+    // setMyUserName('');
   }, [session]);
 
   const switchCamera = useCallback(async () => {
@@ -214,11 +281,7 @@ export default function StreamingPage({ params }) {
     }
   };
 
-  useEffect(() => {
-    if (sessionId) {
-      joinSession();
-    }
-  }, []);
+  console.log('mainStreamManager :', mainStreamManager);
 
   return (
     <div>
@@ -250,7 +313,9 @@ export default function StreamingPage({ params }) {
             >
               <UserVideoComponent streamManager={mainStreamManager} />
             </div>
-          ) : null}
+          ) : (
+            <div>스트리머의 비디오를 기다리는 중...</div>
+          )}
         </div>
 
         <div id="chat-container" className="col-md-6">
