@@ -212,6 +212,83 @@ class ApiService {
 
     return res.text();
   }
+
+  async createSessionId() {
+    const res = await fetch(`${this.baseUrl}/api/sessions`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const { status, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+    }
+
+    const data = await res.json();
+
+    return data;
+  }
+
+  async fetchToken(sessionId: string) {
+    const res = await fetch(
+      `${this.baseUrl}/api/sessions/${sessionId}/connections`,
+      {
+        method: 'POST',
+        credentials: 'include',
+      },
+    );
+
+    if (!res.ok) {
+      const { status, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+    }
+
+    const data = await res.json();
+
+    return data;
+  }
+
+  async fetchSessionCreator(sessionId: string) {
+    const res = await fetch(
+      `${this.baseUrl}/api/sessions/${sessionId}/creator`,
+      {
+        method: 'GET',
+        credentials: 'include',
+      },
+    );
+
+    if (!res.ok) {
+      const { status, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+    }
+
+    const data = await res.json();
+
+    return data;
+  }
+
+  async checkIsStreamerUserOfSession(sessionId: string) {
+    const res = await fetch(
+      `${this.baseUrl}/api/sessions/${sessionId}/creator`,
+      {
+        method: 'GET',
+        credentials: 'include',
+      },
+    );
+
+    if (!res.ok) {
+      const { status, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+    }
+
+    const data = await res.json();
+
+    return data;
+  }
 }
 
 export const apiService = new ApiService();
