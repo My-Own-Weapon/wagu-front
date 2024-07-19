@@ -43,8 +43,8 @@ export default function KakaoMap() {
   const [markers, setMarkers] = useState<any[]>([]);
   const [map, setMap] = useState<any>(null);
   const [posts, setPosts] = useState<PostCardProps[]>([]);
-  const [modalIsOpen, setModalIsOpen] = useState(false); // 모달 상태 관리
-  const [voteUrl, setVoteUrl] = useState(''); // 생성된 URL 저장
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [voteUrl, setVoteUrl] = useState('');
   const router = useRouter();
   const ref = useDragScroll();
   const [liveFriends, setLiveFriends] = useState<Friend[]>([]);
@@ -58,7 +58,7 @@ export default function KakaoMap() {
       window.kakao.maps.load(() => {
         const container = document.getElementById('map');
         if (!container) {
-          console.error('지도 컨테이너를 찾을 수 없습니다.');
+          alert('지도 컨테이너를 찾을 수 없습니다.'); // console.error 대신 alert로 대체
           return;
         }
 
@@ -89,9 +89,9 @@ export default function KakaoMap() {
     };
 
     script.onerror = () => {
-      console.error('카카오 지도 스크립트를 불러오지 못했습니다.');
+      alert('카카오 지도 스크립트를 불러오지 못했습니다.'); // console.error 대신 alert로 대체
     };
-  }, []);
+  }, []); // useEffect의 종속성 배열에 fetchStoresData 추가
 
   const fetchData = (url: string) => {
     return fetch(url, { method: 'GET', credentials: 'include' }).then(
@@ -109,28 +109,30 @@ export default function KakaoMap() {
     bounds: { left: number; down: number; right: number; up: number },
   ) => {
     const { left, down, right, up } = bounds;
-    console.log('Fetching stores data with bounds:', bounds);
     fetchData(
       `https://api.wagubook.shop:8080/map?left=${left}&right=${right}&up=${up}&down=${down}`,
     )
       .then((data) => {
-        console.log('Fetched stores data:', data);
         if (Array.isArray(data)) {
           addMarkers(mapInstance, data);
-          console.log(data);
         } else {
-          console.error('서버로부터 받은 데이터가 배열이 아닙니다:', data);
+          handleFetchError(
+            new Response('서버로부터 받은 데이터가 배열이 아닙니다.', {
+              status: 500,
+            }),
+          );
         }
       })
       .catch(handleFetchError);
   };
 
   const addMarkers = (mapInstance: any, storeData: StoreData[]) => {
-    console.log('상점 데이터에 마커 추가하기:', storeData);
     removeMarkers();
 
     if (!Array.isArray(storeData)) {
-      console.error('storeData가 배열이 아닙니다:', storeData);
+      handleFetchError(
+        new Response('storeData가 배열이 아닙니다.', { status: 500 }),
+      );
       return;
     }
 
@@ -145,7 +147,6 @@ export default function KakaoMap() {
       });
 
       marker.setMap(mapInstance);
-      console.log('마커 추가됨:', marker);
 
       window.kakao.maps.event.addListener(marker, 'click', () => {
         fetchPostsData(store.storeId, 0, 10);
@@ -163,21 +164,21 @@ export default function KakaoMap() {
   };
 
   const fetchPostsData = (storeId: number, page: number, size: number) => {
-    console.log(`Fetching posts for store ID: ${storeId}`);
     fetchData(
       `https://api.wagubook.shop:8080/map/posts?storeId=${storeId}&page=${page}&size=${size}`,
     )
       .then((data) => {
-        console.log('Fetched posts data:', data);
         if (Array.isArray(data)) {
-          console.log(data);
           setPosts(data);
         } else {
-          console.error('서버가 배열이 아닌 데이터를 반환했습니다:', data);
+          handleFetchError(
+            new Response('서버가 배열이 아닌 데이터를 반환했습니다.', {
+              status: 500,
+            }),
+          );
         }
       })
       .catch((error) => {
-        console.error('Fetch error:', error);
         handleFetchError(error);
       });
   };
@@ -187,12 +188,10 @@ export default function KakaoMap() {
     let errorMessage = '알 수 없는 에러 발생';
     try {
       const errorData = await error.json();
-      console.error('Error data:', errorData);
       errorMessage = `Error ${errorData.status}: ${errorData.error} - ${errorData.message}`;
     } catch (jsonError) {
-      console.error('Error parsing JSON:', jsonError);
+      // JSON 파싱 중 오류 발생 시
     }
-    console.error('Fetch error details:', errorMessage);
   };
 
   const createVoteUrl = () => {
@@ -217,43 +216,26 @@ export default function KakaoMap() {
           body: JSON.stringify({
             customSessionId: text,
           }),
-        }).then((res) => {
-          if (!res.ok) {
-            throw new Error('세션 생성 실패');
-          }
-          console.log('생성된 URL:', text);
-          setVoteUrl('https://wagubook.shop/share?sessionId=' + text); // 생성된 URL 설정
-          setModalIsOpen(true);
-        });
+        })
+          .then((res) => {
+            if (!res.ok) {
+              throw new Error('세션 생성 실패');
+            }
+            setVoteUrl('https://www.wagubook.shop/share?sessionId=' + text); // 생성된 URL 설정
+            setModalIsOpen(true);
+          })
+          .catch((error) => {
+            handleFetchError(
+              new Response(`세션 생성 오류: ${error.message}`, { status: 500 }),
+            );
+          });
       })
       .catch((error) => {
-        console.error('URL 생성 오류:', error.message);
+        handleFetchError(
+          new Response(`URL 생성 오류: ${error.message}`, { status: 500 }),
+        );
       });
   };
-
-  const renderPost = (post: PostData) => (
-    <div
-      key={post.postId}
-      onClick={() => {
-        if (post.postId) {
-          router.push(`http://www.wagubook.shop:3000/posts/${post.postId}`);
-        } else {
-          console.error('postId가 정의되지 않았습니다.');
-        }
-      }}
-    >
-      <img
-        src={post.menuImage?.url || '/images/default-image.png'}
-        alt={post.postMainMenu}
-        onError={(e) => {
-          console.error(`Image load error: ${post.menuImage?.url}`, e);
-        }}
-      />
-      <div>{post.postMainMenu}</div>
-      <div>{post.createdDate}</div>
-      <div>{post.menuPrice}</div>
-    </div>
-  );
 
   return (
     <main className={s.container}>

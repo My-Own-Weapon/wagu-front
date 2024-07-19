@@ -1,3 +1,6 @@
+/* eslint-disable eqeqeq */
+/* eslint-disable no-else-return */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-var */
 /* eslint-disable vars-on-top */
 /* eslint-disable no-param-reassign */
@@ -7,14 +10,16 @@
 /* eslint-disable no-shadow */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable import/no-unresolved */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, MouseEventHandler } from 'react';
 import { OpenVidu, Subscriber } from 'openvidu-browser';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Post } from '@/components/Post';
+import { sharing } from 'webpack';
+import StoreCards, { StoreVoteCard } from '@/components/StoreCard';
+import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
 import s from './page.module.scss';
 
 declare global {
@@ -35,11 +40,25 @@ interface UserLocation {
   userId: string;
   lat: number;
   lng: number;
+  imageUrl: string;
+  userName: string;
+}
+
+interface UserDetail {
+  imageUrl: string;
+  userName: string;
+}
+
+interface VoteResult {
+  storeName: string;
+  storeAddress: string;
+  storeId: number;
+  posx: number;
+  posy: number;
+  votes: number;
 }
 
 export default function SharePage() {
-  const router = useRouter();
-
   const [markers, setMarkers] = useState<any[]>([]);
   const [map, setMap] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
@@ -49,39 +68,38 @@ export default function SharePage() {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const OV = useRef<OpenVidu | null>(null);
   const searchParams = useSearchParams();
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<any>(null);
   const [stores, setStores] = useState<any[]>([]);
   const [userLocations, setUserLocations] = useState<UserLocation[]>([]);
   const userMarkers = useRef<Map<string, any>>(new Map());
-
+  const [storeId, setStoreId] = useState<any>();
+  const [isVote, setIsVote] = useState<boolean>(false);
+  const [shareId, setShareId] = useState<string>();
+  const [currSelectedStore, setCurrSelectedStore] = useState<any>();
+  const currSelectedStoreRef = useRef<any>();
+  const UserIconWithText = WithText<UserIconProps>(UserIcon);
+  const [userDetails, setUserDetails] = useState<UserDetail>();
+  const [voteResults, setVoteResults] = useState<VoteResult[]>([]);
   useEffect(() => {
     const sessionId = searchParams.get('sessionId');
     if (sessionId) {
       setSessionId(sessionId);
-    } else {
-      createSession();
+      fetch(`https://wagubook.shop:8080/share/${sessionId}`, {
+        method: 'GET',
+        credentials: 'include',
+      })
+        .then((res) => {
+          return res.text();
+        })
+        .then((shareId) => {
+          setShareId(shareId);
+        });
     }
   }, [searchParams]);
 
-  const createSession = async () => {
-    try {
-      const response = await fetch(
-        'https://api.wagubook.shop:8080/api/sessions',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            customSessionId: 'asdasd',
-          }),
-        },
-      );
-      const newSessionId = await response.text();
-      setSessionId(newSessionId);
-      router.push('/share?sessionId=asdasd');
-    } catch (error) {
-      console.error('세션 생성 중 오류 발생:', error);
-    }
-  };
+  useEffect(() => {
+    console.log(stores);
+  }, [stores]);
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -158,6 +176,68 @@ export default function SharePage() {
       .catch(handleFetchError);
   };
 
+  const handleAddVote: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.stopPropagation();
+
+    console.log(e);
+
+    const { currentTarget } = e;
+    const { dataset } = currentTarget;
+    const { storeId } = dataset;
+
+    console.log('shareId:', shareId);
+    console.log('storeId:', storeId);
+
+    fetch(
+      `https://api.wagubook.shop:8080/share/${shareId}/vote?store_id=${storeId}`,
+      {
+        method: 'POST',
+        credentials: 'include',
+      },
+    )
+      .then((res) => {
+        console.log(res);
+        return res.text();
+      })
+      .then((message) => {
+        console.log(message);
+        alert(message);
+      })
+      .catch((e) => {
+        console.log(e.message);
+        throw e;
+      });
+  };
+
+  const handleDeleteVote: MouseEventHandler<HTMLButtonElement> = (e) => {
+    const { currentTarget } = e;
+    const { dataset } = currentTarget;
+    const { storeId } = dataset;
+
+    console.log('shareId:', shareId);
+    console.log('storeId:', storeId);
+
+    fetch(
+      `https://api.wagubook.shop:8080/share/${shareId}/vote?store_id=${storeId}`,
+      {
+        method: 'PATCH',
+        credentials: 'include',
+      },
+    )
+      .then((res) => {
+        console.log(res);
+        return res.text();
+      })
+      .then((message) => {
+        console.log(message);
+        alert(message);
+      })
+      .catch((e) => {
+        console.log(e.message);
+        throw e;
+      });
+  };
+
   const addMarkers = (mapInstance: any, storeData: StoreData[]) => {
     console.log('상점 데이터에 마커 추가하기:', storeData);
     removeMarkers();
@@ -181,7 +261,8 @@ export default function SharePage() {
       console.log('마커 추가됨:', marker);
 
       window.kakao.maps.event.addListener(marker, 'click', () => {
-        fetchPostsData(store.storeId, 1, 10);
+        setStoreId(store.storeId);
+        fetchPostsData(store.storeId, 0, 10);
       });
 
       return marker;
@@ -215,10 +296,114 @@ export default function SharePage() {
       });
   };
 
-  const voteAdd = () => {};
-  // const voteRemove = () => {};
-  // const voteStart = () => {};
+  const voteAdd = (url: string, storeId: string) => {
+    fetch(`https://api.wagubook.shop:8080/share/${url}`, {
+      method: 'GET',
+      credentials: 'include',
+    })
+      .then((res) => {
+        return res.text();
+      })
+      .then(async (sharedId) => {
+        console.log(sharedId);
+        try {
+          const res = await fetch(
+            `https://api.wagubook.shop:8080/store/${storeId}`,
+            {
+              method: 'GET',
+              credentials: 'include',
+            },
+          );
+          console.log(res);
+          console.log('res.ok', stores);
+          const selectedStore = await res.json();
+          currSelectedStoreRef.current = selectedStore;
+        } catch (e) {
+          if (e instanceof Error) {
+            console.log(e.message);
+          }
+        }
 
+        console.log(stores);
+        fetch(
+          `https://api.wagubook.shop:8080/share/${sharedId}?store_id=${storeId}`,
+          {
+            method: 'POST',
+            credentials: 'include',
+          },
+        )
+          .then((res) => {
+            console.log(res);
+            if (!res.ok) {
+              throw new Error('이미 추가된 가게입니다.');
+            }
+            return res.text();
+          })
+          .then((message) => {
+            setStores([...stores, currSelectedStoreRef.current]);
+            console.log(message);
+            alert(message);
+          })
+          .catch((error) => {
+            alert(error.message);
+          });
+      });
+  };
+
+  const voteDelete = (url: string, selectedStoreId: string) => {
+    fetch(`https://api.wagubook.shop:8080/share/${url}`, {
+      method: 'GET',
+      credentials: 'include',
+    })
+      .then((res) => {
+        return res.text();
+      })
+      .then((sharedId) => {
+        console.log(sharedId);
+        setStores(stores.filter(({ storeId }) => storeId != selectedStoreId));
+        fetch(
+          `https://api.wagubook.shop:8080/share/${sharedId}?store_id=${selectedStoreId}`,
+          {
+            method: 'DELETE',
+            credentials: 'include',
+          },
+        )
+          .then((res) => {
+            console.log(res);
+            return res.text();
+          })
+          .then((message) => {
+            console.log(message);
+            alert(message);
+          })
+          .catch((error) => {
+            throw error;
+          });
+      });
+  };
+
+  const voteDone = () => {
+    fetchVoteResults();
+    setIsVote(true);
+  };
+
+  const fetchVoteResults = () => {
+    fetch(`https://api.wagubook.shop:8080/share/${shareId}/result`, {
+      method: 'GET',
+      credentials: 'include',
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setVoteResults(data);
+        } else {
+          console.error('서버로부터 받은 데이터가 배열이 아닙니다:', data);
+        }
+      })
+      .catch((error) => {
+        console.error('투표 결과를 가져오는 중 오류 발생:', error);
+      });
+  };
   const handleFetchError = async (error: Response) => {
     let errorMessage = '알 수 없는 에러 발생';
     try {
@@ -242,9 +427,9 @@ export default function SharePage() {
 
     session.on('signal:userLocation', (event: any) => {
       const userLocation = JSON.parse(event.data);
-      console.log(event.data); // 디버깅 용 로그 추가
-      console.log(event.from); // Connection object of the sender
-      console.log(event.type); // The type of message ("my-chat")
+      console.log(event.data);
+      console.log(event.from);
+      console.log(event.type);
       setUserLocations((prevLocations) => [...prevLocations, userLocation]);
       updateUserMarker(userLocation);
     });
@@ -257,10 +442,10 @@ export default function SharePage() {
       const [_, username] = document.cookie.split('=');
       await session.connect(token, { clientData: username });
       const publisher = OV.current.initPublisher(undefined, {
-        audioSource: undefined, // 오디오 소스. undefined일 경우 기본 마이크 사용
-        videoSource: false, // 비디오 소스. undefined일 경우 기본 웹캠 사용
-        publishAudio: true, // 오디오를 무음 상태로 시작할지 여부
-        publishVideo: false, // 비디오를 비활성화 상태로 시작할지 여부
+        audioSource: undefined,
+        videoSource: false,
+        publishAudio: true,
+        publishVideo: false,
       });
 
       session.publish(publisher);
@@ -272,8 +457,7 @@ export default function SharePage() {
       console.error('세션 연결 중 오류 발생:', (error as Error).message);
     }
   };
-  const [_, username] = document.cookie.split('=');
-  console.log('안녕', username);
+
   const getToken = async (sessionId: string) => {
     try {
       const responseToken = await fetch(
@@ -312,7 +496,6 @@ export default function SharePage() {
     if (sessionId) {
       await joinSession(sessionId);
 
-      // publisher의 오디오 스트림을 audio 태그에 연결
       if (publisher) {
         const audioElement = document.getElementById(
           'publisherAudio',
@@ -322,7 +505,6 @@ export default function SharePage() {
         }
       }
 
-      // subscribers의 오디오 스트림을 각각의 audio 태그에 연결
       subscribers.forEach((subscriber, index) => {
         const audioElement = document.getElementById(
           `subscriberAudio${index}`,
@@ -359,9 +541,26 @@ export default function SharePage() {
 
   const sendLocation = (lat: number, lng: number) => {
     if (session) {
-      console.log('[ sendLocation ] username : ', username);
+      const [_, username] = document.cookie.split('=');
+      console.log('[ sendLocation 시작 ] username : ', username);
+      fetch(`https://api.wagubook.shop:8080/member/${username}/profile`, {
+        method: 'GET',
+        credentials: 'include',
+      })
+        .then((res) => {
+          console.log('프로필 요청 성공 : ', res);
+          if (!res.ok) {
+            throw new Error('프로필 이미지 받아오기 실패');
+          }
+          return res.json();
+        })
+        .then((data) => {
+          console.log('data: ', data);
+          setUserDetails(data);
+        });
+
       session.signal({
-        data: JSON.stringify({ userId: username, lat, lng }),
+        data: JSON.stringify({ userId: username, lat, lng, userDetails }),
         to: [],
         type: 'userLocation',
       });
@@ -369,7 +568,7 @@ export default function SharePage() {
   };
 
   const updateCenterLocation = () => {
-    if (markers) {
+    if (markers && !isVote) {
       var center = map.getCenter();
       sendLocation(center.getLat(), center.getLng());
     }
@@ -387,75 +586,149 @@ export default function SharePage() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      console.log('10초');
+      console.log('1초');
       updateCenterLocation();
     }, 1000);
 
     return () => clearInterval(interval);
   }, [markers]);
 
-  return (
-    <main className={s.container}>
-      <div>
-        <span>WAGU BOOK</span>
-      </div>
-      <div className={s.mapContainer}>
-        <div id="map" className={s.map} />
-      </div>
-      <div className={s.postContainer}>
-        <Post.Wrapper>
-          <Post>
-            {posts.length === 0 ? (
-              <Post.Title title="현재 선택된 post가 없어요! Post를 선택해보세요!" />
-            ) : (
-              <Post.Title title={`${posts[0].storeName}  Posts`} />
-            )}
-            {posts.length > 0 && <Post.PostCards posts={posts} />}
-          </Post>
-        </Post.Wrapper>
-      </div>
-      <button type="button" onClick={handleJoinSession}>
-        음성 채팅 시작
-      </button>
-      <button type="button" onClick={leaveSession}>
-        음성 채팅 종료
-      </button>
-      {/* <div className={s.voteAdd}>
-        <button type="button" onClick={}>
-          투표 시작
+  if (isVote) {
+    console.log('투표 시작');
+    console.log(stores);
+
+    return (
+      <main className={s.container}>
+        {/* <StoreCards stores={stores} /> */}
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            alignItems: 'center',
+            alignContent: 'center',
+            gap: '10px',
+          }}
+        >
+          {stores.map((store) => {
+            return (
+              <StoreVoteCard
+                key={store.storeId}
+                {...store}
+                handleAddVote={handleAddVote}
+                handleDeleteVote={handleDeleteVote}
+              />
+            );
+          })}
+        </div>
+        <button className={s.myVoteDone} type="button" onClick={voteDone}>
+          투표 URL 생성하기
         </button>
-      </div>
-      <div className={s.voteRemove}>
-        <button type="button" onClick={}>
-          투표 삭제
+      </main>
+    );
+  } else {
+    return (
+      <main className={s.container}>
+        <div className={s.userContainer}>
+          {userLocations.map((userLocation) => {
+            return (
+              <li
+                key={userLocation.userId}
+                style={{
+                  display: 'flex',
+                }}
+              >
+                <UserIconWithText
+                  width={40}
+                  height={40}
+                  shape="circle"
+                  size="small"
+                  imgSrc={
+                    !!userLocation.imageUrl
+                      ? userLocation.imageUrl
+                      : '/profile/profile-default-icon-female.svg'
+                  }
+                  alt="profile-icon"
+                >
+                  {userLocation.userName}
+                </UserIconWithText>
+              </li>
+            );
+          })}
+        </div>
+        <div className={s.mapContainer}>
+          <div id="map" className={s.map} />
+        </div>
+        <div className={s.postContainer}>
+          <Post.Wrapper>
+            <Post>
+              {posts.length === 0 ? (
+                <Post.Title title="현재 선택된 post가 없어요! Post를 선택해보세요!" />
+              ) : (
+                <Post.Title title={`${posts[0].storeName}  Posts`} />
+              )}
+              {posts.length > 0 && <Post.PostCards posts={posts} />}
+            </Post>
+          </Post.Wrapper>
+        </div>
+        <button type="button" onClick={handleJoinSession}>
+          음성 채팅 시작
         </button>
-      </div>
-      <div className={s.voteStart}>
-        <button type="button" onClick={}>
-          투표 삭제
+        <button type="button" onClick={leaveSession}>
+          음성 채팅 종료
         </button>
-      </div> */}
-      <audio
-        id="publisherAudio"
-        autoPlay
-        ref={(audio) => {
-          if (audio && publisher) {
-            audio.srcObject = publisher.stream.getMediaStream();
-          }
-        }}
-      />
-      {subscribers.map((subscriber, index) => (
+        <div className={s.voteAdd}>
+          <button
+            type="button"
+            onClick={() => {
+              voteAdd(sessionId, storeId);
+            }}
+          >
+            투표 추가
+          </button>
+        </div>
+        <div className={s.voteRemove}>
+          <button
+            type="button"
+            onClick={() => {
+              voteDelete(sessionId, storeId);
+            }}
+          >
+            투표 삭제
+          </button>
+        </div>
+        <div className={s.voteStart}>
+          <button
+            type="button"
+            onClick={() => {
+              setIsVote(true);
+            }}
+          >
+            투표 시작
+          </button>
+        </div>
         <audio
-          key={index}
-          id={`subscriberAudio${index}`}
+          id="publisherAudio"
           autoPlay
           ref={(audio) => {
-            if (audio) {
-              audio.srcObject = subscriber.stream.getMediaStream();
+            if (audio && publisher) {
+              audio.srcObject = publisher.stream.getMediaStream();
             }
           }}
         />
-      ))}
-    </main>
-  );
+        {subscribers.map((subscriber, index) => (
+          <audio
+            key={index}
+            id={`subscriberAudio${index}`}
+            autoPlay
+            ref={(audio) => {
+              if (audio) {
+                audio.srcObject = subscriber.stream.getMediaStream();
+              }
+            }}
+          />
+        ))}
+      </main>
+    );
+  }
 }
