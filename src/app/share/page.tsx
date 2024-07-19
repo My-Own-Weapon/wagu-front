@@ -1,3 +1,6 @@
+/* eslint-disable eqeqeq */
+/* eslint-disable no-else-return */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-var */
 /* eslint-disable vars-on-top */
 /* eslint-disable no-param-reassign */
@@ -7,7 +10,6 @@
 /* eslint-disable no-shadow */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable import/no-unresolved */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 'use client';
 
@@ -15,9 +17,10 @@ import { useEffect, useState, useRef, MouseEventHandler } from 'react';
 import { OpenVidu, Subscriber } from 'openvidu-browser';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Post } from '@/components/Post';
-import s, { voteStart } from './page.module.scss';
 import { sharing } from 'webpack';
 import StoreCards, { StoreVoteCard } from '@/components/StoreCard';
+import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
+import s from './page.module.scss';
 
 declare global {
   interface Window {
@@ -37,6 +40,22 @@ interface UserLocation {
   userId: string;
   lat: number;
   lng: number;
+  imageUrl: string;
+  userName: string;
+}
+
+interface UserDetail {
+  imageUrl: string;
+  userName: string;
+}
+
+interface VoteResult {
+  storeName: string;
+  storeAddress: string;
+  storeId: number;
+  posx: number;
+  posy: number;
+  votes: number;
 }
 
 export default function SharePage() {
@@ -58,7 +77,9 @@ export default function SharePage() {
   const [shareId, setShareId] = useState<string>();
   const [currSelectedStore, setCurrSelectedStore] = useState<any>();
   const currSelectedStoreRef = useRef<any>();
-
+  const UserIconWithText = WithText<UserIconProps>(UserIcon);
+  const [userDetails, setUserDetails] = useState<UserDetail>();
+  const [voteResults, setVoteResults] = useState<VoteResult[]>([]);
   useEffect(() => {
     const sessionId = searchParams.get('sessionId');
     if (sessionId) {
@@ -74,9 +95,6 @@ export default function SharePage() {
           setShareId(shareId);
         });
     }
-    // else {
-    //   createSession();
-    // }
   }, [searchParams]);
 
   useEffect(() => {
@@ -301,7 +319,9 @@ export default function SharePage() {
           const selectedStore = await res.json();
           currSelectedStoreRef.current = selectedStore;
         } catch (e) {
-          console.log(e.message);
+          if (e instanceof Error) {
+            console.log(e.message);
+          }
         }
 
         console.log(stores);
@@ -317,7 +337,6 @@ export default function SharePage() {
             if (!res.ok) {
               throw new Error('이미 추가된 가게입니다.');
             }
-
             return res.text();
           })
           .then((message) => {
@@ -363,6 +382,28 @@ export default function SharePage() {
       });
   };
 
+  const voteDone = () => {
+    fetchVoteResults();
+    setIsVote(true);
+  };
+
+  const fetchVoteResults = () => {
+    fetch(`https://api.wagubook.shop:8080/share/${shareId}/result`, {
+      method: 'GET',
+      credentials: 'include',
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setVoteResults(data);
+        } else {
+          console.error('서버로부터 받은 데이터가 배열이 아닙니다:', data);
+        }
+      })
+      .catch((error) => {
+        console.error('투표 결과를 가져오는 중 오류 발생:', error);
+      });
+  };
   const handleFetchError = async (error: Response) => {
     let errorMessage = '알 수 없는 에러 발생';
     try {
@@ -386,9 +427,9 @@ export default function SharePage() {
 
     session.on('signal:userLocation', (event: any) => {
       const userLocation = JSON.parse(event.data);
-      console.log(event.data); 
+      console.log(event.data);
       console.log(event.from);
-      console.log(event.type); 
+      console.log(event.type);
       setUserLocations((prevLocations) => [...prevLocations, userLocation]);
       updateUserMarker(userLocation);
     });
@@ -403,7 +444,7 @@ export default function SharePage() {
       const publisher = OV.current.initPublisher(undefined, {
         audioSource: undefined,
         videoSource: false,
-        publishAudio: true, 
+        publishAudio: true,
         publishVideo: false,
       });
 
@@ -500,9 +541,26 @@ export default function SharePage() {
 
   const sendLocation = (lat: number, lng: number) => {
     if (session) {
-      console.log('[ sendLocation ] username : ', username);
+      const [_, username] = document.cookie.split('=');
+      console.log('[ sendLocation 시작 ] username : ', username);
+      fetch(`https://api.wagubook.shop:8080/member/${username}/profile`, {
+        method: 'GET',
+        credentials: 'include',
+      })
+        .then((res) => {
+          console.log('프로필 요청 성공 : ', res);
+          if (!res.ok) {
+            throw new Error('프로필 이미지 받아오기 실패');
+          }
+          return res.json();
+        })
+        .then((data) => {
+          console.log('data: ', data);
+          setUserDetails(data);
+        });
+
       session.signal({
-        data: JSON.stringify({ userId: username, lat, lng }),
+        data: JSON.stringify({ userId: username, lat, lng, userDetails }),
         to: [],
         type: 'userLocation',
       });
@@ -510,7 +568,7 @@ export default function SharePage() {
   };
 
   const updateCenterLocation = () => {
-    if (markers) {
+    if (markers && !isVote) {
       var center = map.getCenter();
       sendLocation(center.getLat(), center.getLng());
     }
@@ -528,7 +586,7 @@ export default function SharePage() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      console.log('10초');
+      console.log('1초');
       updateCenterLocation();
     }, 1000);
 
@@ -563,11 +621,41 @@ export default function SharePage() {
             );
           })}
         </div>
+        <button className={s.myVoteDone} type="button" onClick={voteDone}>
+          투표 URL 생성하기
+        </button>
       </main>
     );
   } else {
     return (
       <main className={s.container}>
+        <div className={s.userContainer}>
+          {userLocations.map((userLocation) => {
+            return (
+              <li
+                key={userLocation.userId}
+                style={{
+                  display: 'flex',
+                }}
+              >
+                <UserIconWithText
+                  width={40}
+                  height={40}
+                  shape="circle"
+                  size="small"
+                  imgSrc={
+                    !!userLocation.imageUrl
+                      ? userLocation.imageUrl
+                      : '/profile/profile-default-icon-female.svg'
+                  }
+                  alt="profile-icon"
+                >
+                  {userLocation.userName}
+                </UserIconWithText>
+              </li>
+            );
+          })}
+        </div>
         <div className={s.mapContainer}>
           <div id="map" className={s.map} />
         </div>

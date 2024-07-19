@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, MouseEvent } from 'react';
 
 import ImageFill from '@/components/ui/ImageFill';
 
@@ -24,9 +24,8 @@ export interface StoreVoteCardProps {
     id: number;
     url: string;
   };
-  postCount: number;
-  handleAddVote: (e) => void;
-  handleDeleteVote: (e) => void;
+  handleAddVote: (e: MouseEvent) => void;
+  handleDeleteVote: (e: MouseEvent) => void;
 }
 
 export default function StoreCards({ stores }: { stores: Store[] }) {
@@ -42,7 +41,6 @@ export function StoreVoteCard({
   storeId,
   storeName,
   menuImage,
-  postCount,
   handleAddVote,
   handleDeleteVote,
 }: StoreVoteCardProps) {
