@@ -45,6 +45,7 @@
   font-size: 16px;
   color: #ffffff;
   margin: 37px 16px;
+  overflow: auto;
 }
 .voteRemove {
   width: 311px;
@@ -56,6 +57,7 @@
   font-size: 16px;
   color: #ffffff;
   margin: 37px 16px;
+  overflow: auto;
 }
 
 .voteStart {
@@ -68,10 +70,12 @@
   font-size: 16px;
   color: #ffffff;
   margin: 37px 16px;
+  overflow: auto;
 }
 
 .myVoteDone {
   margin: 0 auto;
+  overflow: auto;
 }
 
 .userContainer {
