@@ -15,7 +15,7 @@ export default function Header() {
   const segment = useSelectedLayoutSegment();
   const segments = useSelectedLayoutSegments();
 
-  if (segment === '(auth)' || segment === '(post)') {
+  if (segment === '(auth)' || segment === '(post)' || segment === 'live') {
     return null;
   }
   if (segments.length >= 2) {

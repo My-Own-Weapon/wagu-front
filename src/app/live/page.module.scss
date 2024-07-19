@@ -1,0 +1,26 @@
+.entryPageContainer {
+  margin-top: 20px;
+
+  background-color: pink;
+
+  .entryPageHeaderWrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+
+    .title {
+      font-size: 16px;
+      margin: 0;
+    }
+
+    .joinInfoWrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+    }
+  }
+}
