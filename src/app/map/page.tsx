@@ -207,9 +207,8 @@ export default function KakaoMap() {
         }
         return response.text();
       })
-
       .then((text) => {
-        fetch('https://api.wagubook.shop:8080/api/sessions', {
+        fetch('https://api.wagubook.shop:8080/api/sessions/voice', {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
@@ -221,7 +220,7 @@ export default function KakaoMap() {
             if (!res.ok) {
               throw new Error('세션 생성 실패');
             }
-            setVoteUrl('https://www.wagubook.shop/share?sessionId=' + text);
+            setVoteUrl('localhost:3000/share?sessionId=' + text);
             setModalIsOpen(true);
           })
           .catch((error) => {
