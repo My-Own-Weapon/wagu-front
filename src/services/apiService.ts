@@ -216,6 +216,16 @@ class ApiService {
   async createSessionId() {
     const res = await fetch(`${this.baseUrl}/api/sessions`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        storeLocation: {
+          address: '123 Main St',
+          posx: 123.123,
+          posy: 123.123,
+        },
+      }),
       credentials: 'include',
     });
 
