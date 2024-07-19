@@ -18,7 +18,7 @@ import { OpenVidu, Subscriber } from 'openvidu-browser';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Post } from '@/components/Post';
 import { sharing } from 'webpack';
-import StoreCards, { StoreVoteCard } from '@/components/StoreCard';
+import StoreCards, { StoreCard, StoreVoteCard } from '@/components/StoreCard';
 import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
 import s from './page.module.scss';
 
@@ -75,13 +75,15 @@ export default function SharePage() {
   const [storeId, setStoreId] = useState<any>();
   const [isVote, setIsVote] = useState<boolean>(false);
   const [shareId, setShareId] = useState<string>();
-  const [currSelectedStore, setCurrSelectedStore] = useState<any>();
   const currSelectedStoreRef = useRef<any>();
   const UserIconWithText = WithText<UserIconProps>(UserIcon);
   const [userDetails, setUserDetails] = useState<UserDetail>();
   const [voteResults, setVoteResults] = useState<VoteResult[]>([]);
+  const [isVoteDone, setIsVoteDone] = useState<boolean>(false);
+
   useEffect(() => {
     const sessionId = searchParams.get('sessionId');
+    console.log('sessionId : ', sessionId);
     if (sessionId) {
       setSessionId(sessionId);
       fetch(`https://wagubook.shop:8080/share/${sessionId}`, {
@@ -92,14 +94,11 @@ export default function SharePage() {
           return res.text();
         })
         .then((shareId) => {
+          console.log('shareId : ', shareId);
           setShareId(shareId);
         });
     }
   }, [searchParams]);
-
-  useEffect(() => {
-    console.log(stores);
-  }, [stores]);
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -189,7 +188,7 @@ export default function SharePage() {
     console.log('storeId:', storeId);
 
     fetch(
-      `https://api.wagubook.shop:8080/share/${shareId}/vote?store_id=${storeId}`,
+      `https://api.wagubook.shop:8080/share/${sessionId}/vote?store_id=${storeId}`,
       {
         method: 'POST',
         credentials: 'include',
@@ -218,7 +217,7 @@ export default function SharePage() {
     console.log('storeId:', storeId);
 
     fetch(
-      `https://api.wagubook.shop:8080/share/${shareId}/vote?store_id=${storeId}`,
+      `https://api.wagubook.shop:8080/share/${sessionId}/vote?store_id=${storeId}`,
       {
         method: 'PATCH',
         credentials: 'include',
@@ -296,106 +295,116 @@ export default function SharePage() {
       });
   };
 
-  const voteAdd = (url: string, storeId: string) => {
-    fetch(`https://api.wagubook.shop:8080/share/${url}`, {
+  const voteAdd = async (url: string, storeId: number) => {
+    const res = await fetch(`https://api.wagubook.shop:8080/store/${storeId}`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+    console.log(res);
+    console.log('res.ok', stores);
+    const selectedStore = await res.json();
+    currSelectedStoreRef.current = selectedStore;
+    fetch(
+      `https://api.wagubook.shop:8080/share/${sessionId}?store_id=${storeId}`,
+      {
+        method: 'POST',
+        credentials: 'include',
+      },
+    )
+      .then((res) => {
+        console.log(res);
+        if (!res.ok) {
+          throw new Error('이미 추가된 가게입니다.');
+        }
+        return res.text();
+      })
+      .then((message) => {
+        // setStores([...stores, currSelectedStoreRef.current]);
+        sendVoteAdd(currSelectedStoreRef.current);
+        console.log(message);
+        alert(message);
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
+
+    fetch(`https://api.wagubook.shop:8080/share/${sessionId}/vote/list`, {
       method: 'GET',
       credentials: 'include',
     })
       .then((res) => {
-        return res.text();
+        return JSON.stringify(res.formData);
       })
-      .then(async (sharedId) => {
-        console.log(sharedId);
-        try {
-          const res = await fetch(
-            `https://api.wagubook.shop:8080/store/${storeId}`,
-            {
-              method: 'GET',
-              credentials: 'include',
-            },
-          );
-          console.log(res);
-          console.log('res.ok', stores);
-          const selectedStore = await res.json();
-          currSelectedStoreRef.current = selectedStore;
-        } catch (e) {
-          if (e instanceof Error) {
-            console.log(e.message);
-          }
-        }
-
-        console.log(stores);
-        fetch(
-          `https://api.wagubook.shop:8080/share/${sharedId}?store_id=${storeId}`,
-          {
-            method: 'POST',
-            credentials: 'include',
-          },
-        )
-          .then((res) => {
-            console.log(res);
-            if (!res.ok) {
-              throw new Error('이미 추가된 가게입니다.');
-            }
-            return res.text();
-          })
-          .then((message) => {
-            setStores([...stores, currSelectedStoreRef.current]);
-            console.log(message);
-            alert(message);
-          })
-          .catch((error) => {
-            alert(error.message);
-          });
+      .then((data) => {
+        console.log('[][][][][][][]result : ', data);
+        setStores([stores, res.body]);
+        console.log('GET VOTE LIST : ', stores);
       });
   };
 
+  const sendVoteAdd = (store: any) => {
+    if (session) {
+      session.signal({
+        data: JSON.stringify({ store }),
+        to: [],
+        type: 'addVote',
+      });
+    }
+  };
+
   const voteDelete = (url: string, selectedStoreId: string) => {
-    fetch(`https://api.wagubook.shop:8080/share/${url}`, {
-      method: 'GET',
-      credentials: 'include',
-    })
+    fetch(
+      `https://api.wagubook.shop:8080/share/${sessionId}?store_id=${selectedStoreId}`,
+      {
+        method: 'DELETE',
+        credentials: 'include',
+      },
+    )
       .then((res) => {
+        console.log(res);
+        if (!res.ok) {
+          throw new Error('이미 삭제된 가게입니다.');
+        }
         return res.text();
       })
-      .then((sharedId) => {
-        console.log(sharedId);
+      .then((message) => {
         setStores(stores.filter(({ storeId }) => storeId != selectedStoreId));
-        fetch(
-          `https://api.wagubook.shop:8080/share/${sharedId}?store_id=${selectedStoreId}`,
-          {
-            method: 'DELETE',
-            credentials: 'include',
-          },
-        )
-          .then((res) => {
-            console.log(res);
-            return res.text();
-          })
-          .then((message) => {
-            console.log(message);
-            alert(message);
-          })
-          .catch((error) => {
-            throw error;
-          });
+        sendVoteDelete(storeId);
+        console.log(message);
+        alert(message);
+      })
+      .catch((error) => {
+        alert(error.message);
       });
+  };
+
+  const sendVoteDelete = (storeId: number) => {
+    if (session) {
+      session.signal({
+        data: JSON.stringify({ storeId }),
+        to: [],
+        type: 'voteDelete',
+      });
+    }
   };
 
   const voteDone = () => {
     fetchVoteResults();
-    setIsVote(true);
+    setIsVoteDone(true);
   };
 
   const fetchVoteResults = () => {
-    fetch(`https://api.wagubook.shop:8080/share/${shareId}/result`, {
+    fetch(`https://api.wagubook.shop:8080/share/${sessionId}/result`, {
       method: 'GET',
       credentials: 'include',
     })
-      .then((response) => response.json())
+      .then((response) => {
+        return response.json();
+      })
       .then((data) => {
         if (Array.isArray(data)) {
           setVoteResults(data);
+          console.log('SETRESULT 성공: ', voteResults);
         } else {
           console.error('서버로부터 받은 데이터가 배열이 아닙니다:', data);
         }
@@ -427,11 +436,23 @@ export default function SharePage() {
 
     session.on('signal:userLocation', (event: any) => {
       const userLocation = JSON.parse(event.data);
+      setUserLocations((prevLocations) => [...prevLocations, userLocation]);
+      updateUserMarker(userLocation);
+    });
+
+    session.on('signal:addVote', (event: any) => {
+      event.preventDefault();
+      const { store } = JSON.parse(event.data);
+      console.log('시그널');
       console.log(event.data);
       console.log(event.from);
       console.log(event.type);
-      setUserLocations((prevLocations) => [...prevLocations, userLocation]);
-      updateUserMarker(userLocation);
+      // const { storeId } = event.data;
+      // const { storeId: realstoreId } = storeId;
+      const store2 = store.store;
+      console.log('@@@@@@@@@@@@@@@@@@@@@', store);
+      console.log('!!!!!', store2);
+      setStores([...stores, store]);
     });
 
     try {
@@ -460,11 +481,12 @@ export default function SharePage() {
 
   const getToken = async (sessionId: string) => {
     try {
+      console.log(sessionId);
       const responseToken = await fetch(
-        `https://api.wagubook.shop:8080/api/sessions/${sessionId}/connections`,
+        `https://api.wagubook.shop:8080/api/sessions/${sessionId}/connections/voice`,
         {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+          credentials: 'include',
         },
       );
 
@@ -472,7 +494,7 @@ export default function SharePage() {
         throw new Error(`토큰 요청 실패: ${responseToken.statusText}`);
       }
 
-      const token = await responseToken.text();
+      const { token } = await responseToken.json();
       console.log(`생성된 세션 ID: ${sessionId}`);
       console.log(`생성된 토큰: ${token}`);
 
@@ -586,15 +608,15 @@ export default function SharePage() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      console.log('1초');
+      console.log('10초');
       updateCenterLocation();
-    }, 1000);
+    }, 10000);
 
     return () => clearInterval(interval);
   }, [markers]);
 
   if (isVote) {
-    console.log('투표 시작');
+    console.log('투표화면 시작');
     console.log(stores);
 
     return (
@@ -622,14 +644,16 @@ export default function SharePage() {
           })}
         </div>
         <button className={s.myVoteDone} type="button" onClick={voteDone}>
-          투표 URL 생성하기
+          나의 투표 종료
         </button>
       </main>
     );
+  } else if (isVoteDone) {
+    <div>투표결과 여기 나옴</div>;
   } else {
     return (
       <main className={s.container}>
-        <div className={s.userContainer}>
+        {/* <div className={s.userContainer}>
           {userLocations.map((userLocation) => {
             return (
               <li
@@ -654,8 +678,8 @@ export default function SharePage() {
                 </UserIconWithText>
               </li>
             );
-          })}
-        </div>
+          })} */}
+        {/* </div> */}
         <div className={s.mapContainer}>
           <div id="map" className={s.map} />
         </div>
@@ -677,6 +701,20 @@ export default function SharePage() {
         <button type="button" onClick={leaveSession}>
           음성 채팅 종료
         </button>
+        <div className={s.voteListContainer}>
+          {stores.map((store) => {
+            console.log(store);
+            return (
+              <StoreVoteCard
+                key={store.storeId}
+                {...store}
+                handleAddVote={handleAddVote}
+                handleDeleteVote={handleDeleteVote}
+              />
+            );
+          })}
+        </div>
+
         <div className={s.voteAdd}>
           <button
             type="button"
