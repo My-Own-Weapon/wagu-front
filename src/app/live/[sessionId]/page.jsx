@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-console */
 /* eslint-disable no-useless-return */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-shadow */
@@ -129,38 +131,46 @@ export default function StreamingPage({ params }) {
     console.log('@@@@@ 9');
 
     apiService.fetchToken(sessionId).then(({ token }) => {
+      // First param is the token got from the OpenVidu deployment. Second param can be retrieved by every user on event
+      // 'streamCreated' (property Stream.connection.data), and will be appended to DOM as the user's nickname
+      console.log(token);
       mySession
         .connect(token, { clientData: userName })
         .then(async () => {
-          if (isCreator) {
-            const publisher = await OVInstance.initPublisherAsync(undefined, {
-              audioSource: undefined,
-              videoSource: undefined,
-              publishAudio: true,
-              publishVideo: true,
-              resolution: '640x480',
-              frameRate: 30,
-              insertMode: 'APPEND',
-              mirror: false,
-            });
+          // --- 5) Get your own camera stream ---
 
-            mySession.publish(publisher);
-            const devices = await OVInstance.getDevices();
-            const videoDevices = devices.filter((device) => {
-              return device.kind === 'videoinput';
-            });
-            const currentVideoDeviceId = publisher.stream
-              .getMediaStream()
-              .getVideoTracks()[0]
-              .getSettings().deviceId;
-            const currentVideoDevice = videoDevices.find(
-              (device) => device.deviceId === currentVideoDeviceId,
-            );
+          // Init a publisher passing undefined as targetElement (we don't want OpenVidu to insert a video
+          // element: we will manage it on our own) and with the desired properties
+          const publisher = await OVInstance.initPublisherAsync(undefined, {
+            audioSource: undefined, // The source of audio. If undefined default microphone
+            videoSource: undefined, // The source of video. If undefined default webcam
+            publishAudio: true, // Whether you want to start publishing with your audio unmuted or not
+            publishVideo: true, // Whether you want to start publishing with your video enabled or not
+            resolution: '640x480', // The resolution of your video
+            frameRate: 30, // The frame rate of your video
+            insertMode: 'APPEND', // How the video is inserted in the target element 'video-container'
+            mirror: false, // Whether to mirror your local video or not
+          });
 
-            setCurrentVideoDevice(currentVideoDevice);
-            setMainStreamManager(publisher);
-            setPublisher(publisher);
-          }
+          // --- 6) Publish your stream ---
+
+          mySession.publish(publisher);
+          const devices = await OVInstance.getDevices();
+          const videoDevices = devices.filter((device) => {
+            return device.kind === 'videoinput';
+          });
+          const currentVideoDeviceId = publisher.stream
+            .getMediaStream()
+            .getVideoTracks()[0]
+            .getSettings().deviceId;
+          const currentVideoDevice = videoDevices.find(
+            (device) => device.deviceId === currentVideoDeviceId,
+          );
+
+          // Set the main video in the page to display our webcam and store our Publisher
+          setCurrentVideoDevice(currentVideoDevice);
+          setMainStreamManager(publisher);
+          setPublisher(publisher);
         })
         .catch((error) => {
           console.log(
@@ -170,6 +180,47 @@ export default function StreamingPage({ params }) {
           );
         });
     });
+    // .then(({ token }) => {
+    // mySession.connect(token, { clientData: userName })
+    //   .then(async () => {
+    //     if (isCreator) {
+    //       const publisher = await OVInstance.initPublisherAsync(undefined, {
+    //         audioSource: undefined,
+    //         videoSource: undefined,
+    //         publishAudio: true,
+    //         publishVideo: true,
+    //         resolution: '640x480',
+    //         frameRate: 30,
+    //         insertMode: 'APPEND',
+    //         mirror: false,
+    //       });
+    //     }});
+
+    //     mySession.publish(publisher);
+    //     const devices = await OVInstance.getDevices();
+    //     const videoDevices = devices.filter((device) => {
+    //       return device.kind === 'videoinput';
+    //     });
+    //     const currentVideoDeviceId = publisher.stream
+    //       .getMediaStream()
+    //       .getVideoTracks()[0]
+    //       .getSettings().deviceId;
+    //     const currentVideoDevice = videoDevices.find(
+    //       (device) => device.deviceId === currentVideoDeviceId,
+    //     );
+
+    //     setCurrentVideoDevice(currentVideoDevice);
+    //     setMainStreamManager(publisher);
+    //     setPublisher(publisher);
+
+    // });
+    // // .catch((error) => {
+    // //   console.log(
+    // //     'There was an error connecting to the session:',
+    // //     error.code,
+    // //     error.message,
+    // //   );
+    // // });
   }, []);
 
   const leaveSession = useCallback(() => {
