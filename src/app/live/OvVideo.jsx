@@ -5,8 +5,10 @@
 
 import React, { useEffect, useRef } from 'react';
 
-export default function OpenViduVideoComponent({ streamManager }) {
+function OpenViduVideoComponent({ streamManager }) {
   const videoRef = useRef(null);
+
+  console.log('@@OpenViduVideoComponent streaManager :', streamManager);
 
   useEffect(() => {
     if (streamManager && videoRef.current) {
@@ -16,3 +18,5 @@ export default function OpenViduVideoComponent({ streamManager }) {
 
   return <video autoPlay ref={videoRef} />;
 }
+
+export default OpenViduVideoComponent;
