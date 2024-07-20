@@ -13,6 +13,12 @@
   align-items: center;
 }
 
+@mixin flexRowStart {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 @mixin flexColumnCenter {
   display: flex;
   flex-direction: column;
