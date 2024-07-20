@@ -304,7 +304,7 @@ export default function SharePage() {
     console.log('res.ok', stores);
     const selectedStore = await res.json();
     currSelectedStoreRef.current = selectedStore;
-    fetch(
+    await fetch(
       `https://api.wagubook.shop:8080/share/${sessionId}?store_id=${storeId}`,
       {
         method: 'POST',
@@ -313,6 +313,7 @@ export default function SharePage() {
     )
       .then((res) => {
         console.log(res);
+        console.log('1');
         if (!res.ok) {
           throw new Error('이미 추가된 가게입니다.');
         }
@@ -328,18 +329,19 @@ export default function SharePage() {
         alert(error.message);
       });
 
-    fetch(`https://api.wagubook.shop:8080/share/${sessionId}/vote/list`, {
-      method: 'GET',
-      credentials: 'include',
-    })
-      .then((res) => {
-        return JSON.stringify(res.formData);
-      })
-      .then((data) => {
-        console.log('[][][][][][][]result : ', data);
-        setStores([stores, res.body]);
-        console.log('GET VOTE LIST : ', stores);
-      });
+    await fetchVoteList(sessionId);
+  };
+
+  const fetchVoteList = async (sessionId: string) => {
+    const res = await fetch(
+      `https://api.wagubook.shop:8080/share/${sessionId}/vote/list`,
+      {
+        method: 'GET',
+        credentials: 'include',
+      },
+    );
+    const voteList = await res.json();
+    setStores(() => voteList);
   };
 
   const sendVoteAdd = (store: any) => {
@@ -440,19 +442,10 @@ export default function SharePage() {
       updateUserMarker(userLocation);
     });
 
-    session.on('signal:addVote', (event: any) => {
+    session.on('signal:addVote', async (event: any) => {
       event.preventDefault();
-      const { store } = JSON.parse(event.data);
-      console.log('시그널');
-      console.log(event.data);
-      console.log(event.from);
-      console.log(event.type);
-      // const { storeId } = event.data;
-      // const { storeId: realstoreId } = storeId;
-      const store2 = store.store;
-      console.log('@@@@@@@@@@@@@@@@@@@@@', store);
-      console.log('!!!!!', store2);
-      setStores([...stores, store]);
+
+      await fetchVoteList(sessionId);
     });
 
     try {
