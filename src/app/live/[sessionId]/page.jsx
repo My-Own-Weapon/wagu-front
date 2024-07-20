@@ -660,7 +660,7 @@ export default function StreamingPage({ params }) {
   const [OV, setOV] = useState(undefined);
   const [session, setSession] = useState(undefined);
   const [mainStreamManager, setMainStreamManager] = useState(undefined);
-  const [subscriber, setSubscriber] = useState(null);
+  const [subscribers, setSubscribers] = useState([]);
   const [publisher, setPublisher] = useState(undefined);
   const [currentVideoDevice, setCurrentVideoDevice] = useState(undefined);
 
@@ -727,7 +727,7 @@ export default function StreamingPage({ params }) {
 
       const subscriber = OVSession.subscribe(event.stream, undefined);
       // setMainStreamManager(subscriber); // 스트리머의 스트림을 메인 스트림 매니저로 설정
-      setSubscriber(subscriber);
+      setSubscribers((prev) => [...prev, subscriber]);
     });
 
     OVSession.on('streamDestroyed', (event) => {
@@ -932,14 +932,14 @@ export default function StreamingPage({ params }) {
               <UserVideoComponent streamManager={mainStreamManager} />
             </div>
           ) : (
-            subscriber !== null &&
+            subscribers !== null &&
             !isStreamer && (
               <div
                 className="stream-container col-md-6 col-xs-6"
-                onClick={() => handleMainVideoStream(subscriber)}
+                onClick={() => handleMainVideoStream(subscribers[0])}
               >
                 섭스다
-                <UserVideoComponent streamManager={subscriber} />
+                <UserVideoComponent streamManager={subscribers[0]} />
               </div>
             )
           )}
