@@ -13,7 +13,7 @@
 
 'use client';
 
-import { useEffect, useState, useRef, MouseEventHandler } from 'react';
+import React, { useEffect, useState, useRef, MouseEventHandler } from 'react';
 import { OpenVidu, Subscriber } from 'openvidu-browser';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Post } from '@/components/Post';
@@ -44,34 +44,33 @@ interface UserLocation {
   userName: string;
 }
 
-interface UserDetail {
-  imageUrl: string;
-  userName: string;
-}
-
 interface VoteResult {
-  storeName: string;
-  storeAddress: string;
   storeId: number;
-  posx: number;
-  posy: number;
-  votes: number;
+  storeName: string;
+  menuImage: {
+    id: number;
+    url: string;
+  };
+  postCount: number;
 }
 
 export default function SharePage() {
   const [markers, setMarkers] = useState<any[]>([]);
   const [map, setMap] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
+  const userMarkers = useRef<Map<string, any>>(new Map());
+  const [userLocations, setUserLocations] = useState<UserLocation[]>([]);
+  const [markerImage, setMarkerImage] = useState<any>(null);
+  const [centerMarker, setCenterMarker] = useState<any>(null);
 
-  const [session, setSession] = useState<any>(null);
-  const [publisher, setPublisher] = useState<any>(null);
-  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const OV = useRef<OpenVidu | null>(null);
   const searchParams = useSearchParams();
+  const [session, setSession] = useState<any>(null);
   const [sessionId, setSessionId] = useState<any>(null);
+  const [publisher, setPublisher] = useState<any>(null);
+  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
+
   const [stores, setStores] = useState<any[]>([]);
-  const [userLocations, setUserLocations] = useState<UserLocation[]>([]);
-  const userMarkers = useRef<Map<string, any>>(new Map());
   const [storeId, setStoreId] = useState<any>();
   const [isVote, setIsVote] = useState<boolean>(false);
   const [shareId, setShareId] = useState<string>();
@@ -80,7 +79,8 @@ export default function SharePage() {
   const [userDetails, setUserDetails] = useState<UserDetail>();
   const [voteResults, setVoteResults] = useState<VoteResult[]>([]);
   const [isVoteDone, setIsVoteDone] = useState<boolean>(false);
-
+  const [voteCount, setVoteCount] = useState<number>(0);
+  const [disable, setDisable] = useState<boolean>(false);
   useEffect(() => {
     const sessionId = searchParams.get('sessionId');
     console.log('sessionId : ', sessionId);
@@ -321,7 +321,7 @@ export default function SharePage() {
       })
       .then((message) => {
         // setStores([...stores, currSelectedStoreRef.current]);
-        sendVoteAdd(currSelectedStoreRef.current);
+        sendVoteUpdate();
         console.log(message);
         alert(message);
       })
@@ -344,12 +344,29 @@ export default function SharePage() {
     setStores(() => voteList);
   };
 
-  const sendVoteAdd = (store: any) => {
+  const sendVoteDone = () => {
     if (session) {
       session.signal({
-        data: JSON.stringify({ store }),
         to: [],
-        type: 'addVote',
+        type: 'voteDone',
+      });
+    }
+  };
+
+  const sendVoteUpdate = () => {
+    if (session) {
+      session.signal({
+        to: [],
+        type: 'voteUpdate',
+      });
+    }
+  };
+
+  const sendVoteStart = () => {
+    if (session) {
+      session.signal({
+        to: [],
+        type: 'voteStart',
       });
     }
   };
@@ -371,7 +388,7 @@ export default function SharePage() {
       })
       .then((message) => {
         setStores(stores.filter(({ storeId }) => storeId != selectedStoreId));
-        sendVoteDelete(storeId);
+        sendVoteUpdate();
         console.log(message);
         alert(message);
       })
@@ -380,19 +397,15 @@ export default function SharePage() {
       });
   };
 
-  const sendVoteDelete = (storeId: number) => {
-    if (session) {
-      session.signal({
-        data: JSON.stringify({ storeId }),
-        to: [],
-        type: 'voteDelete',
-      });
-    }
+  const myVoteDone = () => {
+    sendVoteDone();
+    setDisable(true);
   };
 
   const voteDone = () => {
     fetchVoteResults();
     setIsVoteDone(true);
+    setIsVote(false);
   };
 
   const fetchVoteResults = () => {
@@ -442,10 +455,20 @@ export default function SharePage() {
       updateUserMarker(userLocation);
     });
 
-    session.on('signal:addVote', async (event: any) => {
+    session.on('signal:voteUpdate', async (event: any) => {
       event.preventDefault();
 
       await fetchVoteList(sessionId);
+    });
+
+    session.on('signal:voteStart', async (event: any) => {
+      event.preventDefault();
+      await setIsVote(true);
+    });
+
+    session.on('signal:voteDone', async (event: any) => {
+      event.preventDefault();
+      await updateVoteCount();
     });
 
     try {
@@ -497,6 +520,21 @@ export default function SharePage() {
       return null;
     }
   };
+
+  const onIncrease = () => {
+    setVoteCount((voteCount) => voteCount + 1);
+  };
+
+  const updateVoteCount = async () => {
+    await onIncrease();
+  };
+
+  useEffect(() => {
+    console.log('--------voteCount updated:', voteCount);
+    if (voteCount == subscribers.length + 1) {
+      voteDone();
+    }
+  }, [voteCount]);
 
   const leaveSession = () => {
     if (session) {
@@ -589,6 +627,39 @@ export default function SharePage() {
     }
   };
 
+  // const updateCenterLocation = () => {
+  //   if (markers && !isVote) {
+  //     var center = map.getCenter();
+
+  //     // 기존 중심 좌표 마커 제거
+  //     if (markerImage) {
+  //       markerImage.setMap(null);
+  //     }
+
+  //     // 새로운 중심 좌표 마커 이미지 설정
+  //     const imageSrc = '/marker/red-marker.png'; // 마커 이미지 경로
+  //     const imageSize = new window.kakao.maps.Size(30, 30); // 마커 이미지 크기
+  //     const imageOption = { offset: new window.kakao.maps.Point(27, 69) }; // 마커 이미지 옵션
+
+  //     const centerMarkerImage = new window.kakao.maps.MarkerImage(
+  //       imageSrc,
+  //       imageSize,
+  //       imageOption,
+  //     );
+
+  //     // 새로운 중심 좌표 마커 생성 및 설정
+  //     const markerPosition = center;
+  //     const centerMarker = new window.kakao.maps.Marker({
+  //       position: markerPosition,
+  //       image: centerMarkerImage, // 마커 이미지 설정
+  //     });
+
+  //     centerMarker.setMap(map);
+  //     setMarkerImage(centerMarker);
+  //     sendLocation(center.getLat(), center.getLng());
+  //   }
+  // };
+
   useEffect(() => {
     if (map) {
       window.kakao.maps.event.addListener(
@@ -636,43 +707,51 @@ export default function SharePage() {
             );
           })}
         </div>
-        <button className={s.myVoteDone} type="button" onClick={voteDone}>
+        <div
+          style={{
+            backgroundColor: 'red',
+          }}
+        >
+          {voteCount}
+        </div>
+        <button
+          className={s.myVoteDone}
+          type="button"
+          onClick={myVoteDone}
+          disabled={disable}
+        >
           나의 투표 종료
         </button>
       </main>
     );
   } else if (isVoteDone) {
-    <div>투표결과 여기 나옴</div>;
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          alignItems: 'center',
+          alignContent: 'center',
+          gap: '10px',
+        }}
+      >
+        {voteResults.map(({ storeId, storeName, menuImage, postCount }) => {
+          return (
+            <StoreCard
+              key={storeId}
+              storeId={storeId}
+              storeName={storeName}
+              menuImage={menuImage}
+              postCount={postCount}
+            />
+          );
+        })}
+      </div>
+    );
   } else {
     return (
       <main className={s.container}>
-        {/* <div className={s.userContainer}>
-          {userLocations.map((userLocation) => {
-            return (
-              <li
-                key={userLocation.userId}
-                style={{
-                  display: 'flex',
-                }}
-              >
-                <UserIconWithText
-                  width={40}
-                  height={40}
-                  shape="circle"
-                  size="small"
-                  imgSrc={
-                    !!userLocation.imageUrl
-                      ? userLocation.imageUrl
-                      : '/profile/profile-default-icon-female.svg'
-                  }
-                  alt="profile-icon"
-                >
-                  {userLocation.userName}
-                </UserIconWithText>
-              </li>
-            );
-          })} */}
-        {/* </div> */}
         <div className={s.mapContainer}>
           <div id="map" className={s.map} />
         </div>
@@ -708,8 +787,9 @@ export default function SharePage() {
           })}
         </div>
 
-        <div className={s.voteAdd}>
+        <div className={s.voteContainer}>
           <button
+            className={s.voteAddButton}
             type="button"
             onClick={() => {
               voteAdd(sessionId, storeId);
@@ -717,9 +797,8 @@ export default function SharePage() {
           >
             투표 추가
           </button>
-        </div>
-        <div className={s.voteRemove}>
           <button
+            className={s.voteRemoveButton}
             type="button"
             onClick={() => {
               voteDelete(sessionId, storeId);
@@ -728,11 +807,13 @@ export default function SharePage() {
             투표 삭제
           </button>
         </div>
-        <div className={s.voteStart}>
+        <div className={s.voteStartContainer}>
           <button
+            className={s.voteStartButton}
             type="button"
             onClick={() => {
               setIsVote(true);
+              sendVoteStart();
             }}
           >
             투표 시작

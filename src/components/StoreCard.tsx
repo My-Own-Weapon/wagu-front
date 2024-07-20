@@ -17,6 +17,15 @@ export interface Store {
   postCount: number;
 }
 
+export default function StoreCards({ stores }: { stores: Store[] }) {
+  return (
+    <div className={s.cardsContainer}>
+      {stores.length > 0 &&
+        stores.map((store) => <StoreCard key={store.storeId} {...store} />)}
+    </div>
+  );
+}
+
 export interface StoreVoteCardProps {
   storeId: number;
   storeName: string;
@@ -28,12 +37,37 @@ export interface StoreVoteCardProps {
   handleDeleteVote: (e: MouseEvent) => void;
 }
 
-export default function StoreCards({ stores }: { stores: Store[] }) {
+export interface AddedStore {
+  storeId: number;
+  storeName: string;
+  menuImage: {
+    id: number;
+    url: string;
+  };
+}
+
+export function StoreCard({ storeId, storeName, menuImage, postCount }: Store) {
+  const { url } = menuImage;
+
   return (
-    <div className={s.cardsContainer}>
-      {stores.length > 0 &&
-        stores.map((store) => <StoreCard key={store.storeId} {...store} />)}
-    </div>
+    <li className={s.container}>
+      <Link className={s.linkArea} href={`/store/${storeId}`}>
+        <div className={s.wrapper}>
+          <div className={s.storeInfoArea}>
+            <ImageFill
+              src={url ?? '/profile/profile-default-icon-female.svg'}
+              alt="profile-img"
+              fill
+              height="80px"
+              borderRadius="8px"
+              backgroundColor="#aeaeae"
+            />
+            <p className={s.storeName}>{storeName}</p>
+          </div>
+          <p className={s.storePostCount}>{`review ${postCount}개`}</p>
+        </div>
+      </Link>
+    </li>
   );
 }
 
@@ -45,6 +79,7 @@ export function StoreVoteCard({
   handleDeleteVote,
 }: StoreVoteCardProps) {
   const [isVoted, setIsVoted] = useState<boolean>(false);
+  // const [isVoteDone, setIsVoteDone] = useState<boolean>(false);
   const { url } = menuImage;
 
   return (
@@ -107,27 +142,26 @@ export function StoreVoteCard({
   );
 }
 
-function StoreCard({ storeId, storeName, menuImage, postCount }: Store) {
-  const { url } = menuImage;
+// function StoreAddedCard({ storeId, storeName, menuImage}: Store) {
+//   const { url } = menuImage;
 
-  return (
-    <li className={s.container}>
-      <Link className={s.linkArea} href={`/store/${storeId}`}>
-        <div className={s.wrapper}>
-          <div className={s.storeInfoArea}>
-            <ImageFill
-              src={url ?? '/profile/profile-default-icon-female.svg'}
-              alt="profile-img"
-              fill
-              height="80px"
-              borderRadius="8px"
-              backgroundColor="#aeaeae"
-            />
-            <p className={s.storeName}>{storeName}</p>
-          </div>
-          <p className={s.storePostCount}>{`review ${postCount}개`}</p>
-        </div>
-      </Link>
-    </li>
-  );
-}
+//   return (
+//     <li className={s.container}>
+//       <Link className={s.linkArea} href={`/store/${storeId}`}>
+//         <div className={s.wrapper}>
+//           <div className={s.storeInfoArea}>
+//             <ImageFill
+//               src={url ?? '/profile/profile-default-icon-female.svg'}
+//               alt="profile-img"
+//               fill
+//               height="80px"
+//               borderRadius="8px"
+//               backgroundColor="#aeaeae"
+//             />
+//             <p className={s.storeName}>{storeName}</p>
+//           </div>
+//         </div>
+//       </Link>
+//     </li>
+//   );
+// }
