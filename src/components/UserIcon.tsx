@@ -8,6 +8,9 @@ import React, { ReactElement } from 'react';
 
 import s from './UserIcon.module.scss';
 
+/**
+ * ✅ TODO: 전반적인 타입 정의가 미흡.
+ */
 export interface UserIconProps {
   width: number;
   height: number;
