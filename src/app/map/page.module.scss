@@ -1,19 +1,21 @@
 @import '@/styles/variables/radius.scss';
+@import '@/styles/variables/colors.scss';
 @import '@/styles/variables/textSize.scss';
 @import '@/styles/variables/zIndex.scss';
 @import '@/styles/mixins/index.scss';
 
 .container {
-  @include mainStyle;
-  width: 375px;
-  height: 100dvh;
-  margin: 0 auto;
+  position: relative;
+
+  width: 100%;
+  overflow: auto;
+
+  padding-bottom: 80px;
+
   display: flex;
   flex-direction: column;
-  background: #fffaf3;
-  overflow: hidden;
-  position: relative;
-  padding-bottom: 0;
+
+  background: $bgColor;
 }
 
 .title {

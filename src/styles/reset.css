@@ -388,13 +388,3 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-
-button {
-  line-height: 0;
-  padding: 0;
-  margin: 0;
-}
-
-span {
-  line-height: 0;
-}

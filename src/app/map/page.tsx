@@ -56,6 +56,7 @@ export default function KakaoMap() {
   const router = useRouter();
   const ref = useDragScroll();
   const [liveFriends, setLiveFriends] = useState<Friend[]>([]);
+
   useEffect(() => {
     const script = document.createElement('script');
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=948985235eb596e79f570535fd01a71e&autoload=false&libraries=services`;
@@ -66,7 +67,9 @@ export default function KakaoMap() {
       window.kakao.maps.load(() => {
         const container = document.getElementById('map');
         if (!container) {
-          alert('지도 컨테이너를 찾을 수 없습니다.');
+          alert(
+            'document.getElementById("map") 지도 컨테이너를 찾을 수 없습니다.',
+          );
           return;
         }
 
@@ -224,6 +227,8 @@ export default function KakaoMap() {
   };
 
   const createVoteUrl = () => {
+    console.log('실행됨');
+
     fetch('https://api.wagubook.shop:8080/share', {
       method: 'POST',
       credentials: 'include',
@@ -249,7 +254,12 @@ export default function KakaoMap() {
             if (!res.ok) {
               throw new Error('세션 생성 실패');
             }
-            setVoteUrl('https://www.wagubook.shop/share?sessionId=' + text);
+            const BASE_URL =
+              process.env.NODE_ENV === 'development'
+                ? 'http://localhost:3000'
+                : 'https://www.wagubook.shop';
+
+            setVoteUrl(`${BASE_URL}/share?sessionId=${text}`);
             setModalIsOpen(true);
           })
           .catch((error) => {
@@ -271,12 +281,12 @@ export default function KakaoMap() {
         <div id="map" className={s.map} />
       </div>
       <div>
-        <LiveFriends liveFriends={liveFriends} />
+        <LiveFriends liveFriends={liveStream} />
         <div className={s.postContainer}>
           <Post.Wrapper>
             <Post>
               {posts.length === 0 ? (
-                <Post.Title title="현재 선택된 post가 없어요! Post를 선택해보세요!" />
+                <Post.Title title="Post를 선택해보세요!" />
               ) : (
                 <Post.Title title={`${posts[0].storeName}  Posts`} />
               )}
