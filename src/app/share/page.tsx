@@ -42,11 +42,6 @@ interface UserLocation {
   lng: number;
 }
 
-interface UserDetail {
-  imageUrl: string;
-  userName: string;
-}
-
 interface VoteResult {
   storeId: number;
   storeName: string;
@@ -61,10 +56,11 @@ export default function SharePage() {
   const [markers, setMarkers] = useState<any[]>([]);
   const [map, setMap] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
+
   const userMarkers = useRef<Map<string, any>>(new Map());
   const [userLocations, setUserLocations] = useState<UserLocation[]>([]);
-  const [markerImage, setMarkerImage] = useState<any>(null);
-  const [centerMarker, setCenterMarker] = useState<any>(null);
+  const [markerImages, setMarkerImages] = useState<any[]>([]);
+  const [centerMarkers, setCenterMarkers] = useState<any[]>([]);
 
   const OV = useRef<OpenVidu | null>(null);
   const searchParams = useSearchParams();
@@ -84,6 +80,7 @@ export default function SharePage() {
   const [isVoteDone, setIsVoteDone] = useState<boolean>(false);
   const [voteCount, setVoteCount] = useState<number>(0);
   const [disable, setDisable] = useState<boolean>(false);
+
   useEffect(() => {
     const sessionId = searchParams.get('sessionId');
     if (sessionId) {
@@ -147,270 +144,46 @@ export default function SharePage() {
     };
   }, []);
 
-  const fetchData = (url: string) => {
-    return fetch(url, { method: 'GET', credentials: 'include' }).then(
-      (response) => {
-        if (!response.ok) {
-          throw response;
-        }
-        return response.json();
-      },
-    );
-  };
-
-  const fetchStoresData = (
-    mapInstance: any,
-    bounds: { left: number; down: number; right: number; up: number },
-  ) => {
-    const { left, down, right, up } = bounds;
-    fetchData(
-      `https://api.wagubook.shop:8080/map?left=${left}&right=${right}&up=${up}&down=${down}`,
-    )
-      .then((data) => {
-        if (Array.isArray(data)) {
-          addMarkers(mapInstance, data);
-        } else {
-          console.error('서버로부터 받은 데이터가 배열이 아닙니다:', data);
-        }
-      })
-      .catch(handleFetchError);
-  };
-
-  const handleAddVote: MouseEventHandler<HTMLButtonElement> = (e) => {
-    e.stopPropagation();
-
-    const { currentTarget } = e;
-    const { dataset } = currentTarget;
-    const { storeId } = dataset;
-
-    fetch(
-      `https://api.wagubook.shop:8080/share/${sessionId}/vote?store_id=${storeId}`,
-      {
-        method: 'POST',
-        credentials: 'include',
-      },
-    )
-      .then((res) => {
-        return res.text();
-      })
-      .then((message) => {
-        alert(message);
-      })
-      .catch((e) => {
-        throw e;
-      });
-  };
-
-  const handleDeleteVote: MouseEventHandler<HTMLButtonElement> = (e) => {
-    const { currentTarget } = e;
-    const { dataset } = currentTarget;
-    const { storeId } = dataset;
-
-    fetch(
-      `https://api.wagubook.shop:8080/share/${sessionId}/vote?store_id=${storeId}`,
-      {
-        method: 'PATCH',
-        credentials: 'include',
-      },
-    )
-      .then((res) => {
-        return res.text();
-      })
-      .then((message) => {
-        alert(message);
-      })
-      .catch((e) => {
-        throw e;
-      });
-  };
-
-  const addMarkers = (mapInstance: any, storeData: StoreData[]) => {
-    removeMarkers();
-
-    if (!Array.isArray(storeData)) {
-      console.error('storeData가 배열이 아닙니다:', storeData);
-      return;
-    }
-
-    const newMarkers = storeData.map((store) => {
-      const markerPosition = new window.kakao.maps.LatLng(
-        store.posy,
-        store.posx,
-      );
-      const marker = new window.kakao.maps.Marker({
-        position: markerPosition,
-        key: store.storeId,
-      });
-
-      marker.setMap(mapInstance);
-
-      window.kakao.maps.event.addListener(marker, 'click', () => {
-        setStoreId(store.storeId);
-        fetchPostsData(store.storeId, 0, 10);
-      });
-
-      return marker;
-    });
-
-    setMarkers(newMarkers);
-  };
-
-  const removeMarkers = () => {
-    markers.forEach((marker) => marker.setMap(null));
-    setMarkers([]);
-  };
-
-  const fetchPostsData = (storeId: number, page: number, size: number) => {
-    fetchData(
-      `https://api.wagubook.shop:8080/map/posts?storeId=${storeId}&page=${page}&size=${size}`,
-    )
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setPosts(data);
-        } else {
-          console.error('서버가 배열이 아닌 데이터를 반환했습니다:', data);
-        }
-      })
-      .catch((error) => {
-        handleFetchError(error);
-      });
-  };
-
-  const voteAdd = async (url: string, storeId: number) => {
-    const res = await fetch(`https://api.wagubook.shop:8080/store/${storeId}`, {
-      method: 'GET',
-      credentials: 'include',
-    });
-    const selectedStore = await res.json();
-    currSelectedStoreRef.current = selectedStore;
-    await fetch(
-      `https://api.wagubook.shop:8080/share/${sessionId}?store_id=${storeId}`,
-      {
-        method: 'POST',
-        credentials: 'include',
-      },
-    )
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('이미 추가된 가게입니다.');
-        }
-        return res.text();
-      })
-      .then((message) => {
-        sendVoteUpdate();
-        alert(message);
-      })
-      .catch((error) => {
-        alert(error.message);
-      });
-
-    await fetchVoteList(sessionId);
-  };
-
-  const fetchVoteList = async (sessionId: string) => {
-    const res = await fetch(
-      `https://api.wagubook.shop:8080/share/${sessionId}/vote/list`,
-      {
-        method: 'GET',
-        credentials: 'include',
-      },
-    );
-    const voteList = await res.json();
-    setStores(() => voteList);
-  };
-
-  const sendVoteDone = () => {
-    if (session) {
-      session.signal({
-        to: [],
-        type: 'voteDone',
-      });
-    }
-  };
-
-  const sendVoteUpdate = () => {
-    if (session) {
-      session.signal({
-        to: [],
-        type: 'voteUpdate',
-      });
-    }
-  };
-
-  const sendVoteStart = () => {
-    if (session) {
-      session.signal({
-        to: [],
-        type: 'voteStart',
-      });
-    }
-  };
-
-  const voteDelete = (url: string, selectedStoreId: string) => {
-    fetch(
-      `https://api.wagubook.shop:8080/share/${sessionId}?store_id=${selectedStoreId}`,
-      {
-        method: 'DELETE',
-        credentials: 'include',
-      },
-    )
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('이미 삭제된 가게입니다.');
-        }
-        return res.text();
-      })
-      .then((message) => {
-        setStores(stores.filter(({ storeId }) => storeId != selectedStoreId));
-        sendVoteUpdate();
-        alert(message);
-      })
-      .catch((error) => {
-        alert(error.message);
-      });
-  };
-
-  const myVoteDone = () => {
-    sendVoteDone();
-    setDisable(true);
-  };
-
-  const voteDone = () => {
-    fetchVoteResults();
-    setIsVoteDone(true);
-    setIsVote(false);
-  };
-
-  const fetchVoteResults = () => {
-    fetch(`https://api.wagubook.shop:8080/share/${sessionId}/result`, {
+  useEffect(() => {
+    const [_, username] = document.cookie.split('=');
+    fetch(`https://api.wagubook.shop:8080/member/${username}/profile`, {
       method: 'GET',
       credentials: 'include',
     })
-      .then((response) => {
-        return response.json();
+      .then((res) => {
+        return res.json();
       })
       .then((data) => {
-        if (Array.isArray(data)) {
-          setVoteResults(data);
-        } else {
-          console.error('서버로부터 받은 데이터가 배열이 아닙니다:', data);
-        }
-      })
-      .catch((error) => {
-        console.error('투표 결과를 가져오는 중 오류 발생:', error);
+        sendUserData(data.imageUrl, data.username);
       });
-  };
-  const handleFetchError = async (error: Response) => {
-    let errorMessage = '알 수 없는 에러 발생';
-    try {
-      const errorData = await error.json();
-      console.error('오류 데이터:', errorData);
-      errorMessage = `오류 ${errorData.status}: ${errorData.error} - ${errorData.message}`;
-    } catch (jsonError) {
-      console.error('JSON 파싱 오류:', jsonError);
+  }, [subscribers]);
+
+  useEffect(() => {}, [userDetails]);
+
+  useEffect(() => {
+    if (map) {
+      window.kakao.maps.event.addListener(
+        map,
+        'center_changed',
+        updateCenterLocation,
+      );
     }
-    console.error('Fetch 오류 세부 사항:', errorMessage);
-  };
+  }, [map]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log('10초');
+      updateCenterLocation();
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [markers]);
+
+  useEffect(() => {
+    if (voteCount == subscribers.length + 1) {
+      voteDone();
+    }
+  }, [voteCount]);
 
   const joinSession = async (sessionId: string) => {
     OV.current = new OpenVidu();
@@ -423,6 +196,7 @@ export default function SharePage() {
 
     session.on('signal:userLocation', (event: any) => {
       const userLocation = JSON.parse(event.data);
+      console.log('user위치 받음  내용 : ', userLocation);
       setUserLocations((prevLocations) => [...prevLocations, userLocation]);
       updateUserMarker(userLocation);
     });
@@ -497,43 +271,6 @@ export default function SharePage() {
     }
   };
 
-  const onIncrease = () => {
-    setVoteCount((voteCount) => voteCount + 1);
-  };
-
-  const updateVoteCount = async () => {
-    await onIncrease();
-  };
-
-  useEffect(() => {
-    const [_, username] = document.cookie.split('=');
-    fetch(`https://api.wagubook.shop:8080/member/${username}/profile`, {
-      method: 'GET',
-      credentials: 'include',
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        sendUserData(data.imageUrl, data.username);
-      });
-  }, [subscribers]);
-
-  useEffect(() => {
-    if (voteCount == subscribers.length + 1) {
-      voteDone();
-    }
-  }, [voteCount]);
-
-  const leaveSession = () => {
-    if (session) {
-      session.disconnect();
-    }
-    setSession(null);
-    setSubscribers([]);
-    setPublisher(null);
-  };
-
   const handleJoinSession = async () => {
     if (sessionId) {
       await joinSession(sessionId);
@@ -560,9 +297,303 @@ export default function SharePage() {
     }
   };
 
+  const addMarkers = (mapInstance: any, storeData: StoreData[]) => {
+    removeMarkers();
+
+    if (!Array.isArray(storeData)) {
+      console.error('storeData가 배열이 아닙니다:', storeData);
+      return;
+    }
+
+    const newMarkers = storeData.map((store) => {
+      const markerPosition = new window.kakao.maps.LatLng(
+        store.posy,
+        store.posx,
+      );
+      const marker = new window.kakao.maps.Marker({
+        position: markerPosition,
+        key: store.storeId,
+      });
+
+      marker.setMap(mapInstance);
+
+      window.kakao.maps.event.addListener(marker, 'click', () => {
+        setStoreId(store.storeId);
+        fetchPostsData(store.storeId, 0, 10);
+      });
+
+      return marker;
+    });
+
+    setMarkers(newMarkers);
+  };
+
+  const removeMarkers = () => {
+    markers.forEach((marker) => marker.setMap(null));
+    setMarkers([]);
+  };
+
+  const fetchData = (url: string) => {
+    return fetch(url, { method: 'GET', credentials: 'include' }).then(
+      (response) => {
+        if (!response.ok) {
+          throw response;
+        }
+        return response.json();
+      },
+    );
+  };
+
+  const fetchStoresData = (
+    mapInstance: any,
+    bounds: { left: number; down: number; right: number; up: number },
+  ) => {
+    const { left, down, right, up } = bounds;
+    fetchData(
+      `https://api.wagubook.shop:8080/map?left=${left}&right=${right}&up=${up}&down=${down}`,
+    )
+      .then((data) => {
+        if (Array.isArray(data)) {
+          addMarkers(mapInstance, data);
+        } else {
+          console.error('서버로부터 받은 데이터가 배열이 아닙니다:', data);
+        }
+      })
+      .catch(handleFetchError);
+  };
+
+  const fetchPostsData = (storeId: number, page: number, size: number) => {
+    fetchData(
+      `https://api.wagubook.shop:8080/map/posts?storeId=${storeId}&page=${page}&size=${size}`,
+    )
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setPosts(data);
+        } else {
+          console.error('서버가 배열이 아닌 데이터를 반환했습니다:', data);
+        }
+      })
+      .catch((error) => {
+        handleFetchError(error);
+      });
+  };
+
+  const fetchVoteResults = () => {
+    fetch(`https://api.wagubook.shop:8080/share/${sessionId}/result`, {
+      method: 'GET',
+      credentials: 'include',
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setVoteResults(data);
+        } else {
+          console.error('서버로부터 받은 데이터가 배열이 아닙니다:', data);
+        }
+      })
+      .catch((error) => {
+        console.error('투표 결과를 가져오는 중 오류 발생:', error);
+      });
+  };
+
+  const voteAdd = async (url: string, storeId: number) => {
+    const res = await fetch(`https://api.wagubook.shop:8080/store/${storeId}`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+    const selectedStore = await res.json();
+    currSelectedStoreRef.current = selectedStore;
+    await fetch(
+      `https://api.wagubook.shop:8080/share/${sessionId}?store_id=${storeId}`,
+      {
+        method: 'POST',
+        credentials: 'include',
+      },
+    )
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('이미 추가된 가게입니다.');
+        }
+        return res.text();
+      })
+      .then((message) => {
+        sendVoteUpdate();
+        alert(message);
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
+
+    await fetchVoteList(sessionId);
+  };
+
+  const handleAddVote: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.stopPropagation();
+
+    const { currentTarget } = e;
+    const { dataset } = currentTarget;
+    const { storeId } = dataset;
+
+    fetch(
+      `https://api.wagubook.shop:8080/share/${sessionId}/vote?store_id=${storeId}`,
+      {
+        method: 'POST',
+        credentials: 'include',
+      },
+    )
+      .then((res) => {
+        return res.text();
+      })
+      .then((message) => {
+        alert(message);
+      })
+      .catch((e) => {
+        throw e;
+      });
+  };
+
+  const voteDelete = (url: string, selectedStoreId: string) => {
+    fetch(
+      `https://api.wagubook.shop:8080/share/${sessionId}?store_id=${selectedStoreId}`,
+      {
+        method: 'DELETE',
+        credentials: 'include',
+      },
+    )
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('이미 삭제된 가게입니다.');
+        }
+        return res.text();
+      })
+      .then((message) => {
+        setStores(stores.filter(({ storeId }) => storeId != selectedStoreId));
+        sendVoteUpdate();
+        alert(message);
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
+  };
+
+  const handleDeleteVote: MouseEventHandler<HTMLButtonElement> = (e) => {
+    const { currentTarget } = e;
+    const { dataset } = currentTarget;
+    const { storeId } = dataset;
+
+    fetch(
+      `https://api.wagubook.shop:8080/share/${sessionId}/vote?store_id=${storeId}`,
+      {
+        method: 'PATCH',
+        credentials: 'include',
+      },
+    )
+      .then((res) => {
+        return res.text();
+      })
+      .then((message) => {
+        alert(message);
+      })
+      .catch((e) => {
+        throw e;
+      });
+  };
+
+  const fetchVoteList = async (sessionId: string) => {
+    const res = await fetch(
+      `https://api.wagubook.shop:8080/share/${sessionId}/vote/list`,
+      {
+        method: 'GET',
+        credentials: 'include',
+      },
+    );
+    const voteList = await res.json();
+    setStores(() => voteList);
+  };
+
+  const sendVoteDone = () => {
+    if (session) {
+      session.signal({
+        to: [],
+        type: 'voteDone',
+      });
+    }
+  };
+
+  const sendVoteUpdate = () => {
+    if (session) {
+      session.signal({
+        to: [],
+        type: 'voteUpdate',
+      });
+    }
+  };
+
+  const sendVoteStart = () => {
+    if (session) {
+      session.signal({
+        to: [],
+        type: 'voteStart',
+      });
+    }
+  };
+
+  const myVoteDone = () => {
+    sendVoteDone();
+    setDisable(true);
+  };
+
+  const voteDone = () => {
+    fetchVoteResults();
+    setIsVoteDone(true);
+    setIsVote(false);
+  };
+
+  const handleFetchError = async (error: Response) => {
+    let errorMessage = '알 수 없는 에러 발생';
+    try {
+      const errorData = await error.json();
+      console.error('오류 데이터:', errorData);
+      errorMessage = `오류 ${errorData.status}: ${errorData.error} - ${errorData.message}`;
+    } catch (jsonError) {
+      console.error('JSON 파싱 오류:', jsonError);
+    }
+    console.error('Fetch 오류 세부 사항:', errorMessage);
+  };
+
+  const onIncrease = () => {
+    setVoteCount((voteCount) => voteCount + 1);
+  };
+
+  const updateVoteCount = async () => {
+    await onIncrease();
+  };
+
+  const leaveSession = () => {
+    if (session) {
+      session.disconnect();
+    }
+    setSession(null);
+    setSubscribers([]);
+    setPublisher(null);
+  };
+
   const updateUserMarker = ({ userId, lat, lng }: UserLocation) => {
     const markerPosition = new window.kakao.maps.LatLng(lat, lng);
     let marker = userMarkers.current.get(userId);
+
+    const imageSrc = '/profile/profile-default-icon-male.svg'; // 마커이미지의 주소입니다
+    const imageSize = new window.kakao.maps.Size(40, 40); // 마커이미지의 크기입니다
+    const imageOption = { offset: new window.kakao.maps.Point(20, 20) }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+
+    // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
+    const userMarkerImage = new window.kakao.maps.MarkerImage(
+      imageSrc,
+      imageSize,
+      imageOption,
+    );
 
     if (marker) {
       marker.setPosition(markerPosition);
@@ -571,6 +602,7 @@ export default function SharePage() {
         position: markerPosition,
         map,
         title: userId,
+        image: userMarkerImage,
       });
       marker.setMap(map);
       userMarkers.current.set(userId, marker);
@@ -588,6 +620,7 @@ export default function SharePage() {
   };
 
   const sendLocation = (lat: number, lng: number) => {
+    const [_, username] = document.cookie.split('=');
     if (session) {
       session.signal({
         // ✅ 이전코드임
@@ -595,33 +628,6 @@ export default function SharePage() {
         data: JSON.stringify({ userId: username, lat, lng }),
         to: [],
         type: 'userLocation',
-      });
-    }
-  };
-
-  /* ⛔️ 사용안함 */
-  const sendUserProfile = (imageUrl: string, username: string) => {
-    if (session) {
-      const [_, username] = document.cookie.split('=');
-      console.log('[ sendUserProfile ] username : ', username);
-      fetch(`https://api.wagubook.shop:8080/member/${username}/profile`, {
-        method: 'GET',
-        credentials: 'include',
-      })
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error('프로필 이미지 받아오기 실패');
-          }
-          return res.json();
-        })
-        .then((data) => {
-          setUserDetails(data);
-        });
-
-      session.signal({
-        data: JSON.stringify({ userId: username, imageUrl }),
-        to: [],
-        type: 'UserDetail',
       });
     }
   };
@@ -636,65 +642,11 @@ export default function SharePage() {
   const showProfile = (url: string, userName: string) => {
     return (
       <div className={s.userProfileContainer}>
-        <img src={url} alt={userName} width={20} height={20} />
-        userid
+        <img src={url} alt={userName} width={50} height={50} />
+        <div className={s.userName}>{userName}</div>
       </div>
     );
   };
-
-  // const updateCenterLocation = () => {
-  //   if (markers && !isVote) {
-  //     var center = map.getCenter();
-
-  //     // 기존 중심 좌표 마커 제거
-  //     if (markerImage) {
-  //       markerImage.setMap(null);
-  //     }
-
-  //     // 새로운 중심 좌표 마커 이미지 설정
-  //     const imageSrc = '/profile-default-icon-male.svg'; // 마커 이미지 경로
-  //     const imageSize = new window.kakao.maps.Size(30, 30); // 마커 이미지 크기
-  //     const imageOption = { offset: new window.kakao.maps.Point(27, 69) }; // 마커 이미지 옵션
-
-  //     const centerMarkerImage = new window.kakao.maps.MarkerImage(
-  //       imageSrc,
-  //       imageSize,
-  //       imageOption,
-  //     );
-
-  //     // 새로운 중심 좌표 마커 생성 및 설정
-  //     const markerPosition = center;
-  //     const centerMarker = new window.kakao.maps.Marker({
-  //       position: markerPosition,
-  //       image: centerMarkerImage, // 마커 이미지 설정
-  //     });
-
-  //     centerMarker.setMap(map);
-  //     setMarkerImage(centerMarker);
-  //     sendLocation(center.getLat(), center.getLng());
-  //   }
-  // };
-
-  useEffect(() => {}, [userDetails]);
-
-  useEffect(() => {
-    if (map) {
-      window.kakao.maps.event.addListener(
-        map,
-        'center_changed',
-        updateCenterLocation,
-      );
-    }
-  }, [map]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      console.log('10초');
-      updateCenterLocation();
-    }, 10000);
-
-    return () => clearInterval(interval);
-  }, [markers]);
 
   if (isVote) {
     return (
@@ -765,9 +717,18 @@ export default function SharePage() {
   } else {
     return (
       <main className={s.container}>
-        {[...userDetails].map(([username, { imageUrl }]) => {
-          return showProfile(imageUrl, username);
-        })}
+        <div className={s.userContainer}>
+          {[...userDetails].map(([username, { imageUrl }]) => {
+            if (imageUrl == null) {
+              return showProfile(
+                '/profile/profile-default-icon-male.svg',
+                username,
+              );
+            }
+            return showProfile(imageUrl, username);
+          })}
+        </div>
+
         {/* {showProfile('/profile/profile-default-icon-male.svg', 'user')} */}
 
         <div className={s.mapContainer}>

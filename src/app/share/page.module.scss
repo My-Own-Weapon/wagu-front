@@ -105,5 +105,18 @@
 }
 
 .userContainer {
+  display: flex;
   margin: 0 auto;
+}
+
+.userProfileContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-right: 10px;
+}
+.userName {
+  padding-top: 3px;
+  font-size: x-large;
 }
