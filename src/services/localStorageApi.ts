@@ -1,3 +1,5 @@
+'use client';
+
 class LocalStorage {
   private USERNAME = 'username';
 

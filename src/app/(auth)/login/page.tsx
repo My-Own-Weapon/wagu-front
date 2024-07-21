@@ -7,13 +7,9 @@ import { ChangeEventHandler, FormEventHandler, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { localStorageApi } from '@/services/localStorageApi';
 
 import s from './page.module.scss';
-
-interface CookieProtocol {
-  key: string;
-  value: string;
-}
 
 export default function LoginPage() {
   const [loginInfo, setLoginInfo] = useState({
@@ -22,10 +18,6 @@ export default function LoginPage() {
   });
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const router = useRouter();
-
-  const setCookie = ({ key, value }: CookieProtocol) => {
-    document.cookie = `${key}=${value}`;
-  };
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     const { name, value } = e.target;
@@ -41,7 +33,7 @@ export default function LoginPage() {
 
     try {
       await apiService.login(loginInfo);
-      setCookie({ key: 'username', value: loginInfo.username });
+      localStorageApi.setUserName(loginInfo.username);
       router.push('/');
     } catch (error) {
       if (error instanceof Error) {

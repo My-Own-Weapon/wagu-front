@@ -58,7 +58,7 @@ export default function SignupPage() {
           className={s.inputBox}
           label="휴대폰 번호"
           name="phoneNumber"
-          type="tel"
+          type="text"
           placeholder="휴대폰 번호를 입력해 주세요"
         />
         {!signupState.succ && (
