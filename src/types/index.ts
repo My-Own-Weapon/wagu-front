@@ -44,3 +44,10 @@ export interface PostImage {
   id: string;
   url: string;
 }
+
+export interface AddressSearchDetails {
+  address: string;
+  storeName: string;
+  posx: string;
+  posy: string;
+}

@@ -11,6 +11,7 @@ import Image from 'next/image';
 
 import { apiService } from '@/services/apiService';
 import InputBox from '@/components/ui/InputBox';
+import { AddressSearchDetails } from '@/types';
 
 import s from './AddressInput.module.scss';
 
@@ -27,13 +28,6 @@ interface KAKAOSearchAddressResponse {
   x: string;
   y: string;
   place_url: string;
-}
-
-export interface AddressSearchDetails {
-  address: string;
-  storeName: string;
-  posx: string;
-  posy: string;
 }
 
 export default function AddressInput({
