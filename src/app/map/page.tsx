@@ -249,7 +249,7 @@ export default function KakaoMap() {
             if (!res.ok) {
               throw new Error('세션 생성 실패');
             }
-            setVoteUrl('localhost:3000/share?sessionId=' + text);
+            setVoteUrl('https://www.wagubook.shop/share?sessionId=' + text);
             setModalIsOpen(true);
           })
           .catch((error) => {
