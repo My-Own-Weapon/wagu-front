@@ -1,4 +1,4 @@
-import { LoginUserInputs, SignupDetails } from '@/types';
+import { AddressSearchDetails, LoginUserInputs, SignupDetails } from '@/types';
 
 interface ProfileDetailsResponse {
   userName: string;
@@ -236,7 +236,12 @@ class ApiService {
     return res.text();
   }
 
-  async createSessionId() {
+  async createSessionId({
+    storeName,
+    address,
+    posx,
+    posy,
+  }: AddressSearchDetails) {
     const res = await fetch(`${this.baseUrl}/api/sessions`, {
       method: 'POST',
       headers: {
@@ -244,10 +249,11 @@ class ApiService {
       },
       body: JSON.stringify({
         storeLocation: {
-          address: '123 Main St',
-          posx: 123.123,
-          posy: 123.123,
+          address,
+          posx,
+          posy,
         },
+        storeName,
       }),
       credentials: 'include',
     });
