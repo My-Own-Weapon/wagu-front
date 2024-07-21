@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
 /* eslint-disable react/no-array-index-key */
@@ -28,6 +29,7 @@ export default function StreamingPage({ params }) {
   const [isStreamer, setIsStreamer] = useState(false);
 
   const [OV, setOV] = useState(undefined);
+  const [isLiveOn, setIsLiveOn] = useState(true);
   const [session, setSession] = useState(undefined);
   const [mainStreamManager, setMainStreamManager] = useState(undefined);
   const [subscribers, setSubscribers] = useState([]);
@@ -36,6 +38,20 @@ export default function StreamingPage({ params }) {
 
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
+  // const [messages, setMessages] = useState([
+  //   { user: 'user', text: 'hello' },
+  //   { user: 'user', text: 'hello' },
+  //   {
+  //     user: '김창식',
+  //     text: 'ㅇㄴ마ㅣㅓ엄나ㅣ어마ㅣㄴ어ㅏㅣㅁ너아ㅣ먼아ㅣ머ㅏ니어마ㅣㄴ어ㅏㅣㅁ너아머나어ㅏㅁ너아먼ㅇ',
+  //   },
+  //   { user: 'user', text: 'hello' },
+  //   { user: '호오잇', text: '...?' },
+  //   {
+  //     user: '김창식',
+  //     text: 'ㅇㄴ마ㅣㅓ엄나ㅣ어마ㅣㄴ어ㅏㅣㅁ너아ㅣ먼아ㅣ머ㅏ니어마ㅣㄴ어ㅏㅣㅁ너아머나어ㅏㅁ너아먼ㅇ',
+  //   },
+  // ]);
 
   useEffect(() => {
     const checkStreamer = async () => {
@@ -166,7 +182,7 @@ export default function StreamingPage({ params }) {
     setMessage('');
     setMessages([]);
 
-    router.push('/live');
+    router.push('/');
   }, [session]);
 
   const handleSwitchCameraClick = useCallback(async () => {
@@ -218,7 +234,10 @@ export default function StreamingPage({ params }) {
   return (
     <>
       <LiveHeader
+        isLiveOn={isLiveOn}
         isStreamer={isStreamer}
+        streamerName="왕도끼"
+        streamerProfileImage="/profile/profile-default-icon-female.svg"
         onLeaveSession={handleLeaveSessionClick}
         onSwitchCamera={handleSwitchCameraClick}
       />
@@ -229,24 +248,6 @@ export default function StreamingPage({ params }) {
           ) : (
             subscribers !== null &&
             !isStreamer && <UserVideoComponent streamManager={subscribers[0]} />
-          )}
-        </div>
-        <div id="session-header">
-          <input
-            className="btn btn-large btn-danger"
-            type="button"
-            id="buttonLeaveSession"
-            onClick={handleLeaveSessionClick}
-            value="Leave session"
-          />
-          {isStreamer && (
-            <input
-              className="btn btn-large btn-success"
-              type="button"
-              id="buttonSwitchCamera"
-              onClick={handleSwitchCameraClick}
-              value="Switch Camera"
-            />
           )}
         </div>
         <div className={s.chatBoxContianer}>
@@ -260,8 +261,8 @@ export default function StreamingPage({ params }) {
                     <Image
                       src="/profile/profile-default-icon-male.svg"
                       alt="user"
-                      width={20}
-                      height={20}
+                      width={26}
+                      height={26}
                     />
                   </span>
                   <div className={s.msgArea}>
@@ -272,18 +273,28 @@ export default function StreamingPage({ params }) {
               );
             })}
           </div>
-          <form className={s.chatInputWrapper} onSubmit={handleSendChatMessage}>
-            <input
-              className={s.chatInput}
-              type="text"
-              value={message}
-              onChange={handleChatMessageChange}
-              placeholder="Type a message..."
-            />
-            <button className={s.msgSendBtn} type="submit">
-              <Image src="/images/send.svg" alt="send" width={20} height={20} />
-            </button>
-          </form>
+          <div className={s.chatInputContainer}>
+            <form
+              className={s.chatInputWrapper}
+              onSubmit={handleSendChatMessage}
+            >
+              <input
+                className={s.chatInput}
+                type="text"
+                value={message}
+                onChange={handleChatMessageChange}
+                placeholder="Type a message..."
+              />
+              <button className={s.msgSendBtn} type="submit">
+                <Image
+                  src="/images/live/send_airplain.svg"
+                  alt="send"
+                  width={24}
+                  height={24}
+                />
+              </button>
+            </form>
+          </div>
         </div>
       </main>
     </>

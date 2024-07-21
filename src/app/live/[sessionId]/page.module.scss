@@ -1,5 +1,7 @@
 @import '@styles/variables/textSize.scss';
+@import '@styles/variables/fontWeight.scss';
 @import '@styles/variables/colors.scss';
+@import '@styles/variables/radius.scss';
 @import '@styles/mixins/index.scss';
 
 .container {
@@ -14,54 +16,151 @@
   width: 100%;
   height: 100dvh;
 
+  .streamerVideoWrapper {
+    position: absolute;
+    top: 0;
+    left: -15px;
+    // width: 100%;
+    height: 100dvh;
+
+    // background-color: rebeccapurple;
+  }
+
   .chatBoxContianer {
     position: absolute;
     bottom: 0;
     right: 0;
-    width: 100%;
-    height: 50%;
-    background-color: lightsalmon;
+    left: 0;
+
+    height: 30%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.5) 0%,
+      transparent 100%
+    );
+    backdrop-filter: blur(3px);
+
     border-top: 1px solid #e0e0e0;
 
-    .chatArea {
-      @include flexRowStart;
-      gap: 4px;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 1) 30%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 1) 30%
+    );
 
-      .msgArea {
-        @include flexCenter;
+    .chatBoxWrapper {
+      @include flexColumnStart;
+      padding: 0 24px;
 
-        gap: 12px;
-        overflow-y: auto;
+      gap: 10px;
 
-        .userName {
-          font-size: $textMedium;
-          color: $white;
+      overflow: auto;
+
+      .chatArea {
+        position: relative;
+        width: 100%;
+        @include flexRowStart;
+        gap: 10px;
+
+        .userImg {
+          position: absolute;
+          top: 2px;
+          left: 3px;
+
+          line-height: 0;
+          border-radius: 50%;
+          border: 1px solid $white;
+          background-color: pink;
         }
 
-        .msg {
-          font-size: $textSmall;
-          color: $white;
+        .msgArea {
+          @include flexColumnStart;
+
+          margin-left: 40px;
+
+          gap: 4px;
+          overflow-y: auto;
+
+          .userName {
+            font-weight: $medium;
+            font-size: $textMedium;
+            color: $white;
+          }
+
+          .msg {
+            font-size: $textSmall;
+            color: $white;
+          }
         }
       }
     }
   }
+  .chatInputContainer {
+    background-color: transparent;
+    padding: 12px 24px 16px 24px;
 
-  .chatInputWrapper {
-    .chatInput {
-      flex: 1;
-      padding: 2px 4px;
-      background-color: #fff;
-      border: none;
-      border-radius: 5px;
-      box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
-    }
+    .chatInputWrapper {
+      @include flexCenter;
 
-    .msgSendBtn {
-      background-color: transparent;
+      gap: 8px;
 
-      border: none;
+      .chatInput {
+        flex: 1;
 
-      cursor: pointer;
+        padding: 10px;
+
+        color: $white;
+        background-color: rgba(0, 0, 0, 0.3);
+
+        border: 1px solid #f0f0f0be;
+        border-radius: 5px;
+        box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
+
+        &::placeholder {
+          color: #f0f0f0be;
+          font-weight: $medium;
+          font-size: $textMedium;
+        }
+      }
+
+      .msgSendBtn {
+        width: 40px;
+        background-color: transparent;
+
+        border: none;
+
+        cursor: pointer;
+      }
     }
   }
 }
+
+// /* Frame 114 */
+
+// /* Auto layout */
+// display: flex;
+// flex-direction: row;
+// align-items: flex-start;
+// padding: 7.26486px;
+// gap: 7.26px;
+
+// width: 37.78px;
+// height: 26.88px;
+
+// background: linear-gradient(90deg, #EF5F00 -0.53%, #E8A700 100.06%);
+// border-radius: 3.84px;
+
+// /* Inside auto layout */
+// flex: none;
+// order: 0;
+// flex-grow: 0;
