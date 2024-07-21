@@ -11,7 +11,7 @@ import s from './UserIcon.module.scss';
 export interface UserIconProps {
   width: number;
   height: number;
-  size: 'small' | 'large';
+  size?: 'small' | 'large';
   shape?: 'circle' | 'square';
   imgSrc: string;
   alt: string;
