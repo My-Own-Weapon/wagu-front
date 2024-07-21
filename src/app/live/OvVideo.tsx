@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react/jsx-filename-extension */
 /* eslint-disable jsx-a11y/media-has-caption */
 
@@ -5,10 +6,12 @@
 
 import React, { useEffect, useRef } from 'react';
 
-function OpenViduVideoComponent({ streamManager }) {
-  const videoRef = useRef(null);
+interface Props {
+  streamManager: any;
+}
 
-  console.log('@@OpenViduVideoComponent streaManager :', streamManager);
+function OpenViduVideoComponent({ streamManager }: Props) {
+  const videoRef = useRef(null);
 
   useEffect(() => {
     if (streamManager && videoRef.current) {
@@ -16,7 +19,15 @@ function OpenViduVideoComponent({ streamManager }) {
     }
   }, [streamManager]);
 
-  return <video autoPlay ref={videoRef} />;
+  return (
+    <video
+      style={{
+        height: '100dvh',
+      }}
+      autoPlay
+      ref={videoRef}
+    />
+  );
 }
 
 export default OpenViduVideoComponent;

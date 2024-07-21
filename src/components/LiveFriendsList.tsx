@@ -1,15 +1,16 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
 
 import s from './LiveFriendsList.module.scss';
 
 export interface Friend {
-  memberId: string;
-  username: string;
-  memberImageUrl: string | null;
-  each: boolean;
-  onLive: boolean;
+  profileImage: string;
+  sessionId: string;
+  userName: string;
+  address: string;
+  storeName: string;
 }
 
 export default function LiveFriends({
@@ -44,23 +45,25 @@ export default function LiveFriends({
       )}
       {liveFriends.length > 0 ? (
         <ul className={s.friends}>
-          {liveFriends.map(({ memberId, username, memberImageUrl }) => (
-            <li key={memberId}>
-              <UserIconWithText
-                width={40}
-                height={40}
-                shape="circle"
-                size="small"
-                imgSrc={
-                  !!memberImageUrl
-                    ? memberImageUrl
-                    : '/profile/profile-default-icon-female.svg'
-                }
-                alt="profile-icon"
-              >
-                {username}
-              </UserIconWithText>
-            </li>
+          {liveFriends.map(({ profileImage, sessionId, userName }) => (
+            <Link href={`/live/${sessionId}`} key={sessionId}>
+              <li>
+                <UserIconWithText
+                  width={40}
+                  height={40}
+                  shape="circle"
+                  size="small"
+                  imgSrc={
+                    !!profileImage
+                      ? profileImage
+                      : '/profile/profile-default-icon-female.svg'
+                  }
+                  alt="profile-icon"
+                >
+                  {userName}
+                </UserIconWithText>
+              </li>
+            </Link>
           ))}
         </ul>
       ) : (
