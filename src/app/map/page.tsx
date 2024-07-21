@@ -39,10 +39,18 @@ interface PostData {
   menuPrice: string;
 }
 
+interface LiveStreamData {
+  profileImage: string;
+  sessionId: string;
+  userName: string;
+  address: string;
+  storeName: string;
+}
 export default function KakaoMap() {
   const [markers, setMarkers] = useState<any[]>([]);
   const [map, setMap] = useState<any>(null);
   const [posts, setPosts] = useState<PostCardProps[]>([]);
+  const [liveStream, setLiveStream] = useState<LiveStreamData[]>([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [voteUrl, setVoteUrl] = useState('');
   const router = useRouter();
@@ -58,7 +66,7 @@ export default function KakaoMap() {
       window.kakao.maps.load(() => {
         const container = document.getElementById('map');
         if (!container) {
-          alert('지도 컨테이너를 찾을 수 없습니다.'); // console.error 대신 alert로 대체
+          alert('지도 컨테이너를 찾을 수 없습니다.');
           return;
         }
 
@@ -89,9 +97,9 @@ export default function KakaoMap() {
     };
 
     script.onerror = () => {
-      alert('카카오 지도 스크립트를 불러오지 못했습니다.'); // console.error 대신 alert로 대체
+      alert('카카오 지도 스크립트를 불러오지 못했습니다.');
     };
-  }, []); // useEffect의 종속성 배열에 fetchStoresData 추가
+  }, []);
 
   const fetchData = (url: string) => {
     return fetch(url, { method: 'GET', credentials: 'include' }).then(
@@ -149,6 +157,7 @@ export default function KakaoMap() {
       marker.setMap(mapInstance);
 
       window.kakao.maps.event.addListener(marker, 'click', () => {
+        fetchLiveData(store.storeId);
         fetchPostsData(store.storeId, 0, 10);
       });
 
@@ -163,6 +172,26 @@ export default function KakaoMap() {
     setMarkers([]);
   };
 
+  const fetchLiveData = (storeId: number) => {
+    fetch(`https://wagubook.shop:8080/map/live/${storeId}`, {
+      method: 'GET',
+      credentials: 'include',
+    })
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setLiveStream(data);
+        } else {
+          handleFetchError(
+            new Response('서버가 배열이 아닌 데이터를 반환했습니다.', {
+              status: 500,
+            }),
+          );
+        }
+      })
+      .catch((error) => {
+        handleFetchError(error);
+      });
+  };
   const fetchPostsData = (storeId: number, page: number, size: number) => {
     fetchData(
       `https://api.wagubook.shop:8080/map/posts?storeId=${storeId}&page=${page}&size=${size}`,
@@ -207,9 +236,8 @@ export default function KakaoMap() {
         }
         return response.text();
       })
-
       .then((text) => {
-        fetch('https://api.wagubook.shop:8080/api/sessions', {
+        fetch('https://api.wagubook.shop:8080/api/sessions/voice', {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
@@ -221,7 +249,7 @@ export default function KakaoMap() {
             if (!res.ok) {
               throw new Error('세션 생성 실패');
             }
-            setVoteUrl('https://www.wagubook.shop/share?sessionId=' + text); // 생성된 URL 설정
+            setVoteUrl('https://www.wagubook.shop/share?sessionId=' + text);
             setModalIsOpen(true);
           })
           .catch((error) => {

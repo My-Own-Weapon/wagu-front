@@ -5,13 +5,17 @@
 
 .container {
   width: 375px;
-  height: 100%;
+  padding-bottom: 100px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   background: $bgColor;
   overflow-y: auto;
+}
+
+.voteListContainer {
+  display: flex;
 }
 
 .mapContainer {
@@ -35,30 +39,46 @@
   padding-top: 27px;
 }
 
-.voteAdd {
-  width: 311px;
-  height: 56px;
-  background: #ff9900;
-  border: none;
-  border-radius: 8px;
-  font-family: 'Roboto';
-  font-size: 16px;
-  color: #ffffff;
-  margin: 37px 16px;
-}
-.voteRemove {
-  width: 311px;
-  height: 56px;
-  background: #ff9900;
-  border: none;
-  border-radius: 8px;
-  font-family: 'Roboto';
-  font-size: 16px;
-  color: #ffffff;
-  margin: 37px 16px;
+.voteContainer {
+  display: flex;
+  margin: auto;
 }
 
-.voteStart {
+.voteAddButton {
+  width: 150px;
+  height: 56px;
+  background: #ff9900;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Roboto';
+  font-size: 16px;
+  color: #ffffff;
+  margin: 37px 16px;
+  overflow: auto;
+}
+
+.voteRemoveContainer {
+  margin: auto;
+}
+
+.voteRemoveButton {
+  width: 150px;
+  height: 56px;
+  background: #ff9900;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Roboto';
+  font-size: 16px;
+  color: #ffffff;
+  margin: 37px 16px;
+  overflow: auto;
+}
+
+.voteStartContainer {
+  margin: auto;
+}
+
+.voteStartButton {
   width: 311px;
   height: 56px;
   background: #ff9900;
@@ -68,12 +88,35 @@
   font-size: 16px;
   color: #ffffff;
   margin: 37px 16px;
+  overflow: auto;
 }
 
 .myVoteDone {
-  margin: 0 auto;
+  width: 311px;
+  height: 56px;
+  background: #ff9900;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Roboto';
+  font-size: 16px;
+  color: #ffffff;
+  margin: 37px 16px;
+  overflow: auto;
 }
 
 .userContainer {
+  display: flex;
   margin: 0 auto;
+}
+
+.userProfileContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-right: 10px;
+}
+.userName {
+  padding-top: 3px;
+  font-size: x-large;
 }
