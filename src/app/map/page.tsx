@@ -39,10 +39,18 @@ interface PostData {
   menuPrice: string;
 }
 
+interface LiveStreamData {
+  profileImage: string;
+  sessionId: string;
+  userName: string;
+  address: string;
+  storeName: string;
+}
 export default function KakaoMap() {
   const [markers, setMarkers] = useState<any[]>([]);
   const [map, setMap] = useState<any>(null);
   const [posts, setPosts] = useState<PostCardProps[]>([]);
+  const [liveStream, setLiveStream] = useState<LiveStreamData[]>([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [voteUrl, setVoteUrl] = useState('');
   const router = useRouter();
@@ -149,6 +157,7 @@ export default function KakaoMap() {
       marker.setMap(mapInstance);
 
       window.kakao.maps.event.addListener(marker, 'click', () => {
+        fetchLiveData(store.storeId);
         fetchPostsData(store.storeId, 0, 10);
       });
 
@@ -163,6 +172,26 @@ export default function KakaoMap() {
     setMarkers([]);
   };
 
+  const fetchLiveData = (storeId: number) => {
+    fetch(`https://wagubook.shop:8080/map/live/${storeId}`, {
+      method: 'GET',
+      credentials: 'include',
+    })
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setLiveStream(data);
+        } else {
+          handleFetchError(
+            new Response('서버가 배열이 아닌 데이터를 반환했습니다.', {
+              status: 500,
+            }),
+          );
+        }
+      })
+      .catch((error) => {
+        handleFetchError(error);
+      });
+  };
   const fetchPostsData = (storeId: number, page: number, size: number) => {
     fetchData(
       `https://api.wagubook.shop:8080/map/posts?storeId=${storeId}&page=${page}&size=${size}`,
