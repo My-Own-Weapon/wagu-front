@@ -57,7 +57,7 @@ export default function Home() {
       try {
         const [postsData, liveFriendsData] = await Promise.all([
           apiService.fetchPosts(),
-          apiService.fetchFollowings(),
+          apiService.fetchLiveFriends(),
         ]);
 
         setAllPosts(postsData);

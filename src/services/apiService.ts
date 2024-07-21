@@ -1,5 +1,13 @@
 import { LoginUserInputs, SignupDetails } from '@/types';
 
+interface ProfileDetailsResponse {
+  userName: string;
+  profileImage: string;
+  followerNum: number;
+  followingNum: number;
+  postNum: number;
+}
+
 class ApiService {
   private mswBaseUrl = 'http://localhost:9090';
 
@@ -53,6 +61,21 @@ class ApiService {
     });
 
     return res.text();
+  }
+
+  async fetchProfileDetails(memberId: number): Promise<ProfileDetailsResponse> {
+    const res = await fetch(`${this.baseUrl}/member/${memberId}/profile`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
+    return res.json();
   }
 
   async checkSession() {
@@ -288,6 +311,23 @@ class ApiService {
         credentials: 'include',
       },
     );
+
+    if (!res.ok) {
+      const { status, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+    }
+
+    const data = await res.json();
+
+    return data;
+  }
+
+  async fetchLiveFriends() {
+    const res = await fetch(`${this.baseUrl}/rooms/followings`, {
+      method: 'GET',
+      credentials: 'include',
+    });
 
     if (!res.ok) {
       const { status, error } = await res.json();
