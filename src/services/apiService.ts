@@ -322,6 +322,23 @@ class ApiService {
 
     return data;
   }
+
+  async fetchLiveFriends() {
+    const res = await fetch(`${this.baseUrl}/rooms/followings`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const { status, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+    }
+
+    const data = await res.json();
+
+    return data;
+  }
 }
 
 export const apiService = new ApiService();
