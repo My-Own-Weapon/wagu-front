@@ -43,7 +43,7 @@ export function UserIcon({
 
 interface WithTextProps {
   children?: ReactElement | string;
-  size: 'small' | 'large';
+  size?: 'small' | 'large';
 }
 
 export function WithText<T extends WithTextProps>(
