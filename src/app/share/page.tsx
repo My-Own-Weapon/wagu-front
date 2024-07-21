@@ -21,6 +21,7 @@ import { sharing } from 'webpack';
 import StoreCards, { StoreCard, StoreVoteCard } from '@/components/StoreCard';
 import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
 import s from './page.module.scss';
+import { localStorageApi } from '@/services/localStorageApi';
 
 declare global {
   interface Window {
@@ -145,7 +146,7 @@ export default function SharePage() {
   }, []);
 
   useEffect(() => {
-    const [_, username] = document.cookie.split('=');
+    const username = localStorageApi.getUserName();
     fetch(`https://api.wagubook.shop:8080/member/${username}/profile`, {
       method: 'GET',
       credentials: 'include',
@@ -154,7 +155,7 @@ export default function SharePage() {
         return res.json();
       })
       .then((data) => {
-        sendUserData(data.imageUrl, data.username);
+        sendUserData(data.imageUrl, data.username, data.name);
       });
   }, [subscribers]);
 
@@ -231,7 +232,7 @@ export default function SharePage() {
       if (!token) {
         throw new Error('토큰이 정의되지 않았습니다');
       }
-      const [_, username] = document.cookie.split('=');
+      const username = localStorageApi.getUserName();
       await session.connect(token, { clientData: username });
       const publisher = OV.current.initPublisher(undefined, {
         audioSource: undefined,
@@ -609,10 +610,10 @@ export default function SharePage() {
     }
   };
 
-  const sendUserData = (userImage: string, username: string) => {
+  const sendUserData = (userImage: string, username: string, name: string) => {
     if (session) {
       session.signal({
-        data: JSON.stringify({ userImage, username }),
+        data: JSON.stringify({ userImage, username, name }),
         to: [],
         type: 'userData',
       });
@@ -620,7 +621,7 @@ export default function SharePage() {
   };
 
   const sendLocation = (lat: number, lng: number) => {
-    const [_, username] = document.cookie.split('=');
+    const username = localStorageApi.getUserName();
     if (session) {
       session.signal({
         // ✅ 이전코드임
@@ -718,14 +719,14 @@ export default function SharePage() {
     return (
       <main className={s.container}>
         <div className={s.userContainer}>
-          {[...userDetails].map(([username, { imageUrl }]) => {
+          {[...userDetails].map(([username, { imageUrl, name }]) => {
             if (imageUrl == null) {
               return showProfile(
                 '/profile/profile-default-icon-male.svg',
-                username,
+                name,
               );
             }
-            return showProfile(imageUrl, username);
+            return showProfile(imageUrl, name);
           })}
         </div>
 
