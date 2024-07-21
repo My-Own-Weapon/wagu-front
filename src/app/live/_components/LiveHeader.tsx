@@ -1,83 +1,112 @@
 'use client';
 
 // import { useStore } from '@/stores';
-import BackArrowSVG from '@public/BackIcon.svg';
 import Image from 'next/image';
 import { MouseEventHandler } from 'react';
 
+import { UserIcon } from '@/components/UserIcon';
+
+import s from './LiveHeader.module.scss';
+
 interface Props {
+  isLiveOn: boolean;
   streamerName: string;
   streamerProfileImage: string;
   isStreamer: boolean;
-  onClickBack: () => void;
   onLeaveSession: () => void;
   onSwitchCamera: MouseEventHandler<HTMLButtonElement>;
 }
 
 export default function LiveHeader({
+  isLiveOn,
   streamerName,
   streamerProfileImage,
   isStreamer,
-  onClickBack,
   onLeaveSession,
   onSwitchCamera,
 }: Props) {
   // const isStreamer = useStore((state) => state.isStreamer);
 
   return (
-    <header
-      style={{
-        position: 'fixed',
-        zIndex: 100,
-        top: 0,
-        left: 0,
-
-        width: '100%',
-        height: '60px',
-
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      }}
-    >
-      <div
-        style={{
-          flexGrow: '1',
-
-          padding: '0 24px',
-
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: '24px',
-        }}
-      >
-        {!isStreamer && (
-          <div>
-            <Image
-              src={streamerProfileImage}
-              alt={streamerName}
-              width={40}
-              height={40}
-            />
+    <header className={s.container}>
+      <div className={s.streamerInfoArea}>
+        <UserIcon
+          imgSrc={streamerProfileImage}
+          shape="circle"
+          alt={streamerName}
+          width={24}
+          height={24}
+        />
+        <p className={s.streamerName}>{streamerName}</p>
+      </div>
+      <div className={s.buttonsWrapper}>
+        {isStreamer && (
+          <StreamerButtons
+            onLeaveSession={onLeaveSession}
+            onSwitchCamera={onSwitchCamera}
+          />
+        )}
+        {isLiveOn && (
+          <div className={s.liveFlagBox}>
+            <p className={s.liveFlagText}>Live!</p>
           </div>
         )}
-        {isStreamer && (
-          <>
-            <button type="button" onClick={onClickBack}>
-              <BackArrowSVG />
-            </button>
-            <button type="button" onClick={onLeaveSession}>
-              방송 종료
-            </button>
-            <button type="button" onClick={onSwitchCamera}>
-              카메라 변경
-            </button>
-          </>
+        <div className={s.viewerCountArea}>
+          <Image
+            src="/images/live/eye.svg"
+            alt="viewer"
+            width={16}
+            height={16}
+          />
+          <p className={s.viewersCount}>30</p>
+        </div>
+        {!isStreamer && isLiveOn && (
+          <button
+            className={s.leaveLiveBtn}
+            type="button"
+            onClick={onLeaveSession}
+          >
+            <Image
+              src="/images/live/close_x.svg"
+              alt="live-end"
+              width={24}
+              height={24}
+            />
+          </button>
         )}
       </div>
     </header>
+  );
+}
+
+interface StreamerButtonsProps {
+  onLeaveSession: () => void;
+  onSwitchCamera: MouseEventHandler<HTMLButtonElement>;
+}
+
+function StreamerButtons({
+  onLeaveSession,
+  onSwitchCamera,
+}: StreamerButtonsProps) {
+  return (
+    // <div className={s.streamrButtons}>
+    <>
+      <button className={s.liveEndBtn} type="button" onClick={onLeaveSession}>
+        방송 종료
+      </button>
+      <button
+        className={s.switchCameraBtn}
+        type="button"
+        onClick={onSwitchCamera}
+      >
+        <Image
+          src="/images/live/camera_switch.svg"
+          alt="switch camera"
+          width={16}
+          height={16}
+        />
+      </button>
+    </>
+    // </div>
   );
 }
