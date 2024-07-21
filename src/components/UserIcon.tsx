@@ -8,10 +8,13 @@ import React, { ReactElement } from 'react';
 
 import s from './UserIcon.module.scss';
 
+/**
+ * ✅ TODO: 전반적인 타입 정의가 미흡.
+ */
 export interface UserIconProps {
   width: number;
   height: number;
-  size: 'small' | 'large';
+  size?: 'small' | 'large';
   shape?: 'circle' | 'square';
   imgSrc: string;
   alt: string;
@@ -43,7 +46,7 @@ export function UserIcon({
 
 interface WithTextProps {
   children?: ReactElement | string;
-  size: 'small' | 'large';
+  size?: 'small' | 'large';
 }
 
 export function WithText<T extends WithTextProps>(
