@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react/jsx-filename-extension */
 /* eslint-disable jsx-a11y/media-has-caption */
 
@@ -5,7 +6,11 @@
 
 import React, { useEffect, useRef } from 'react';
 
-function OpenViduVideoComponent({ streamManager }) {
+interface Props {
+  streamManager: any;
+}
+
+function OpenViduVideoComponent({ streamManager }: Props) {
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -14,7 +19,15 @@ function OpenViduVideoComponent({ streamManager }) {
     }
   }, [streamManager]);
 
-  return <video autoPlay ref={videoRef} />;
+  return (
+    <video
+      style={{
+        height: '100dvh',
+      }}
+      autoPlay
+      ref={videoRef}
+    />
+  );
 }
 
 export default OpenViduVideoComponent;
