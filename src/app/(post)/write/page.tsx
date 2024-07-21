@@ -17,7 +17,7 @@ import InputBox from '@/components/ui/InputBox';
 import ImageFill from '@/components/ui/ImageFill';
 import Button from '@/components/ui/Button';
 import CategoryList from '@/components/CategoryList';
-import AddressInput, { AddressSearchDetails } from '@/components/AddressInput';
+import AddressInput from '@/components/AddressInput';
 
 import s from './page.module.scss';
 
