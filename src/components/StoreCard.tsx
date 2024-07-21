@@ -33,6 +33,7 @@ export interface StoreVoteCardProps {
     id: number;
     url: string;
   };
+  nobutton: boolean;
   handleAddVote: (e: MouseEvent) => void;
   handleDeleteVote: (e: MouseEvent) => void;
 }
@@ -75,6 +76,7 @@ export function StoreVoteCard({
   storeId,
   storeName,
   menuImage,
+  nobutton,
   handleAddVote,
   handleDeleteVote,
 }: StoreVoteCardProps) {
@@ -83,85 +85,54 @@ export function StoreVoteCard({
   const { url } = menuImage;
 
   return (
-    <li className={s.container}>
-      <div className={s.linkArea}>
-        <div className={s.wrapper}>
-          <div className={s.storeInfoArea}>
+    <li className={s.vcontainer}>
+      <div>
+        <div>
+          <div>
+            {/* <div className={s.vlinkArea}> */}
+            {/* <div className={s.vwrapper}> */}
+            {/* <div className={s.vstoreInfoArea}> */}
             <ImageFill
               src={url ?? '/profile/profile-default-icon-female.svg'}
               alt="profile-img"
               fill
-              height="80px"
+              height="70px"
               borderRadius="8px"
               backgroundColor="#aeaeae"
             />
-            <p className={s.storeName}>{storeName}</p>
+            <p className={s.vstoreName}>{storeName}</p>
           </div>
-          <div
-            style={{
-              display: 'flex',
-            }}
-          >
-            {isVoted ? (
-              <button
-                style={{
-                  backgroundColor: 'red',
-                  color: 'white',
-                  border: 'none',
-                }}
-                data-store-id={storeId}
-                type="button"
-                onClick={(e) => {
-                  handleDeleteVote(e);
-                  setIsVoted(false);
-                }}
-              >
-                투표 삭제
-              </button>
-            ) : (
-              <button
-                style={{
-                  backgroundColor: 'blue',
-                  color: 'white',
-                  border: 'none',
-                }}
-                type="button"
-                data-store-id={storeId}
-                onClick={(e) => {
-                  handleAddVote(e);
-                  setIsVoted(true);
-                }}
-              >
-                투표 추가
-              </button>
-            )}
-          </div>
+          {!nobutton && (
+            <div>
+              {isVoted ? (
+                <button
+                  className={s.deleteVoteBtn}
+                  data-store-id={storeId}
+                  type="button"
+                  onClick={(e) => {
+                    handleDeleteVote(e);
+                    setIsVoted(false);
+                  }}
+                >
+                  투표 삭제
+                </button>
+              ) : (
+                <button
+                  className={s.addVoteBtn}
+                  type="button"
+                  data-store-id={storeId}
+                  onClick={(e) => {
+                    handleAddVote(e);
+                    setIsVoted(true);
+                  }}
+                >
+                  투표 추가
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </li>
   );
 }
-
-// function StoreAddedCard({ storeId, storeName, menuImage}: Store) {
-//   const { url } = menuImage;
-
-//   return (
-//     <li className={s.container}>
-//       <Link className={s.linkArea} href={`/store/${storeId}`}>
-//         <div className={s.wrapper}>
-//           <div className={s.storeInfoArea}>
-//             <ImageFill
-//               src={url ?? '/profile/profile-default-icon-female.svg'}
-//               alt="profile-img"
-//               fill
-//               height="80px"
-//               borderRadius="8px"
-//               backgroundColor="#aeaeae"
-//             />
-//             <p className={s.storeName}>{storeName}</p>
-//           </div>
-//         </div>
-//       </Link>
-//     </li>
-//   );
-// }

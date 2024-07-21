@@ -63,3 +63,51 @@
     }
   }
 }
+
+.vcontainer {
+  width: calc(100% - 24px);
+  padding: 12px;
+
+  border: 1px solid $gray400;
+  border-radius: 8px;
+
+  background-color: $white;
+
+  .vstoreName {
+    margin-top: 12px;
+    color: $textTitleColor;
+    font-size: $textMedium;
+    font-weight: $semiBold;
+  }
+
+  .addVoteBtn {
+    width: 100%;
+    height: 40px;
+
+    margin-top: 12px;
+
+    border: none;
+    border-radius: 8px;
+
+    background-color: $blue600;
+    color: $white;
+    font-size: $textSmall;
+    font-weight: $medium;
+  }
+
+  .deleteVoteBtn {
+    width: 100%;
+    height: 40px;
+
+    margin-top: 12px;
+
+    border: none;
+    border-radius: 8px;
+
+    background-color: $red600;
+
+    color: $white;
+    font-size: $textSmall;
+    font-weight: $medium;
+  }
+}

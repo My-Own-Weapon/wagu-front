@@ -4,9 +4,9 @@
 @import '@/styles/mixins/index.scss';
 
 .container {
-  width: 375px;
+  width: 100%;
   padding-bottom: 100px;
-  margin: 0 auto;
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -15,7 +15,15 @@
 }
 
 .voteListContainer {
-  display: flex;
+  width: calc(100% - 24px);
+
+  margin-top: 16px;
+  padding: 0 12px;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 16px;
+  row-gap: 12px;
 }
 
 .mapContainer {
@@ -36,12 +44,20 @@
 }
 
 .postContainer {
+  width: 100%;
   padding-top: 27px;
 }
 
 .voteContainer {
   display: flex;
   margin: auto;
+}
+
+.voteCardsContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 16px;
+  row-gap: 12px;
 }
 
 .voteAddButton {
@@ -105,8 +121,12 @@
 }
 
 .userContainer {
+  width: 100%;
+
   display: flex;
-  margin: 0 auto;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
 }
 
 .userProfileContainer {
