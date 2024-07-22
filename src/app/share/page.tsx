@@ -60,6 +60,10 @@ interface VoteResult {
 }
 
 const SEND_LOCATION_INTERVAL = 3000;
+const MSG = {
+  NO_SESSION_INSTANCE: 'session 인스턴스가 없습니다.',
+  NO_SESSION_ID: 'session id가 없습니다.',
+};
 
 export default function SharePage() {
   const searchParams = useSearchParams();
@@ -462,7 +466,7 @@ export default function SharePage() {
         return res.text();
       })
       .then((message) => {
-        sendVoteUpdate();
+        broadcastUpdateVoteListSIG();
         alert(message);
       })
       .catch((error) => {
@@ -508,7 +512,7 @@ export default function SharePage() {
       );
 
       setStores(stores.filter(({ curStoreId }) => curStoreId != storeId));
-      sendVoteUpdate();
+      broadcastUpdateVoteListSIG();
       alert(succMsg);
     } catch (e) {
       if (e instanceof Error) {
@@ -555,39 +559,39 @@ export default function SharePage() {
   };
 
   // 내가 투표를 종료했을을 알리는 SIG
-  const sendVoteDone = () => {
-    if (session) {
-      session.signal({
-        to: [],
-        type: 'voteDone',
-      });
-    }
+  const broadcastImVoteDoneSIG = () => {
+    if (!session) throw new Error(MSG.NO_SESSION_INSTANCE);
+
+    session.signal({
+      to: [],
+      type: 'voteDone',
+    });
   };
 
   // voteUpdate 시그널을 받으면 누군가가 투표를 삭제하던 추가하던 voteList가 바뀌었으니 새로 받아와라 !
-  const sendVoteUpdate = () => {
-    if (session) {
-      session.signal({
-        to: [],
-        type: 'voteUpdate',
-      });
-    }
+  const broadcastUpdateVoteListSIG = () => {
+    if (!session) throw new Error(MSG.NO_SESSION_INSTANCE);
+
+    session.signal({
+      to: [],
+      type: 'voteUpdate',
+    });
   };
 
   // 나 투표 하고싶어
   // ✅ TODO: 아무나 눌러도 다 시작됨
-  const sendVoteStart = () => {
-    if (session) {
-      session.signal({
-        to: [],
-        type: 'voteStart',
-      });
-    }
+  const sendVoteStartSIG = () => {
+    if (!session) throw new Error(MSG.NO_SESSION_INSTANCE);
+
+    session.signal({
+      to: [],
+      type: 'voteStart',
+    });
   };
 
   // [AFTER 투표]에서 나 투표 끝냈어
   const myVoteDone = () => {
-    sendVoteDone();
+    broadcastImVoteDoneSIG();
     setDisable(true);
   };
 
@@ -659,6 +663,8 @@ export default function SharePage() {
 
   // 내 프로필을 SIG으로 subscriber에게 보냄
   const sendUserData = (userImage: string, username: string, name: string) => {
+    if (!session) throw new Error(MSG.NO_SESSION_INSTANCE);
+
     if (session) {
       session.signal({
         data: JSON.stringify({ userImage, username, name }),
@@ -670,16 +676,16 @@ export default function SharePage() {
 
   // 내 위치를 SIG으로 subscriber에게 보냄
   const sendLocation = (lat: number, lng: number) => {
+    if (!session) throw new Error(MSG.NO_SESSION_INSTANCE);
+
     const username = localStorageApi.getUserName();
-    if (session) {
-      session.signal({
-        // ✅ 이전코드임
-        // data: JSON.stringify({ userId: username, lat, lng, userDetails }),
-        data: JSON.stringify({ userId: username, lat, lng }),
-        to: [],
-        type: 'userLocation',
-      });
-    }
+    session.signal({
+      // ✅ 이전코드임
+      // data: JSON.stringify({ userId: username, lat, lng, userDetails }),
+      data: JSON.stringify({ userId: username, lat, lng }),
+      to: [],
+      type: 'userLocation',
+    });
   };
 
   /* 투표화면으로 들어갔을때 실행되지 않도록
@@ -691,15 +697,6 @@ export default function SharePage() {
     }
 
     console.log('없음');
-  };
-
-  const showProfile = (url: string, userName: string) => {
-    return (
-      <div className={s.userProfileContainer}>
-        <img src={url} alt={userName} width={50} height={50} />
-        <div className={s.userName}>{userName}</div>
-      </div>
-    );
   };
 
   const getStoreLive = async (storeId: number) => {
@@ -717,20 +714,6 @@ export default function SharePage() {
 
     return res.json();
   };
-
-  // useEffect(() => {
-  //   console.log('vote result 바뀜', voteResults);
-
-  //   voteResults.forEach(async ({ storeId }) => {
-  //     const liveStore = await getStoreLive(storeId);
-
-  //     console.log(liveStore);
-
-  //     if (liveStores.length > 0) {
-  //       setLiveStores((prev) => [...prev, ...liveStore]);
-  //     }
-  //   });
-  // }, [voteResults]);
 
   useEffect(() => {
     const fetchLiveStores = async () => {
@@ -905,7 +888,7 @@ export default function SharePage() {
             type="button"
             onClick={() => {
               setIsVote(true);
-              sendVoteStart();
+              sendVoteStartSIG();
             }}
           >
             투표 시작
