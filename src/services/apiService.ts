@@ -18,6 +18,8 @@ interface ShareMapPublishSessionResponse {
   sessionId: string;
 }
 
+type SuccessMessageResponse = Promise<string>;
+
 class ApiService {
   private mswBaseUrl = 'http://localhost:9090';
 
@@ -423,6 +425,121 @@ class ApiService {
 
     return res.json();
   }
+
+  /* ----------------- about Vote ----------------- */
+
+  /* [BEFORE 개표 (투표 List에 CRUD)] */
+  async addStoreToVoteList(
+    sessionId: string,
+    storeId: string,
+  ): SuccessMessageResponse {
+    const res = await fetch(
+      `${this.baseUrl}/share/${sessionId}?store_id=${storeId}`,
+      {
+        method: 'POST',
+        credentials: 'include',
+      },
+    );
+
+    if (!res.ok) {
+      const { status, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+    }
+
+    return res.text();
+  }
+
+  async deleteStoreFromVoteList(sessionId: string, storeId: string) {
+    const res = await fetch(
+      `${this.baseUrl}/share/${sessionId}?store_id=${storeId}`,
+      {
+        method: 'DELETE',
+        credentials: 'include',
+      },
+    );
+
+    if (!res.ok) {
+      const { status, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+    }
+
+    return res.text();
+  }
+
+  /* [AFTER 개표 (투표 LIST에 있는 선택지를 vote)] */
+  async voteStore(sessionId: string, storeId: string): SuccessMessageResponse {
+    const res = await fetch(
+      `${this.baseUrl}/shareshare/${sessionId}/vote?store_id=${storeId}`,
+      {
+        method: 'POST',
+        credentials: 'include',
+      },
+    );
+
+    if (!res.ok) {
+      const { status, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+    }
+
+    return res.text();
+  }
+
+  async cancelVoteStore(sessionId: string, storeId: string) {
+    const res = await fetch(
+      `${this.baseUrl}/share/${sessionId}/vote?store_id=${storeId}`,
+      {
+        method: 'PATCH',
+        credentials: 'include',
+      },
+    );
+
+    if (!res.ok) {
+      const { status, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+    }
+
+    return res.text();
+  }
+
+  async fetchVoteResults(sessionId: string) {
+    const res = await fetch(`${this.baseUrl}/share/${sessionId}/result`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const { status, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+    }
+
+    return res.json();
+  }
+
+  // async cancelVoteStore(
+  //   sessionId: string,
+  //   storeId: string,
+  // ): SuccessMessageResponse {
+  //   const res = await fetch(
+  //     `${this.baseUrl}/share/${sessionId}?store_id=${storeId}`,
+  //     {
+  //       method: 'DELETE',
+  //       credentials: 'include',
+  //     },
+  //   );
+
+  //   if (!res.ok) {
+  //     const { status, error } = await res.json();
+
+  //     throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+  //   }
+
+  //   return res.text();
+  // }
 }
 
 export const apiService = new ApiService();
