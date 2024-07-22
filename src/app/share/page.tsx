@@ -24,6 +24,7 @@ import StoreCards, { StoreCard, StoreVoteCard } from '@/components/StoreCard';
 import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
 import Link from 'next/link';
 import { localStorageApi } from '@/services/localStorageApi';
+import LiveFriends from '@/components/LiveFriendsList';
 
 import s from './page.module.scss';
 
@@ -737,23 +738,32 @@ export default function SharePage() {
     return res.json();
   };
 
+  // useEffect(() => {
+  //   console.log('vote result 바뀜', voteResults);
+
+  //   voteResults.forEach(async ({ storeId }) => {
+  //     const liveStore = await getStoreLive(storeId);
+
+  //     console.log(liveStore);
+
+  //     if (liveStores.length > 0) {
+  //       setLiveStores((prev) => [...prev, ...liveStore]);
+  //     }
+  //   });
+  // }, [voteResults]);
+
   useEffect(() => {
-    console.log('vote result 바뀜', voteResults);
+    const fetchLiveStores = async () => {
+      const liveStoresUpdates = await Promise.all(
+        voteResults.map(({ storeId }) => getStoreLive(storeId)),
+      );
+      const flattedLiveStoresUpdates = liveStoresUpdates.flat();
 
-    voteResults.forEach(async ({ storeId }) => {
-      const liveStore = await getStoreLive(storeId);
+      setLiveStores((prev) => [...prev, ...flattedLiveStoresUpdates]);
+    };
 
-      console.log(liveStore);
-
-      if (liveStores.length > 0) {
-        setLiveStores((prev) => [...prev, liveStore]);
-      }
-    });
+    fetchLiveStores();
   }, [voteResults]);
-
-  useEffect(() => {
-    console.log('liveStores 변경 ', liveStores);
-  }, [liveStores]);
 
   // 투표가 시작되었습니다.
   if (isVote) {
@@ -806,25 +816,11 @@ export default function SharePage() {
           gap: '10px',
         }}
       >
-        {liveStores.length > 0
-          ? liveStores.map(({ sessionId }) => {
-              return (
-                <Link
-                  style={{
-                    width: '80px',
-                    height: '40px',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                  key={sessionId}
-                  href={`/live/${sessionId}`}
-                >
-                  <div>방송중</div>
-                </Link>
-              );
-            })
-          : null}
+        {/* {liveStores.length > 0 ? (
+          <LiveFriends liveFriends={liveStores} />
+        ) : ( */}
+        <LiveFriends liveFriends={liveStores} />
+        {/* )} */}
         {voteResults.map(({ storeId, storeName, menuImage, postCount }) => {
           return (
             <StoreCard
