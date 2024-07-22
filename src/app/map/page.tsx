@@ -106,16 +106,14 @@ export default function KakaoMap() {
 
     const newMarkers = stores.map((store) => {
       const { kakao } = window;
-
-      const imageSrc = '/images/map/ping_orange.svg'; // 마커이미지의 주소입니다
-      const imageSize = new kakao.maps.Size(32, 32); // 마커이미지의 크기입니다
-      const imageOption = { offset: new kakao.maps.Point(16, 32) }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+      const imageSrc = '/images/map/ping_orange.svg';
+      const imageSize = new kakao.maps.Size(32, 32);
+      const imageOption = { offset: new kakao.maps.Point(16, 32) };
       const markerImage = new kakao.maps.MarkerImage(
         imageSrc,
         imageSize,
         imageOption,
       );
-
       const markerPosition = new kakao.maps.LatLng(store.posy, store.posx);
       const marker = new kakao.maps.Marker({
         position: markerPosition,
