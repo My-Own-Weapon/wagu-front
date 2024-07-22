@@ -221,6 +221,21 @@ class ApiService {
     return res.json();
   }
 
+  async fetchStoreDetails(storeId: number) {
+    const res = await fetch(`${this.baseUrl}/store/${storeId}`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
+    return res.json();
+  }
+
   async searchStore(storeName: string) {
     const res = await fetch(
       `${this.baseUrl}/stores?keyword=${storeName}&page=0&size=12`,
@@ -237,19 +252,6 @@ class ApiService {
     }
 
     return res.json();
-  }
-
-  async fetchStoresOfMapBoundary({ left, right, up, down }: MapVertexes) {
-    const res = await fetch(
-      `${this.baseUrl}/map?left=${left}&right=${right}&up=${up}&down=${down}`,
-      {
-        method: 'GET',
-        credentials: 'include',
-      },
-    );
-    const stores = await res.json();
-
-    return stores;
   }
 
   async fetchLiveOnStreamersOfStore(storeId: number) {
@@ -386,6 +388,20 @@ class ApiService {
     return data;
   }
 
+  /* about map page */
+  async fetchStoresOfMapBoundary({ left, right, up, down }: MapVertexes) {
+    const res = await fetch(
+      `${this.baseUrl}/map?left=${left}&right=${right}&up=${up}&down=${down}`,
+      {
+        method: 'GET',
+        credentials: 'include',
+      },
+    );
+    const stores = await res.json();
+
+    return stores;
+  }
+
   /* about Share Map page */
   async createShareMapRandomSessionId(): Promise<string> {
     const res = await fetch(`${this.baseUrl}/share`, {
@@ -431,7 +447,7 @@ class ApiService {
   /* [BEFORE 개표 (투표 List에 CRUD)] */
   async addStoreToVoteList(
     sessionId: string,
-    storeId: string,
+    storeId: string | number,
   ): SuccessMessageResponse {
     const res = await fetch(
       `${this.baseUrl}/share/${sessionId}?store_id=${storeId}`,
