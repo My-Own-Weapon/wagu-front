@@ -58,7 +58,12 @@ interface VoteResult {
   postCount: number;
 }
 
-const SEND_LOCATION_INTERVAL = 3000;
+const SEND_LOCATION_INTERVAL = 300000000000000;
+
+// export const saveData = () => {
+//   // 여기에 원하는 동작을 구현합니다. 예를 들어, 데이터를 저장하거나 로그를 남기는 작업을 수행합니다.
+//   console.log('데이터 저장 중...');
+// };
 
 export default function SharePage() {
   const searchParams = useSearchParams();
@@ -91,6 +96,22 @@ export default function SharePage() {
   const [voteCount, setVoteCount] = useState<number>(0);
   const [disable, setDisable] = useState<boolean>(false);
   const [liveStores, setLiveStores] = useState<any[]>([]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: any) => {
+      // custom 함수 호출
+      leaveSession();
+      const confirmationMessage = '음성 연결이 해제됩니다.';
+      event.returnValue = confirmationMessage; // Chrome에서는 returnValue를 설정해야 경고가 나타납니다.
+      return confirmationMessage;
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
 
   useEffect(() => {
     console.log('---1 get sessionId---');
@@ -163,7 +184,7 @@ export default function SharePage() {
 
   useEffect(() => {
     console.log('---3 userName 서버에 전송');
-
+    console.log('subscribers : ', subscribers);
     const username = localStorageApi.getUserName();
     /* 참가자가 들어오면 내 프로필을 가져오고 + 보내... (why: 내 프로필을 참여자에게 보냄 & 늦게들어오면 몰?루) 
       if 내정보 있어 ? 내정보 가져와서 보내 : 서버에 요청해서 가져와서 보내
@@ -176,6 +197,7 @@ export default function SharePage() {
         return res.json();
       })
       .then((data) => {
+        console.log('sendUserData 실행 : ', data);
         sendUserData(data.imageUrl, data.username, data.name);
       });
   }, [subscribers]);
@@ -221,8 +243,17 @@ export default function SharePage() {
     const session = OV.current.initSession();
 
     session.on('streamCreated', (event: any) => {
-      const subscriber = session.subscribe(event.stream, undefined);
-      setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
+      // 내가 자신의 구독자가 되는 상황을 막기 위해 필터링
+      if (
+        event.stream.connection.connectionId !== session.connection.connectionId
+      ) {
+        console.log('누군가 세션에 들어오면 세션에 있는 참가자들은 이걸 받음!');
+        const subscriber = session.subscribe(event.stream, undefined);
+        setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
+        console.log('streamCreate받음 : subscribers', subscribers);
+      } else {
+        console.log('내가 나의 구독자이면 안됨!!!');
+      }
     });
 
     session.on('signal:userLocation', (event: any) => {
@@ -251,14 +282,17 @@ export default function SharePage() {
     session.on('signal:userData', async (event: any) => {
       const userDetail = JSON.parse(event.data);
       userDetails.set(userDetail.username, userDetail);
+      console.log('userData 받음1111 userDetails : ', userDetails);
       setUserDetails((prev) => {
         const updated = new Map(prev);
         updated.set(userDetail.username, userDetail);
+        console.log('userData 받음2222 userDetails : ', userDetails);
         return updated;
       });
     });
 
     try {
+      console.log('세션이 연결된 후 제일 먼저 실행!');
       const token = await getToken(sessionId);
       if (!token) {
         throw new Error('토큰이 정의되지 않았습니다');
@@ -275,6 +309,7 @@ export default function SharePage() {
       session.publish(publisher);
       setSession(session);
       setPublisher(publisher);
+      console.log('setPublisher 실행 , publisher : ', publisher);
     } catch (error) {
       console.error('세션 연결 중 오류 발생:', (error as Error).message);
     }
@@ -306,13 +341,14 @@ export default function SharePage() {
   const handleJoinSession = async (sessionId: string) => {
     if (sessionId) {
       await joinSession(sessionId);
-
+      console.log('handleJoinSession 실행 // publisher : ', publisher);
       if (publisher) {
         const audioElement = document.getElementById(
           'publisherAudio',
         ) as HTMLAudioElement;
         if (audioElement) {
           audioElement.srcObject = publisher.stream.getMediaStream();
+          audioElement.muted = true;
         }
       }
 
@@ -682,7 +718,7 @@ export default function SharePage() {
     if (session) {
       session.signal({
         data: JSON.stringify({ userImage, username, name }),
-        to: [],
+        to: subscribers,
         type: 'userData',
       });
     }
@@ -690,6 +726,8 @@ export default function SharePage() {
 
   // 내 위치를 SIG으로 subscriber에게 보냄
   const sendLocation = (lat: number, lng: number) => {
+    console.log('sendLocation 실행 , subscribers', subscribers);
+    console.log('sendLocation 실행 , publisher', publisher);
     const username = localStorageApi.getUserName();
     if (session) {
       session.signal({
