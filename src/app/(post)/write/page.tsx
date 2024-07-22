@@ -170,7 +170,7 @@ export default function BoardPage() {
         posy,
       },
       permission: 'PUBLIC',
-      auto: 'true',
+      auto: 'false',
       menus: [],
     };
 
@@ -191,6 +191,7 @@ export default function BoardPage() {
     });
 
     const objString = JSON.stringify(formObj);
+    console.log(objString);
     const blobObj = new Blob([objString], { type: 'application/json' });
 
     formData.append('data', blobObj);

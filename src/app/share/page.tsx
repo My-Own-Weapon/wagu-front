@@ -722,6 +722,8 @@ export default function SharePage() {
   };
 
   const getStoreLive = async (storeId: number) => {
+    console.log(storeId);
+
     const res = await fetch(
       `https://wagubook.shop:8080/map/live?storeId=${storeId}`,
       {
@@ -730,17 +732,28 @@ export default function SharePage() {
       },
     );
 
+    console.log(res);
+
     return res.json();
   };
 
   useEffect(() => {
+    console.log('vote result 바뀜', voteResults);
+
     voteResults.forEach(async ({ storeId }) => {
       const liveStore = await getStoreLive(storeId);
+
+      console.log(liveStore);
+
       if (liveStores.length > 0) {
         setLiveStores((prev) => [...prev, liveStore]);
       }
     });
   }, [voteResults]);
+
+  useEffect(() => {
+    console.log('liveStores 변경 ', liveStores);
+  }, [liveStores]);
 
   // 투표가 시작되었습니다.
   if (isVote) {
