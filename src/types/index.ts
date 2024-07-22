@@ -51,3 +51,14 @@ export interface AddressSearchDetails {
   posx: string;
   posy: string;
 }
+
+/**
+ *  left, right: x-axis
+ *  up, down: y-axis
+ */
+export interface MapVertexes {
+  left: number;
+  right: number;
+  up: number;
+  down: number;
+}

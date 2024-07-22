@@ -1,4 +1,9 @@
-import { AddressSearchDetails, LoginUserInputs, SignupDetails } from '@/types';
+import {
+  AddressSearchDetails,
+  LoginUserInputs,
+  MapVertexes,
+  SignupDetails,
+} from '@/types';
 
 interface ProfileDetailsResponse {
   userName: string;
@@ -7,6 +12,13 @@ interface ProfileDetailsResponse {
   followingNum: number;
   postNum: number;
 }
+
+interface ShareMapPublishSessionResponse {
+  memberId: number;
+  sessionId: string;
+}
+
+type SuccessMessageResponse = Promise<string>;
 
 class ApiService {
   private mswBaseUrl = 'http://localhost:9090';
@@ -18,6 +30,7 @@ class ApiService {
 
   private sessionId = '';
 
+  /* Auth */
   async login({ username, password }: LoginUserInputs) {
     const res = await fetch(`${this.baseUrl}/login`, {
       method: 'POST',
@@ -63,21 +76,6 @@ class ApiService {
     return res.text();
   }
 
-  async fetchProfileDetails(memberId: number): Promise<ProfileDetailsResponse> {
-    const res = await fetch(`${this.baseUrl}/member/${memberId}/profile`, {
-      method: 'GET',
-      credentials: 'include',
-    });
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
-
-    return res.json();
-  }
-
   async checkSession() {
     const res = await fetch(`${this.baseUrl}/session`, {
       method: 'GET',
@@ -95,6 +93,80 @@ class ApiService {
     return res.text();
   }
 
+  /* about User */
+  async fetchProfileDetails(memberId: number): Promise<ProfileDetailsResponse> {
+    const res = await fetch(`${this.baseUrl}/member/${memberId}/profile`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
+    return res.json();
+  }
+
+  async fetchFollowings() {
+    const res = await fetch(`${this.baseUrl}/followings`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    return res.json();
+  }
+
+  async followUser(memberId: number) {
+    const res = await fetch(`${this.baseUrl}/members/${memberId}/follow`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
+    return res.text();
+  }
+
+  async unFollowUser(memberId: number) {
+    const res = await fetch(`${this.baseUrl}/members/${memberId}/follow`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
+    return res.text();
+  }
+
+  async searchUsers(username: string) {
+    const res = await fetch(
+      `${this.baseUrl}/members?username=${username}&page=0&size=12`,
+      {
+        method: 'GET',
+        credentials: 'include',
+      },
+    );
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
+    return res.json();
+  }
+
+  /* about Post */
   async fetchPosts() {
     const res = await fetch(`${this.baseUrl}/posts`, {
       method: 'GET',
@@ -130,26 +202,38 @@ class ApiService {
     return res;
   }
 
-  async fetchFollowings() {
-    const res = await fetch(`${this.baseUrl}/followings`, {
-      method: 'GET',
-      credentials: 'include',
-    });
+  /* about Store */
+  async fetchPostsOfStore(storeId: number) {
+    const res = await fetch(
+      `${this.baseUrl}/map/posts?storeId=${storeId}&page=0&size=12`,
+      {
+        method: 'GET',
+        credentials: 'include',
+      },
+    );
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
 
     return res.json();
   }
 
-  async fetchKAKAOStoreInfo(name: string) {
-    const url = `${this.kakaoBaseUrl}${encodeURIComponent(name)}`;
-    const res = await fetch(url, {
+  async fetchStoreDetails(storeId: number) {
+    const res = await fetch(`${this.baseUrl}/store/${storeId}`, {
       method: 'GET',
-      headers: {
-        Authorization: `KakaoAK f117ced1de2bab59de8005c69892ed73`,
-      },
+      credentials: 'include',
     });
-    const data = await res.json();
 
-    return data;
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
+    return res.json();
   }
 
   async searchStore(storeName: string) {
@@ -170,72 +254,30 @@ class ApiService {
     return res.json();
   }
 
-  async searchUsers(username: string) {
-    const res = await fetch(
-      `${this.baseUrl}/members?username=${username}&page=0&size=12`,
-      {
-        method: 'GET',
-        credentials: 'include',
-      },
-    );
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
-
-    return res.json();
-  }
-
-  async fetchPostsOfStore(storeId: number) {
-    const res = await fetch(
-      `${this.baseUrl}/map/posts?storeId=${storeId}&page=0&size=12`,
-      {
-        method: 'GET',
-        credentials: 'include',
-      },
-    );
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
-
-    return res.json();
-  }
-
-  async followUser(memberId: number) {
-    const res = await fetch(`${this.baseUrl}/members/${memberId}/follow`, {
-      method: 'POST',
+  async fetchLiveOnStreamersOfStore(storeId: number) {
+    const res = await fetch(`${this.baseUrl}/map/live?storeId=${storeId}`, {
+      method: 'GET',
       credentials: 'include',
     });
+    const streamers = await res.json();
 
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
-
-    return res.text();
+    return streamers;
   }
 
-  async unFollowUser(memberId: number) {
-    const res = await fetch(`${this.baseUrl}/members/${memberId}/follow`, {
-      method: 'DELETE',
-      credentials: 'include',
+  async fetchKAKAOStoreInfo(name: string) {
+    const url = `${this.kakaoBaseUrl}${encodeURIComponent(name)}`;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `KakaoAK f117ced1de2bab59de8005c69892ed73`,
+      },
     });
+    const data = await res.json();
 
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
-
-    return res.text();
+    return data;
   }
 
+  /* about Live */
   async createSessionId({
     storeName,
     address,
@@ -344,6 +386,154 @@ class ApiService {
     const data = await res.json();
 
     return data;
+  }
+
+  /* about map page */
+  async fetchStoresOfMapBoundary({ left, right, up, down }: MapVertexes) {
+    const res = await fetch(
+      `${this.baseUrl}/map?left=${left}&right=${right}&up=${up}&down=${down}`,
+      {
+        method: 'GET',
+        credentials: 'include',
+      },
+    );
+    const stores = await res.json();
+
+    return stores;
+  }
+
+  /* about Share Map page */
+  async createShareMapRandomSessionId(): Promise<string> {
+    const res = await fetch(`${this.baseUrl}/share`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const { status, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+    }
+
+    const sessionIdForShareUrl = await res.text();
+
+    return sessionIdForShareUrl;
+  }
+
+  /** sessionId랑 매칭되는 sessionId를 가진 session을 생성하고 개시한다. */
+  async publishShareMapSession(
+    sessionId: string,
+  ): Promise<ShareMapPublishSessionResponse> {
+    const res = await fetch(`${this.baseUrl}/api/sessions/voice`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customSessionId: sessionId,
+      }),
+    });
+
+    if (!res.ok) {
+      const { status, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+    }
+
+    return res.json();
+  }
+
+  /* ----------------- about Vote ----------------- */
+
+  /* [BEFORE 개표 (투표 List에 CRUD)] */
+  async addStoreToVoteList(
+    sessionId: string,
+    storeId: string | number,
+  ): SuccessMessageResponse {
+    const res = await fetch(
+      `${this.baseUrl}/share/${sessionId}?store_id=${storeId}`,
+      {
+        method: 'POST',
+        credentials: 'include',
+      },
+    );
+
+    if (!res.ok) {
+      const { status, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+    }
+
+    return res.text();
+  }
+
+  async deleteStoreFromVoteList(sessionId: string, storeId: string) {
+    const res = await fetch(
+      `${this.baseUrl}/share/${sessionId}?store_id=${storeId}`,
+      {
+        method: 'DELETE',
+        credentials: 'include',
+      },
+    );
+
+    if (!res.ok) {
+      const { status, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+    }
+
+    return res.text();
+  }
+
+  /* [AFTER 개표 (투표 LIST에 있는 선택지를 vote)] */
+  async voteStore(sessionId: string, storeId: string): SuccessMessageResponse {
+    const res = await fetch(
+      `${this.baseUrl}/share/${sessionId}/vote?store_id=${storeId}`,
+      {
+        method: 'POST',
+        credentials: 'include',
+      },
+    );
+
+    if (!res.ok) {
+      const { status, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+    }
+
+    return res.text();
+  }
+
+  async cancelVoteStore(sessionId: string, storeId: string) {
+    const res = await fetch(
+      `${this.baseUrl}/share/${sessionId}/vote?store_id=${storeId}`,
+      {
+        method: 'PATCH',
+        credentials: 'include',
+      },
+    );
+
+    if (!res.ok) {
+      const { status, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+    }
+
+    return res.text();
+  }
+
+  async fetchVoteResults(sessionId: string) {
+    const res = await fetch(`${this.baseUrl}/share/${sessionId}/result`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const { status, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+    }
+
+    return res.json();
   }
 }
 

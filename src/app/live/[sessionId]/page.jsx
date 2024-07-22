@@ -38,20 +38,6 @@ export default function StreamingPage({ params }) {
 
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
-  // const [messages, setMessages] = useState([
-  //   { user: 'user', text: 'hello' },
-  //   { user: 'user', text: 'hello' },
-  //   {
-  //     user: '김창식',
-  //     text: 'ㅇㄴ마ㅣㅓ엄나ㅣ어마ㅣㄴ어ㅏㅣㅁ너아ㅣ먼아ㅣ머ㅏ니어마ㅣㄴ어ㅏㅣㅁ너아머나어ㅏㅁ너아먼ㅇ',
-  //   },
-  //   { user: 'user', text: 'hello' },
-  //   { user: '호오잇', text: '...?' },
-  //   {
-  //     user: '김창식',
-  //     text: 'ㅇㄴ마ㅣㅓ엄나ㅣ어마ㅣㄴ어ㅏㅣㅁ너아ㅣ먼아ㅣ머ㅏ니어마ㅣㄴ어ㅏㅣㅁ너아머나어ㅏㅁ너아먼ㅇ',
-  //   },
-  // ]);
 
   useEffect(() => {
     const checkStreamer = async () => {

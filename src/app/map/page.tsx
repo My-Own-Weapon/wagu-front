@@ -1,18 +1,17 @@
+/* eslint-disable no-shadow */
 /* eslint-disable prefer-template */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Post } from '@/components/Post';
-import useDragScroll from '@/hooks/useDragScroll';
-import LiveFriends, { Friend } from '@/components/LiveFriendsList';
+import LiveFriends from '@/components/LiveFriendsList';
 import VoteUrlModal from '@/components/VoteUrlModal';
-import { PostCardProps } from '@/types';
+import { MapVertexes, PostCardProps } from '@/types';
+import { apiService } from '@/services/apiService';
 
 import s from './page.module.scss';
 
@@ -30,16 +29,7 @@ interface StoreData {
   posy: number;
 }
 
-interface PostData {
-  postId: number;
-  storeName: string;
-  postMainMenu: string;
-  menuImage: { url: string };
-  createdDate: string;
-  menuPrice: string;
-}
-
-interface LiveStreamData {
+interface Streamer {
   profileImage: string;
   sessionId: string;
   userName: string;
@@ -48,14 +38,12 @@ interface LiveStreamData {
 }
 export default function KakaoMap() {
   const [markers, setMarkers] = useState<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [map, setMap] = useState<any>(null);
   const [posts, setPosts] = useState<PostCardProps[]>([]);
-  const [liveStream, setLiveStream] = useState<LiveStreamData[]>([]);
+  const [streamers, setStreamers] = useState<Streamer[]>([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [voteUrl, setVoteUrl] = useState('');
-  const router = useRouter();
-  const ref = useDragScroll();
-  const [liveFriends, setLiveFriends] = useState<Friend[]>([]);
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -89,7 +77,7 @@ export default function KakaoMap() {
           const swLatLng = mapBounds.getSouthWest();
           const neLatLng = mapBounds.getNorthEast();
 
-          fetchStoresData(mapInstance, {
+          fetchStoresOfMapBoundary(mapInstance, {
             left: swLatLng.getLng(),
             down: swLatLng.getLat(),
             right: neLatLng.getLng(),
@@ -104,64 +92,40 @@ export default function KakaoMap() {
     };
   }, []);
 
-  const fetchData = (url: string) => {
-    return fetch(url, { method: 'GET', credentials: 'include' }).then(
-      (response) => {
-        if (!response.ok) {
-          throw response;
-        }
-        return response.json();
-      },
-    );
-  };
-
-  const fetchStoresData = (
+  const fetchStoresOfMapBoundary = async (
     mapInstance: any,
-    bounds: { left: number; down: number; right: number; up: number },
+    bounds: MapVertexes,
   ) => {
-    const { left, down, right, up } = bounds;
-    fetchData(
-      `https://api.wagubook.shop:8080/map?left=${left}&right=${right}&up=${up}&down=${down}`,
-    )
-      .then((data) => {
-        if (Array.isArray(data)) {
-          addMarkers(mapInstance, data);
-        } else {
-          handleFetchError(
-            new Response('서버로부터 받은 데이터가 배열이 아닙니다.', {
-              status: 500,
-            }),
-          );
-        }
-      })
-      .catch(handleFetchError);
+    const stores = await apiService.fetchStoresOfMapBoundary(bounds);
+
+    addMarkers(mapInstance, stores);
   };
 
-  const addMarkers = (mapInstance: any, storeData: StoreData[]) => {
+  const addMarkers = (mapInstance: any, stores: StoreData[]) => {
     removeMarkers();
 
-    if (!Array.isArray(storeData)) {
-      handleFetchError(
-        new Response('storeData가 배열이 아닙니다.', { status: 500 }),
+    const newMarkers = stores.map((store) => {
+      const { kakao } = window;
+      const imageSrc = '/images/map/ping_orange.svg';
+      const imageSize = new kakao.maps.Size(32, 32);
+      const imageOption = { offset: new kakao.maps.Point(16, 32) };
+      const markerImage = new kakao.maps.MarkerImage(
+        imageSrc,
+        imageSize,
+        imageOption,
       );
-      return;
-    }
-
-    const newMarkers = storeData.map((store) => {
-      const markerPosition = new window.kakao.maps.LatLng(
-        store.posy,
-        store.posx,
-      );
-      const marker = new window.kakao.maps.Marker({
+      const markerPosition = new kakao.maps.LatLng(store.posy, store.posx);
+      const marker = new kakao.maps.Marker({
         position: markerPosition,
         key: store.storeId,
+        image: markerImage,
       });
 
       marker.setMap(mapInstance);
 
       window.kakao.maps.event.addListener(marker, 'click', () => {
-        fetchLiveData(store.storeId);
-        fetchPostsData(store.storeId, 0, 10);
+        fetchStreamers(store.storeId);
+        fetchPosts(store.storeId);
       });
 
       return marker;
@@ -175,107 +139,29 @@ export default function KakaoMap() {
     setMarkers([]);
   };
 
-  const fetchLiveData = (storeId: number) => {
-    fetch(`https://wagubook.shop:8080/map/live?storeId=${storeId}`, {
-      method: 'GET',
-      credentials: 'include',
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log('현재 라이브 중인 ㄴㅁㅇ :', data);
+  const fetchStreamers = async (storeId: number) => {
+    const liveOnStreamers =
+      await apiService.fetchLiveOnStreamersOfStore(storeId);
 
-        if (Array.isArray(data)) {
-          setLiveStream(data);
-        } else {
-          handleFetchError(
-            new Response('서버가 배열이 아닌 데이터를 반환했습니다.', {
-              status: 500,
-            }),
-          );
-        }
-      })
-      .catch((error) => {
-        handleFetchError(error);
-      });
-  };
-  const fetchPostsData = (storeId: number, page: number, size: number) => {
-    fetchData(
-      `https://api.wagubook.shop:8080/map/posts?storeId=${storeId}&page=${page}&size=${size}`,
-    )
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setPosts(data);
-        } else {
-          handleFetchError(
-            new Response('서버가 배열이 아닌 데이터를 반환했습니다.', {
-              status: 500,
-            }),
-          );
-        }
-      })
-      .catch((error) => {
-        handleFetchError(error);
-      });
+    setStreamers(liveOnStreamers);
   };
 
-  // Error handling
-  const handleFetchError = async (error: Response) => {
-    let errorMessage = '알 수 없는 에러 발생';
-    try {
-      const errorData = await error.json();
-      errorMessage = `Error ${errorData.status}: ${errorData.error} - ${errorData.message}`;
-    } catch (jsonError) {
-      // JSON 파싱 중 오류 발생 시
-    }
+  const fetchPosts = async (storeId: number) => {
+    const posts = await apiService.fetchPostsOfStore(storeId);
+
+    setPosts(posts);
   };
 
-  const createVoteUrl = () => {
-    console.log('실행됨');
+  const createShareMapUrl = async () => {
+    const BASE_URL =
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : process.env.NEXT_PUBLIC_BASE_URL;
+    const sessionId = await apiService.createShareMapRandomSessionId();
+    apiService.publishShareMapSession(sessionId);
 
-    fetch('https://api.wagubook.shop:8080/share', {
-      method: 'POST',
-      credentials: 'include',
-    })
-      .then((response) => {
-        if (!response.ok) {
-          return response.text().then((text) => {
-            throw new Error(`요청 실패됨: ${text}`);
-          });
-        }
-        return response.text();
-      })
-      .then((text) => {
-        fetch('https://api.wagubook.shop:8080/api/sessions/voice', {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            customSessionId: text,
-          }),
-        })
-          .then((res) => {
-            if (!res.ok) {
-              throw new Error('세션 생성 실패');
-            }
-            const BASE_URL =
-              process.env.NODE_ENV === 'development'
-                ? 'http://localhost:3000'
-                : 'https://www.wagubook.shop';
-
-            setVoteUrl(`${BASE_URL}/share?sessionId=${text}`);
-            setModalIsOpen(true);
-          })
-          .catch((error) => {
-            handleFetchError(
-              new Response(`세션 생성 오류: ${error.message}`, { status: 500 }),
-            );
-          });
-      })
-      .catch((error) => {
-        handleFetchError(
-          new Response(`URL 생성 오류: ${error.message}`, { status: 500 }),
-        );
-      });
+    setVoteUrl(`${BASE_URL}/share?sessionId=${sessionId}`);
+    setModalIsOpen(true);
   };
 
   return (
@@ -284,17 +170,7 @@ export default function KakaoMap() {
         <div id="map" className={s.map} />
       </div>
       <div>
-        <LiveFriends liveFriends={liveStream} />
-        {/* {liveStream.length > 0 &&
-          liveStream.map(({ sessionId, userName, storeName }) => {
-            return (
-              <Link key={sessionId}>
-                <div>store Name :{storeName}</div>
-                <div>userName :{userName}</div>
-                <div>sessionId :{sessionId}</div>
-              </ㅣ>
-            );
-          })} */}
+        <LiveFriends liveFriends={streamers} />
         <div className={s.postContainer}>
           <Post.Wrapper>
             <Post>
@@ -312,7 +188,7 @@ export default function KakaoMap() {
         <button
           className={s.createUrlButton}
           type="button"
-          onClick={createVoteUrl}
+          onClick={createShareMapUrl}
         >
           투표 URL 생성하기
         </button>
