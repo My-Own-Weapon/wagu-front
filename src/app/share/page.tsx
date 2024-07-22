@@ -80,7 +80,7 @@ export default function SharePage() {
   const [markerImages, setMarkerImages] = useState<any[]>([]);
   const [centerMarkers, setCenterMarkers] = useState<any[]>([]);
 
-  const OV = useRef<OpenVidu | null>(null);
+  const [OV, setOV] = useState<OpenVidu | null>(null);
   const [session, setSession] = useState<any>(null);
   // const [sessionId, setSessionId] = useState<any>(null);
   const [publisher, setPublisher] = useState<any>(null);
@@ -100,8 +100,12 @@ export default function SharePage() {
   const [liveStores, setLiveStores] = useState<any[]>([]);
 
   useEffect(() => {
-    console.log('---2 kakao map script(인스턴스) 생성 ---');
+    console.log('--- 1');
 
+    // 세션 생성 및 오디오 태그에 오디오 소스 연결
+    joinSessionAndPatchAudioTag(sessionId);
+
+    // kakao map 생성
     const script = document.createElement('script');
     script.src =
       'https://dapi.kakao.com/v2/maps/sdk.js?appkey=948985235eb596e79f570535fd01a71e&autoload=false&libraries=services';
@@ -151,7 +155,7 @@ export default function SharePage() {
     console.log('---3 userName 서버에 전송');
 
     const username = localStorageApi.getUserName();
-    /* 참가자가 들어오면 내 프로필을 가져오고 + 보내... (why: 내 프로필을 참여자에게 보냄 & 늦게들어오면 몰?루) 
+    /* 참가자가 들어오면 내 프로필을 가져오고 + 보내... (why: 내 프로필을 참여자에게 보냄 & 늦게들어오면 몰?루)
       if 내정보 있어 ? 내정보 가져와서 보내 : 서버에 요청해서 가져와서 보내
     */
     fetch(`https://api.wagubook.shop:8080/member/${username}/profile`, {
@@ -175,18 +179,19 @@ export default function SharePage() {
         'center_changed',
         updateCenterLocation,
       );
-
-      if (sessionId) {
-        joinSessionAndPatchAudioTag(sessionId);
-      } else {
-        throw new Error('세션 ID가 없습니다.');
-      }
     }
   }, [map]);
 
   useEffect(() => {
+    window.addEventListener('beforeunload', leaveSession);
+    return () => {
+      window.removeEventListener('beforeunload', leaveSession);
+    };
+  }, []);
+
+  useEffect(() => {
     const interval = setInterval(() => {
-      console.log('10초');
+      // console.log('10초');
 
       updateCenterLocation();
     }, SEND_LOCATION_INTERVAL);
@@ -203,8 +208,10 @@ export default function SharePage() {
   const joinSession = async (sessionId: string) => {
     console.log('--- join session !!!');
 
-    OV.current = new OpenVidu();
-    const session = OV.current.initSession();
+    const OV = new OpenVidu();
+    setOV(OV);
+    const session = OV.initSession();
+    setSession(session);
 
     session.on('streamCreated', (event: any) => {
       const subscriber = session.subscribe(event.stream, undefined);
@@ -216,6 +223,21 @@ export default function SharePage() {
       // console.log('user위치 받음  내용 : ', userLocation);
       setUserLocations((prevLocations) => [...prevLocations, userLocation]);
       updateUserMarker(userLocation);
+    });
+
+    session.on('streamDestroyed', (event) => {
+      setSubscribers((prevSubscribers) => {
+        return prevSubscribers.filter((sub) => {
+          console.log('sub', sub);
+          console.log('event.stream.streamManager', event.stream.streamManager);
+          console.log(
+            'sub !== event.stream.streamManager',
+            sub !== event.stream.streamManager,
+          );
+
+          return sub !== event.stream.streamManager;
+        });
+      });
     });
 
     // 나 투표했으니까 다들 투표된거 업데이트해
@@ -251,15 +273,12 @@ export default function SharePage() {
       }
       const username = localStorageApi.getUserName();
       await session.connect(token, { clientData: username });
-      const publisher = OV.current.initPublisher(undefined, {
+      const publisher = OV.initPublisher(undefined, {
         audioSource: undefined,
         videoSource: false,
-        publishAudio: true,
-        publishVideo: false,
       });
 
       session.publish(publisher);
-      setSession(session);
       setPublisher(publisher);
     } catch (error) {
       console.error('세션 연결 중 오류 발생:', (error as Error).message);
@@ -561,10 +580,26 @@ export default function SharePage() {
       session.disconnect();
     }
 
+    if (publisher) {
+      console.log('publisher', publisher);
+
+      const mediaStream = publisher.stream.getMediaStream();
+      if (mediaStream && mediaStream.getTracks) {
+        // 모든 미디어 트랙 중지
+        mediaStream
+          .getTracks()
+          .forEach((track: { stop: () => any }) => track.stop());
+      }
+    }
+
     setSession(null);
     setSubscribers([]);
     setPublisher(null);
   };
+
+  useEffect(() => {
+    console.log(subscribers);
+  }, [subscribers]);
 
   const updateUserMarker = ({ userId, lat, lng }: UserLocation) => {
     const markerPosition = new window.kakao.maps.LatLng(lat, lng);
@@ -600,11 +635,14 @@ export default function SharePage() {
     // if (!session) throw new Error(MSG.NO_SESSION_INSTANCE);
 
     if (session) {
+      console.log('세션있음');
       session.signal({
         data: JSON.stringify({ userImage, username, name }),
         to: [],
         type: 'userData',
       });
+    } else {
+      console.log('세션없음');
     }
   };
 
