@@ -471,7 +471,7 @@ class ApiService {
   /* [AFTER 개표 (투표 LIST에 있는 선택지를 vote)] */
   async voteStore(sessionId: string, storeId: string): SuccessMessageResponse {
     const res = await fetch(
-      `${this.baseUrl}/shareshare/${sessionId}/vote?store_id=${storeId}`,
+      `${this.baseUrl}/share/${sessionId}/vote?store_id=${storeId}`,
       {
         method: 'POST',
         credentials: 'include',
