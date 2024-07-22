@@ -16,15 +16,16 @@
 'use client';
 
 import React, { useEffect, useState, useRef, MouseEventHandler } from 'react';
-import { OpenVidu, Subscriber } from 'openvidu-browser';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Post } from '@/components/Post';
-import { sharing } from 'webpack';
-import StoreCards, { StoreCard, StoreVoteCard } from '@/components/StoreCard';
-import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
+import { OpenVidu, Subscriber } from 'openvidu-browser';
 import Link from 'next/link';
-import { localStorageApi } from '@/services/localStorageApi';
+
+import { Post } from '@/components/Post';
+import StoreCards, { StoreCard, StoreVoteCard } from '@/components/StoreCard';
 import LiveFriends from '@/components/LiveFriendsList';
+import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
+import { localStorageApi } from '@/services/localStorageApi';
+import { apiService } from '@/services/apiService';
 
 import s from './page.module.scss';
 
@@ -59,10 +60,16 @@ interface VoteResult {
 }
 
 const SEND_LOCATION_INTERVAL = 3000;
+const MSG = {
+  NO_SESSION_INSTANCE: 'session 인스턴스가 없습니다.',
+  NO_SESSION_ID: 'session id가 없습니다.',
+};
+
+// let i = 0;
 
 export default function SharePage() {
   const searchParams = useSearchParams();
-  const sessionId = searchParams.get('sessionId');
+  const sessionId = searchParams.get('sessionId')!;
 
   const [markers, setMarkers] = useState<any[]>([]);
   const [map, setMap] = useState<any>(null);
@@ -73,7 +80,7 @@ export default function SharePage() {
   const [markerImages, setMarkerImages] = useState<any[]>([]);
   const [centerMarkers, setCenterMarkers] = useState<any[]>([]);
 
-  const OV = useRef<OpenVidu | null>(null);
+  const [OV, setOV] = useState<OpenVidu | null>(null);
   const [session, setSession] = useState<any>(null);
   // const [sessionId, setSessionId] = useState<any>(null);
   const [publisher, setPublisher] = useState<any>(null);
@@ -93,29 +100,12 @@ export default function SharePage() {
   const [liveStores, setLiveStores] = useState<any[]>([]);
 
   useEffect(() => {
-    console.log('---1 get sessionId---');
-    // const sessionId = searchParams.get('sessionId');
+    console.log('--- 1');
 
-    /* ❌ 없어도 됨  */
-    if (sessionId) {
-      // setSessionId(sessionId);
-      fetch(`https://wagubook.shop:8080/share/${sessionId}`, {
-        method: 'GET',
-        credentials: 'include',
-      })
-        .then((res) => {
-          return res.text();
-        })
-        .then((shareId) => {
-          console.log('---- shareId:', shareId);
-          setShareId(shareId);
-        });
-    }
-  }, [searchParams]);
+    // 세션 생성 및 오디오 태그에 오디오 소스 연결
+    joinSessionAndPatchAudioTag(sessionId);
 
-  useEffect(() => {
-    console.log('---2 kakao map script(인스턴스) 생성 ---');
-
+    // kakao map 생성
     const script = document.createElement('script');
     script.src =
       'https://dapi.kakao.com/v2/maps/sdk.js?appkey=948985235eb596e79f570535fd01a71e&autoload=false&libraries=services';
@@ -165,7 +155,7 @@ export default function SharePage() {
     console.log('---3 userName 서버에 전송');
 
     const username = localStorageApi.getUserName();
-    /* 참가자가 들어오면 내 프로필을 가져오고 + 보내... (why: 내 프로필을 참여자에게 보냄 & 늦게들어오면 몰?루) 
+    /* 참가자가 들어오면 내 프로필을 가져오고 + 보내... (why: 내 프로필을 참여자에게 보냄 & 늦게들어오면 몰?루)
       if 내정보 있어 ? 내정보 가져와서 보내 : 서버에 요청해서 가져와서 보내
     */
     fetch(`https://api.wagubook.shop:8080/member/${username}/profile`, {
@@ -189,18 +179,19 @@ export default function SharePage() {
         'center_changed',
         updateCenterLocation,
       );
-
-      if (sessionId) {
-        handleJoinSession(sessionId);
-      } else {
-        throw new Error('세션 ID가 없습니다.');
-      }
     }
   }, [map]);
 
   useEffect(() => {
+    window.addEventListener('beforeunload', leaveSession);
+    return () => {
+      window.removeEventListener('beforeunload', leaveSession);
+    };
+  }, []);
+
+  useEffect(() => {
     const interval = setInterval(() => {
-      console.log('10초');
+      // console.log('10초');
 
       updateCenterLocation();
     }, SEND_LOCATION_INTERVAL);
@@ -217,8 +208,10 @@ export default function SharePage() {
   const joinSession = async (sessionId: string) => {
     console.log('--- join session !!!');
 
-    OV.current = new OpenVidu();
-    const session = OV.current.initSession();
+    const OV = new OpenVidu();
+    setOV(OV);
+    const session = OV.initSession();
+    setSession(session);
 
     session.on('streamCreated', (event: any) => {
       const subscriber = session.subscribe(event.stream, undefined);
@@ -227,15 +220,30 @@ export default function SharePage() {
 
     session.on('signal:userLocation', (event: any) => {
       const userLocation = JSON.parse(event.data);
-      console.log('user위치 받음  내용 : ', userLocation);
+      // console.log('user위치 받음  내용 : ', userLocation);
       setUserLocations((prevLocations) => [...prevLocations, userLocation]);
       updateUserMarker(userLocation);
+    });
+
+    session.on('streamDestroyed', (event) => {
+      setSubscribers((prevSubscribers) => {
+        return prevSubscribers.filter((sub) => {
+          console.log('sub', sub);
+          console.log('event.stream.streamManager', event.stream.streamManager);
+          console.log(
+            'sub !== event.stream.streamManager',
+            sub !== event.stream.streamManager,
+          );
+
+          return sub !== event.stream.streamManager;
+        });
+      });
     });
 
     // 나 투표했으니까 다들 투표된거 업데이트해
     session.on('signal:voteUpdate', async (event: any) => {
       event.preventDefault();
-      await fetchVoteList(sessionId);
+      await fetchVoteListAndSet(sessionId);
     });
 
     session.on('signal:voteStart', async (event: any) => {
@@ -265,15 +273,12 @@ export default function SharePage() {
       }
       const username = localStorageApi.getUserName();
       await session.connect(token, { clientData: username });
-      const publisher = OV.current.initPublisher(undefined, {
+      const publisher = OV.initPublisher(undefined, {
         audioSource: undefined,
         videoSource: false,
-        publishAudio: true,
-        publishVideo: false,
       });
 
       session.publish(publisher);
-      setSession(session);
       setPublisher(publisher);
     } catch (error) {
       console.error('세션 연결 중 오류 발생:', (error as Error).message);
@@ -303,7 +308,9 @@ export default function SharePage() {
     }
   };
 
-  const handleJoinSession = async (sessionId: string) => {
+  const joinSessionAndPatchAudioTag = async (sessionId: string) => {
+    // console.log('---------- join session ----------', i++);
+
     if (sessionId) {
       await joinSession(sessionId);
 
@@ -332,7 +339,6 @@ export default function SharePage() {
 
   /* 좌표를 맵에 추가하는 함수 */
   const addMarkers = (mapInstance: any, storeData: StoreData[]) => {
-    /* 불변성 */
     removeMarkers();
 
     if (!Array.isArray(storeData)) {
@@ -354,7 +360,7 @@ export default function SharePage() {
 
       window.kakao.maps.event.addListener(marker, 'click', () => {
         setStoreId(store.storeId);
-        fetchPostsData(store.storeId, 0, 10);
+        fetchPostsAndSet(store.storeId);
       });
 
       return marker;
@@ -368,200 +374,141 @@ export default function SharePage() {
     setMarkers([]);
   };
 
-  const fetchStores = (url: string) => {
-    return fetch(url, { method: 'GET', credentials: 'include' }).then(
-      (response) => {
-        if (!response.ok) {
-          throw response;
-        }
-        return response.json();
-      },
-    );
-  };
-
-  const fetchStoresData = (
+  const fetchStoresData = async (
     mapInstance: any,
     bounds: { left: number; down: number; right: number; up: number },
   ) => {
-    const { left, down, right, up } = bounds;
+    try {
+      const stores = await apiService.fetchStoresOfMapBoundary(bounds);
 
-    /* 지우고 다시 받아와서 마커 설정 */
-    fetchStores(
-      `https://api.wagubook.shop:8080/map?left=${left}&right=${right}&up=${up}&down=${down}`,
-    )
-      .then((data) => {
-        if (Array.isArray(data)) {
-          addMarkers(mapInstance, data);
-        } else {
-          console.error('서버로부터 받은 데이터가 배열이 아닙니다:', data);
-        }
-      })
-      .catch(handleFetchError);
+      addMarkers(mapInstance, stores);
+    } catch (e) {
+      if (e instanceof Error) {
+        alert(e.message);
+      }
+    }
   };
 
-  /* 스토어에 대한 포스트들 fetch */
-  const fetchPostsData = (storeId: number, page: number, size: number) => {
-    fetchStores(
-      `https://api.wagubook.shop:8080/map/posts?storeId=${storeId}&page=${page}&size=${size}`,
-    )
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setPosts(data);
-        } else {
-          console.error('서버가 배열이 아닌 데이터를 반환했습니다:', data);
-        }
-      })
-      .catch((error) => {
-        handleFetchError(error);
-      });
+  const fetchPostsAndSet = async (storeId: number) => {
+    try {
+      const posts = await apiService.fetchPostsOfStore(storeId);
+
+      setPosts(posts);
+    } catch (e) {
+      if (e instanceof Error) {
+        alert(e.message);
+      }
+    }
   };
 
   /* 투표 결과를 받아온다 */
-  const fetchVoteResults = () => {
-    fetch(`https://api.wagubook.shop:8080/share/${sessionId}/result`, {
-      method: 'GET',
-      credentials: 'include',
-    })
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setVoteResults(data);
-        } else {
-          console.error('서버로부터 받은 데이터가 배열이 아닙니다:', data);
-        }
-      })
-      .catch((error) => {
-        console.error('투표 결과를 가져오는 중 오류 발생:', error);
-      });
+  const fetchVoteResults = async () => {
+    // if (!sessionId) {
+    //   throw new Error('세션 ID가 없습니다.');
+    // }
+
+    try {
+      const result = await apiService.fetchVoteResults(sessionId);
+
+      setVoteResults(result);
+    } catch (e) {
+      if (e instanceof Error) {
+        alert(e.message);
+      }
+    }
   };
 
   // 투표 list에 추가하기 위한 함수
-  const voteAdd = async (url: string, storeId: number) => {
-    // id로 식당을 검색 후 정보 찾아와서
-    const res = await fetch(`https://api.wagubook.shop:8080/store/${storeId}`, {
-      method: 'GET',
-      credentials: 'include',
-    });
-    const selectedStore = await res.json();
-    currSelectedStoreRef.current = selectedStore;
+  const handleAddStoreToVoteListClick = async (
+    url: string,
+    storeId: number,
+  ) => {
+    // if (!sessionId) throw new Error(MSG.NO_SESSION_ID);
 
-    // 찾은 식당 정보를 투표에 추가
-    await fetch(
-      `https://api.wagubook.shop:8080/share/${sessionId}?store_id=${storeId}`,
-      {
-        method: 'POST',
-        credentials: 'include',
-      },
-    )
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('이미 추가된 가게입니다.');
-        }
-        return res.text();
-      })
-      .then((message) => {
-        sendVoteUpdate();
-        alert(message);
-      })
-      .catch((error) => {
-        alert(error.message);
-      });
+    try {
+      const selectedStoreDetails = await apiService.fetchStoreDetails(storeId);
+      currSelectedStoreRef.current = selectedStoreDetails;
+      const succMsg = await apiService.addStoreToVoteList(sessionId, storeId);
+      await fetchVoteListAndSet(sessionId);
 
-    // 투표에 추가한 가게들을 받아와서 재할당 불변성
-    await fetchVoteList(sessionId);
+      alert(succMsg);
+      broadcastUpdateVoteListSIG();
+    } catch (e) {
+      if (e instanceof Error) {
+        alert(e.message);
+      }
+    }
   };
 
-  // const fetchVoteList = async (sessionId: string) => {
-  //   const res = await fetch(
-  //     `https://api.wagubook.shop:8080/share/${sessionId}/vote/list`,
-  //     {
-  //       method: 'GET',
-  //       credentials: 'include',
-  //     },
-  //   );
-  //   const voteList = await res.json();
-  //   setStores(() => voteList);
-  // };
-
   // [AFTER 투표] 투표가 시작되었을때 가게 카드에서 투표버튼 핸들러
-  const handleAddVote: MouseEventHandler<HTMLButtonElement> = (e) => {
+  const handleVoteStoreClick: MouseEventHandler<HTMLButtonElement> = async (
+    e,
+  ) => {
     e.stopPropagation();
 
-    const { currentTarget } = e;
-    const { dataset } = currentTarget;
+    const { dataset } = e.currentTarget;
     const { storeId } = dataset;
 
-    fetch(
-      `https://api.wagubook.shop:8080/share/${sessionId}/vote?store_id=${storeId}`,
-      {
-        method: 'POST',
-        credentials: 'include',
-      },
-    )
-      .then((res) => {
-        return res.text();
-      })
-      .then((message) => {
-        alert(message);
-      })
-      .catch((e) => {
-        throw e;
-      });
+    if (!sessionId || !storeId) throw new Error('세션 ID가 없습니다.');
+
+    try {
+      const succMsg = await apiService.voteStore(sessionId, storeId);
+
+      alert(succMsg);
+    } catch (e) {
+      if (e instanceof Error) {
+        alert(e.message);
+      }
+    }
   };
 
   // [BEFORE 투표] 투표가 ⛔️시작되기전⛔️에 가게 카드에서 투표버튼 ⭐️ 핸들러
-  const voteDelete = (url: string, selectedStoreId: string) => {
-    fetch(
-      `https://api.wagubook.shop:8080/share/${sessionId}?store_id=${selectedStoreId}`,
-      {
-        method: 'DELETE',
-        credentials: 'include',
-      },
-    )
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('이미 삭제된 가게입니다.');
-        }
-        return res.text();
-      })
-      .then((message) => {
-        setStores(stores.filter(({ storeId }) => storeId != selectedStoreId));
-        sendVoteUpdate();
-        alert(message);
-      })
-      .catch((error) => {
-        alert(error.message);
-      });
+  const deleteStoreFromVoteList = async (url: string, storeId: string) => {
+    if (!sessionId || !storeId) {
+      throw new Error('세션 ID 또는 store id가 없습니다.');
+    }
+
+    try {
+      const succMsg = await apiService.deleteStoreFromVoteList(
+        sessionId,
+        storeId,
+      );
+
+      setStores(stores.filter(({ curStoreId }) => curStoreId != storeId));
+      broadcastUpdateVoteListSIG();
+      alert(succMsg);
+    } catch (e) {
+      if (e instanceof Error) {
+        alert(`[${e.message}]
+          이미 추가된 가게입니다 !`);
+      }
+    }
   };
 
   // [AFTER 투표] 투표 추가 버튼색이 빨강으로 변하면서 등록되는 함수
-  const handleDeleteVote: MouseEventHandler<HTMLButtonElement> = (e) => {
-    const { currentTarget } = e;
-    const { dataset } = currentTarget;
+  const handleCancelVote: MouseEventHandler<HTMLButtonElement> = async (e) => {
+    e.stopPropagation();
+
+    const { dataset } = e.currentTarget;
     const { storeId } = dataset;
 
-    fetch(
-      `https://api.wagubook.shop:8080/share/${sessionId}/vote?store_id=${storeId}`,
-      {
-        method: 'PATCH',
-        credentials: 'include',
-      },
-    )
-      .then((res) => {
-        return res.text();
-      })
-      .then((message) => {
-        alert(message);
-      })
-      .catch((e) => {
-        throw e;
-      });
+    if (!sessionId || !storeId) {
+      throw new Error('세션 ID 또는 store id가 없습니다.');
+    }
+
+    try {
+      const succMsg = await apiService.cancelVoteStore(sessionId, storeId);
+
+      alert(`${succMsg}`);
+    } catch (e) {
+      if (e instanceof Error) {
+        alert(e.message);
+      }
+    }
   };
 
-  const fetchVoteList = async (sessionId: string | null) => {
-    if (!sessionId) return;
+  const fetchVoteListAndSet = async (sessionId: string | null) => {
+    // if (!sessionId) return;
 
     const res = await fetch(
       `https://api.wagubook.shop:8080/share/${sessionId}/vote/list`,
@@ -571,11 +518,13 @@ export default function SharePage() {
       },
     );
     const voteList = await res.json();
+
     setStores(() => voteList);
   };
 
   // 내가 투표를 종료했을을 알리는 SIG
-  const sendVoteDone = () => {
+  const broadcastImVoteDoneSIG = () => {
+    // if (!session) throw new Error(MSG.NO_SESSION_INSTANCE);
     if (session) {
       session.signal({
         to: [],
@@ -585,7 +534,8 @@ export default function SharePage() {
   };
 
   // voteUpdate 시그널을 받으면 누군가가 투표를 삭제하던 추가하던 voteList가 바뀌었으니 새로 받아와라 !
-  const sendVoteUpdate = () => {
+  const broadcastUpdateVoteListSIG = () => {
+    // if (!session) throw new Error(MSG.NO_SESSION_INSTANCE);
     if (session) {
       session.signal({
         to: [],
@@ -596,7 +546,8 @@ export default function SharePage() {
 
   // 나 투표 하고싶어
   // ✅ TODO: 아무나 눌러도 다 시작됨
-  const sendVoteStart = () => {
+  const broadcastWantVoteStartSIG = () => {
+    // if (!session) throw new Error(MSG.NO_SESSION_INSTANCE);
     if (session) {
       session.signal({
         to: [],
@@ -605,29 +556,15 @@ export default function SharePage() {
     }
   };
 
-  // [AFTER 투표]에서 나 투표 끝냈어
-  const myVoteDone = () => {
-    sendVoteDone();
+  const handleMyVoteDoneClick = () => {
+    broadcastImVoteDoneSIG();
     setDisable(true);
   };
 
-  // [AFTER 투표] 모두 투표가 끝났어
   const voteAllDone = () => {
     fetchVoteResults();
     setIsVoteDone(true);
     setIsVote(false);
-  };
-
-  const handleFetchError = async (error: Response) => {
-    let errorMessage = '알 수 없는 에러 발생';
-    try {
-      const errorData = await error.json();
-      console.error('오류 데이터:', errorData);
-      errorMessage = `오류 ${errorData.status}: ${errorData.error} - ${errorData.message}`;
-    } catch (jsonError) {
-      console.error('JSON 파싱 오류:', jsonError);
-    }
-    console.error('Fetch 오류 세부 사항:', errorMessage);
   };
 
   const onIncrease = () => {
@@ -643,10 +580,26 @@ export default function SharePage() {
       session.disconnect();
     }
 
+    if (publisher) {
+      console.log('publisher', publisher);
+
+      const mediaStream = publisher.stream.getMediaStream();
+      if (mediaStream && mediaStream.getTracks) {
+        // 모든 미디어 트랙 중지
+        mediaStream
+          .getTracks()
+          .forEach((track: { stop: () => any }) => track.stop());
+      }
+    }
+
     setSession(null);
     setSubscribers([]);
     setPublisher(null);
   };
+
+  useEffect(() => {
+    console.log(subscribers);
+  }, [subscribers]);
 
   const updateUserMarker = ({ userId, lat, lng }: UserLocation) => {
     const markerPosition = new window.kakao.maps.LatLng(lat, lng);
@@ -679,17 +632,24 @@ export default function SharePage() {
 
   // 내 프로필을 SIG으로 subscriber에게 보냄
   const sendUserData = (userImage: string, username: string, name: string) => {
+    // if (!session) throw new Error(MSG.NO_SESSION_INSTANCE);
+
     if (session) {
+      console.log('세션있음');
       session.signal({
         data: JSON.stringify({ userImage, username, name }),
         to: [],
         type: 'userData',
       });
+    } else {
+      console.log('세션없음');
     }
   };
 
   // 내 위치를 SIG으로 subscriber에게 보냄
   const sendLocation = (lat: number, lng: number) => {
+    // if (!session) throw new Error(MSG.NO_SESSION_INSTANCE);
+
     const username = localStorageApi.getUserName();
     if (session) {
       session.signal({
@@ -710,16 +670,7 @@ export default function SharePage() {
       sendLocation(center.getLat(), center.getLng());
     }
 
-    console.log('없음');
-  };
-
-  const showProfile = (url: string, userName: string) => {
-    return (
-      <div className={s.userProfileContainer}>
-        <img src={url} alt={userName} width={50} height={50} />
-        <div className={s.userName}>{userName}</div>
-      </div>
-    );
+    // console.log('없음');
   };
 
   const getStoreLive = async (storeId: number) => {
@@ -737,20 +688,6 @@ export default function SharePage() {
 
     return res.json();
   };
-
-  // useEffect(() => {
-  //   console.log('vote result 바뀜', voteResults);
-
-  //   voteResults.forEach(async ({ storeId }) => {
-  //     const liveStore = await getStoreLive(storeId);
-
-  //     console.log(liveStore);
-
-  //     if (liveStores.length > 0) {
-  //       setLiveStores((prev) => [...prev, ...liveStore]);
-  //     }
-  //   });
-  // }, [voteResults]);
 
   useEffect(() => {
     const fetchLiveStores = async () => {
@@ -775,8 +712,8 @@ export default function SharePage() {
               <StoreVoteCard
                 key={store.storeId}
                 {...store}
-                handleAddVote={handleAddVote}
-                handleDeleteVote={handleDeleteVote}
+                handleAddVote={handleVoteStoreClick}
+                handleDeleteVote={handleCancelVote}
               />
             );
           })}
@@ -797,7 +734,7 @@ export default function SharePage() {
         <button
           className={s.myVoteDone}
           type="button"
-          onClick={myVoteDone}
+          onClick={handleMyVoteDoneClick}
           disabled={disable}
         >
           나의 투표 종료
@@ -890,8 +827,8 @@ export default function SharePage() {
                 key={store.storeId}
                 {...store}
                 nobutton
-                handleAddVote={handleAddVote}
-                handleDeleteVote={handleDeleteVote}
+                handleAddVote={handleVoteStoreClick}
+                handleDeleteVote={handleCancelVote}
               />
             );
           })}
@@ -902,7 +839,7 @@ export default function SharePage() {
             type="button"
             onClick={() => {
               if (!sessionId) return;
-              voteAdd(sessionId, storeId);
+              handleAddStoreToVoteListClick(sessionId, storeId);
             }}
           >
             투표 추가
@@ -913,7 +850,7 @@ export default function SharePage() {
             onClick={() => {
               if (!sessionId) return;
 
-              voteDelete(sessionId, storeId);
+              deleteStoreFromVoteList(sessionId, storeId);
             }}
           >
             투표 삭제
@@ -925,7 +862,7 @@ export default function SharePage() {
             type="button"
             onClick={() => {
               setIsVote(true);
-              sendVoteStart();
+              broadcastWantVoteStartSIG();
             }}
           >
             투표 시작
