@@ -16,15 +16,16 @@
 'use client';
 
 import React, { useEffect, useState, useRef, MouseEventHandler } from 'react';
-import { OpenVidu, Subscriber } from 'openvidu-browser';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Post } from '@/components/Post';
-import { sharing } from 'webpack';
-import StoreCards, { StoreCard, StoreVoteCard } from '@/components/StoreCard';
-import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
+import { OpenVidu, Subscriber } from 'openvidu-browser';
 import Link from 'next/link';
-import { localStorageApi } from '@/services/localStorageApi';
+
+import { Post } from '@/components/Post';
+import StoreCards, { StoreCard, StoreVoteCard } from '@/components/StoreCard';
 import LiveFriends from '@/components/LiveFriendsList';
+import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
+import { localStorageApi } from '@/services/localStorageApi';
+import { apiService } from '@/services/apiService';
 
 import s from './page.module.scss';
 
@@ -417,28 +418,27 @@ export default function SharePage() {
   };
 
   /* 투표 결과를 받아온다 */
-  const fetchVoteResults = () => {
-    fetch(`https://api.wagubook.shop:8080/share/${sessionId}/result`, {
-      method: 'GET',
-      credentials: 'include',
-    })
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setVoteResults(data);
-        } else {
-          console.error('서버로부터 받은 데이터가 배열이 아닙니다:', data);
-        }
-      })
-      .catch((error) => {
-        console.error('투표 결과를 가져오는 중 오류 발생:', error);
-      });
+  const fetchVoteResults = async () => {
+    if (!sessionId) {
+      throw new Error('세션 ID가 없습니다.');
+    }
+
+    try {
+      const result = await apiService.fetchVoteResults(sessionId);
+
+      setVoteResults(result);
+    } catch (e) {
+      if (e instanceof Error) {
+        alert(e.message);
+      }
+    }
   };
 
   // 투표 list에 추가하기 위한 함수
-  const voteAdd = async (url: string, storeId: number) => {
+  const handleAddStoreToVoteListClick = async (
+    url: string,
+    storeId: number,
+  ) => {
     // id로 식당을 검색 후 정보 찾아와서
     const res = await fetch(`https://api.wagubook.shop:8080/store/${storeId}`, {
       method: 'GET',
@@ -473,91 +473,71 @@ export default function SharePage() {
     await fetchVoteList(sessionId);
   };
 
-  // const fetchVoteList = async (sessionId: string) => {
-  //   const res = await fetch(
-  //     `https://api.wagubook.shop:8080/share/${sessionId}/vote/list`,
-  //     {
-  //       method: 'GET',
-  //       credentials: 'include',
-  //     },
-  //   );
-  //   const voteList = await res.json();
-  //   setStores(() => voteList);
-  // };
-
   // [AFTER 투표] 투표가 시작되었을때 가게 카드에서 투표버튼 핸들러
-  const handleAddVote: MouseEventHandler<HTMLButtonElement> = (e) => {
+  const handleVoteStoreClick: MouseEventHandler<HTMLButtonElement> = async (
+    e,
+  ) => {
     e.stopPropagation();
 
-    const { currentTarget } = e;
-    const { dataset } = currentTarget;
+    const { dataset } = e.currentTarget;
     const { storeId } = dataset;
 
-    fetch(
-      `https://api.wagubook.shop:8080/share/${sessionId}/vote?store_id=${storeId}`,
-      {
-        method: 'POST',
-        credentials: 'include',
-      },
-    )
-      .then((res) => {
-        return res.text();
-      })
-      .then((message) => {
-        alert(message);
-      })
-      .catch((e) => {
-        throw e;
-      });
+    if (!sessionId || !storeId) throw new Error('세션 ID가 없습니다.');
+
+    try {
+      const succMsg = await apiService.voteStore(sessionId, storeId);
+
+      alert(succMsg);
+    } catch (e) {
+      if (e instanceof Error) {
+        alert(e.message);
+      }
+    }
   };
 
   // [BEFORE 투표] 투표가 ⛔️시작되기전⛔️에 가게 카드에서 투표버튼 ⭐️ 핸들러
-  const voteDelete = (url: string, selectedStoreId: string) => {
-    fetch(
-      `https://api.wagubook.shop:8080/share/${sessionId}?store_id=${selectedStoreId}`,
-      {
-        method: 'DELETE',
-        credentials: 'include',
-      },
-    )
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('이미 삭제된 가게입니다.');
-        }
-        return res.text();
-      })
-      .then((message) => {
-        setStores(stores.filter(({ storeId }) => storeId != selectedStoreId));
-        sendVoteUpdate();
-        alert(message);
-      })
-      .catch((error) => {
-        alert(error.message);
-      });
+  const deleteStoreFromVoteList = async (url: string, storeId: string) => {
+    if (!sessionId || !storeId) {
+      throw new Error('세션 ID 또는 store id가 없습니다.');
+    }
+
+    try {
+      const succMsg = await apiService.deleteStoreFromVoteList(
+        sessionId,
+        storeId,
+      );
+
+      setStores(stores.filter(({ curStoreId }) => curStoreId != storeId));
+      sendVoteUpdate();
+      alert(succMsg);
+    } catch (e) {
+      if (e instanceof Error) {
+        alert(`[${e.message}]
+          이미 추가된 가게입니다 !`);
+      }
+    }
   };
 
   // [AFTER 투표] 투표 추가 버튼색이 빨강으로 변하면서 등록되는 함수
-  const handleDeleteVote: MouseEventHandler<HTMLButtonElement> = (e) => {
-    const { currentTarget } = e;
-    const { dataset } = currentTarget;
+  const handleCancelVote: MouseEventHandler<HTMLButtonElement> = async (e) => {
+    e.stopPropagation();
+
+    const { dataset } = e.currentTarget;
     const { storeId } = dataset;
 
-    fetch(
-      `https://api.wagubook.shop:8080/share/${sessionId}/vote?store_id=${storeId}`,
-      {
-        method: 'PATCH',
-        credentials: 'include',
-      },
-    )
-      .then((res) => {
-        return res.text();
-      })
-      .then((message) => {
-        alert(message);
-      })
-      .catch((e) => {
-        throw e;
-      });
+    if (!sessionId || !storeId) {
+      throw new Error('세션 ID 또는 store id가 없습니다.');
+    }
+
+    try {
+      const succMsg = await apiService.cancelVoteStore(sessionId, storeId);
+
+      alert(`${succMsg}`);
+    } catch (e) {
+      if (e instanceof Error) {
+        alert(e.message);
+      }
+    }
   };
 
   const fetchVoteList = async (sessionId: string | null) => {
@@ -775,8 +755,8 @@ export default function SharePage() {
               <StoreVoteCard
                 key={store.storeId}
                 {...store}
-                handleAddVote={handleAddVote}
-                handleDeleteVote={handleDeleteVote}
+                handleAddVote={handleVoteStoreClick}
+                handleDeleteVote={handleCancelVote}
               />
             );
           })}
@@ -890,8 +870,8 @@ export default function SharePage() {
                 key={store.storeId}
                 {...store}
                 nobutton
-                handleAddVote={handleAddVote}
-                handleDeleteVote={handleDeleteVote}
+                handleAddVote={handleVoteStoreClick}
+                handleDeleteVote={handleCancelVote}
               />
             );
           })}
@@ -902,7 +882,7 @@ export default function SharePage() {
             type="button"
             onClick={() => {
               if (!sessionId) return;
-              voteAdd(sessionId, storeId);
+              handleAddStoreToVoteListClick(sessionId, storeId);
             }}
           >
             투표 추가
@@ -913,7 +893,7 @@ export default function SharePage() {
             onClick={() => {
               if (!sessionId) return;
 
-              voteDelete(sessionId, storeId);
+              deleteStoreFromVoteList(sessionId, storeId);
             }}
           >
             투표 삭제
