@@ -176,11 +176,14 @@ export default function KakaoMap() {
   };
 
   const fetchLiveData = (storeId: number) => {
-    fetch(`https://wagubook.shop:8080/map/live/${storeId}`, {
+    fetch(`https://wagubook.shop:8080/map/live?storeId=${storeId}`, {
       method: 'GET',
       credentials: 'include',
     })
+      .then((res) => res.json())
       .then((data) => {
+        console.log('현재 라이브 중인 ㄴㅁㅇ :', data);
+
         if (Array.isArray(data)) {
           setLiveStream(data);
         } else {
@@ -282,6 +285,16 @@ export default function KakaoMap() {
       </div>
       <div>
         <LiveFriends liveFriends={liveStream} />
+        {/* {liveStream.length > 0 &&
+          liveStream.map(({ sessionId, userName, storeName }) => {
+            return (
+              <Link key={sessionId}>
+                <div>store Name :{storeName}</div>
+                <div>userName :{userName}</div>
+                <div>sessionId :{sessionId}</div>
+              </ㅣ>
+            );
+          })} */}
         <div className={s.postContainer}>
           <Post.Wrapper>
             <Post>
