@@ -519,27 +519,6 @@ class ApiService {
 
     return res.json();
   }
-
-  // async cancelVoteStore(
-  //   sessionId: string,
-  //   storeId: string,
-  // ): SuccessMessageResponse {
-  //   const res = await fetch(
-  //     `${this.baseUrl}/share/${sessionId}?store_id=${storeId}`,
-  //     {
-  //       method: 'DELETE',
-  //       credentials: 'include',
-  //     },
-  //   );
-
-  //   if (!res.ok) {
-  //     const { status, error } = await res.json();
-
-  //     throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
-  //   }
-
-  //   return res.text();
-  // }
 }
 
 export const apiService = new ApiService();
