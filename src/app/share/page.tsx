@@ -189,17 +189,17 @@ export default function SharePage() {
     /* 참가자가 들어오면 내 프로필을 가져오고 + 보내... (why: 내 프로필을 참여자에게 보냄 & 늦게들어오면 몰?루) 
       if 내정보 있어 ? 내정보 가져와서 보내 : 서버에 요청해서 가져와서 보내
     */
-    fetch(`https://api.wagubook.shop:8080/member/${username}/profile`, {
-      method: 'GET',
-      credentials: 'include',
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        console.log('sendUserData 실행 : ', data);
-        sendUserData(data.imageUrl, data.username, data.name);
-      });
+    // fetch(`https://api.wagubook.shop:8080/member/${username}/profile`, {
+    //   method: 'GET',
+    //   credentials: 'include',
+    // })
+    //   .then((res) => {
+    //     return res.json();
+    //   })
+    //   .then((data) => {
+    //     console.log('sendUserData 실행 : ', data);
+    //     sendUserData(data.imageUrl, data.username, data.name);
+    //   });
   }, [subscribers]);
 
   useEffect(() => {
