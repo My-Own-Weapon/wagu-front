@@ -13,6 +13,12 @@ interface ProfileDetailsResponse {
   postNum: number;
 }
 
+interface ProfileWithoutFollowResponse {
+  memberId: number;
+  imgUrl: string;
+  username: string;
+  name: string;
+}
 interface ShareMapPublishSessionResponse {
   memberId: number;
   sessionId: string;
@@ -107,6 +113,25 @@ class ApiService {
     }
 
     return res.json();
+  }
+
+  async fetchProfileWithoutFollow(
+    userName: string,
+  ): Promise<ProfileWithoutFollowResponse> {
+    const res = await fetch(`${this.baseUrl}/member/${userName}/profile`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
+    const profile = await res.json();
+
+    return profile;
   }
 
   async fetchFollowings() {
@@ -311,7 +336,7 @@ class ApiService {
     return data;
   }
 
-  async fetchToken(sessionId: string) {
+  async fetchStreamingToken(sessionId: string) {
     const res = await fetch(
       `${this.baseUrl}/api/sessions/${sessionId}/connections`,
       {
@@ -466,6 +491,23 @@ class ApiService {
     return res.text();
   }
 
+  async fetchStoresInVoteList(sessionId: string) {
+    const res = await fetch(`${this.baseUrl}/share/${sessionId}/vote/list`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const { status, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+    }
+
+    const voteList = await res.json();
+
+    return voteList;
+  }
+
   async deleteStoreFromVoteList(sessionId: string, storeId: string) {
     const res = await fetch(
       `${this.baseUrl}/share/${sessionId}?store_id=${storeId}`,
@@ -482,6 +524,25 @@ class ApiService {
     }
 
     return res.text();
+  }
+
+  async fetchShareMapToken(sessionId: string) {
+    const res = await fetch(
+      `${this.baseUrl}/api/sessions/${sessionId}/connections/voice`,
+      {
+        method: 'POST',
+        credentials: 'include',
+      },
+    );
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
+    const { token } = await res.json();
+
+    return token;
   }
 
   /* [AFTER 개표 (투표 LIST에 있는 선택지를 vote)] */
