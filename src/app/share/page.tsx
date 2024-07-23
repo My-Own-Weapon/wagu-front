@@ -776,6 +776,9 @@ export default function SharePage() {
       <main className={s.container}>
         <div className={s.userContainer}>
           {[...userDetails].map(([username, { imageUrl, name }]) => {
+            console.log('userDetails', userDetails);
+            console.log('imageUrl', imageUrl);
+
             return (
               <UserIconWithText
                 key={username}

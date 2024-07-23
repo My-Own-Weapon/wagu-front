@@ -156,7 +156,7 @@ export default function KakaoMap() {
     const BASE_URL =
       process.env.NODE_ENV === 'development'
         ? 'http://localhost:3000'
-        : 'https://wagubook.shop';
+        : 'https://www.wagubook.shop';
     const sessionId = await apiService.createShareMapRandomSessionId();
     apiService.publishShareMapSession(sessionId);
 
