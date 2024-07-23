@@ -62,3 +62,10 @@ export interface MapVertexes {
   up: number;
   down: number;
 }
+
+export interface ProfileWithoutFollowResponse {
+  memberId: number;
+  imageUrl: string;
+  username: string;
+  name: string;
+}

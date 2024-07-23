@@ -63,10 +63,10 @@ export default function KakaoMap() {
 
         const options = {
           center: new window.kakao.maps.LatLng(
-            37.297379834634675,
-            127.03869108937842,
+            37.5035685391056,
+            127.0416472341673,
           ),
-          level: 3,
+          level: 5,
         };
 
         const mapInstance = new window.kakao.maps.Map(container, options);
@@ -156,7 +156,7 @@ export default function KakaoMap() {
     const BASE_URL =
       process.env.NODE_ENV === 'development'
         ? 'http://localhost:3000'
-        : process.env.NEXT_PUBLIC_BASE_URL;
+        : 'https://www.wagubook.shop';
     const sessionId = await apiService.createShareMapRandomSessionId();
     apiService.publishShareMapSession(sessionId);
 

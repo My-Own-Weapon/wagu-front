@@ -106,7 +106,7 @@ export default function StreamingPage({ params }) {
       console.warn(exception);
     });
 
-    apiService.fetchToken(sessionId).then(({ token }) => {
+    apiService.fetchStreamingToken(sessionId).then(({ token }) => {
       // First param is the token got from the OpenVidu deployment. Second param can be retrieved by every user on event
       // 'streamCreated' (property Stream.connection.data), and will be appended to DOM as the user's nickname
       console.log(token);

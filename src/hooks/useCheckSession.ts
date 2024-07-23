@@ -11,7 +11,6 @@ export const useCheckSession = () => {
         await apiService.checkSession();
       } catch (error) {
         if (error instanceof Error) {
-          alert(error.message);
           router.push('/entry');
         }
       }
