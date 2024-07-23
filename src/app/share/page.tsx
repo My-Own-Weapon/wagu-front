@@ -234,7 +234,12 @@ export default function SharePage() {
     setSession(session);
 
     session.on('streamCreated', (event: any) => {
+      const { clientData } = JSON.parse(event.stream.connection.data);
+      const userName = localStorageApi.getUserName();
+      if (clientData === userName) return;
+
       const subscriber = session.subscribe(event.stream, undefined);
+
       setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
     });
 
