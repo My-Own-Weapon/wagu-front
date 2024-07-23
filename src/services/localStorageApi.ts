@@ -1,6 +1,8 @@
 'use client';
 
 class LocalStorage {
+  private NAME = 'name';
+
   private USERNAME = 'username';
 
   getUserName() {
@@ -9,6 +11,14 @@ class LocalStorage {
 
   setUserName(name: string) {
     localStorage.setItem(this.USERNAME, name);
+  }
+
+  getName() {
+    return localStorage.getItem(this.NAME);
+  }
+
+  setName(name: string) {
+    localStorage.setItem(this.NAME, name);
   }
 }
 
