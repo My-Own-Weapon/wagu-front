@@ -18,10 +18,9 @@
 import React, { useEffect, useState, useRef, MouseEventHandler } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { OpenVidu, Subscriber } from 'openvidu-browser';
-import Link from 'next/link';
 
 import { Post } from '@/components/Post';
-import StoreCards, { StoreCard, StoreVoteCard } from '@/components/StoreCard';
+import { StoreCard, StoreVoteCard } from '@/components/StoreCard';
 import LiveFriends from '@/components/LiveFriendsList';
 import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
 import { localStorageApi } from '@/services/localStorageApi';
@@ -44,7 +43,7 @@ interface StoreData {
 }
 
 interface UserProfile {
-  imgUrl: string;
+  imageUrl: string;
   username: string;
   name: string;
 }
@@ -64,7 +63,7 @@ interface Stores {
   postCount: number;
 }
 
-const SEND_LOCATION_INTERVAL = 3000;
+const SEND_LOCATION_INTERVAL = 10000;
 const MSG = {
   NO_SESSION_INSTANCE: 'session 인스턴스가 없습니다.',
   NO_SESSION_ID: 'session id가 없습니다.',
@@ -104,16 +103,33 @@ export default function SharePage() {
   useEffect(() => {
     console.log('--- subscriber 배열 :', subscribers);
     console.log('--- subscriber 배열 길이 :', subscribers.length);
-    console.log('--- ');
   }, [subscribers]);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    console.log('usersProfile :', usersProfile);
+  }, [usersProfile]);
 
   useEffect(() => {
-    console.log('--- 1');
-
     // 세션 생성 및 오디오 태그에 오디오 소스 연결
     // joinSessionAndPatchAudioTag(sessionId);
+    const fetchcurrUserProfile = async () => {
+      const userName = localStorageApi.getUserName() as string;
+      const profile = await apiService.fetchProfileWithoutFollow(userName);
+
+      console.log('apiService profile', profile);
+
+      const { imageUrl, username, name } = profile;
+      localStorageApi.setName(name);
+
+      // sendUserData({ imageUrl, username, name });
+      setUsersProfile((prev) => {
+        const updated = new Map(prev.entries());
+        updated.set(username, { imageUrl, username, name });
+        return updated;
+      });
+    };
+
+    fetchcurrUserProfile();
 
     // kakao map 생성
     const script = document.createElement('script');
@@ -132,14 +148,27 @@ export default function SharePage() {
 
         const options = {
           center: new window.kakao.maps.LatLng(
-            37.297379834634675,
-            127.03869108937842,
+            37.5035685391056,
+            127.0416472341673,
           ),
-          level: 3,
+          level: 5,
         };
 
         const mapInstance = new window.kakao.maps.Map(container, options);
         setMap(mapInstance);
+
+        // 맵이 로드되고 움직임이 있어야 본인의 프로필이 보이기 때문
+        setTimeout(() => {
+          mapInstance.panTo(
+            new window.kakao.maps.LatLng(37.5035585179056, 127.04164711416),
+          );
+
+          setTimeout(() => {
+            mapInstance.panTo(
+              new window.kakao.maps.LatLng(37.5035685391056, 127.0416472341673),
+            );
+          }, 500);
+        }, 1000);
 
         window.kakao.maps.event.addListener(mapInstance, 'idle', () => {
           const mapBounds = mapInstance.getBounds();
@@ -163,21 +192,21 @@ export default function SharePage() {
 
   useEffect(() => {
     const fetchcurrUserProfile = async () => {
-      const userId = localStorageApi.getUserName() as string;
-      const profile = await apiService.fetchProfileWithoutFollow(userId);
-      const { imgUrl, username, name } = profile;
+      const userName = localStorageApi.getUserName() as string;
+      const profile = await apiService.fetchProfileWithoutFollow(userName);
 
-      sendUserData({ imgUrl, username, name });
+      console.log('apiService profile', profile);
+
+      const { imageUrl, username, name } = profile;
+      localStorageApi.setName(name);
+
+      sendUserData({ imageUrl, username, name });
     };
-
-    console.log('---3 userName 서버에 전송');
 
     fetchcurrUserProfile();
   }, [subscribers]);
 
   useEffect(() => {
-    console.log('---4 kakao map 이벤트 등록');
-
     if (map) {
       window.kakao.maps.event.addListener(
         map,
@@ -191,6 +220,7 @@ export default function SharePage() {
     }
   }, [map]);
 
+  // session이 없을때 map의 이벤트를 등록하면 updateCenterLocation 내부의 시그널이 등록되지 않습니다.
   useEffect(() => {
     if (map) {
       window.kakao.maps.event.addListener(
@@ -209,15 +239,13 @@ export default function SharePage() {
     };
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // console.log('10초');
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     updateCenterLocation();
+  //   }, SEND_LOCATION_INTERVAL);
 
-      updateCenterLocation();
-    }, SEND_LOCATION_INTERVAL);
-
-    return () => clearInterval(interval);
-  }, [markers]);
+  //   return () => clearInterval(interval);
+  // }, [markers]);
 
   useEffect(() => {
     if (voteEndCnt == subscribers.length + 1) {
@@ -238,6 +266,18 @@ export default function SharePage() {
       const userName = localStorageApi.getUserName();
       if (clientData === userName) return;
 
+      //   let flag = false;
+
+      //   [...usersProfile].forEach(([key, vale]) => {
+      //     console.log('---- user name ', key, vale);
+      //     if (key === clientData) {
+      //       flag = true;
+      //     }
+      //   });
+
+      //   if (flag) return;
+      //   const subscriber = session.subscribe(event.stream, undefined);
+
       const subscriber = session.subscribe(event.stream, undefined);
 
       setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
@@ -245,6 +285,8 @@ export default function SharePage() {
 
     session.on('signal:userLocation', (event: any) => {
       const userLocation = JSON.parse(event.data);
+
+      console.log('userLocation : ', userLocation);
 
       setUserLocations((prevLocations) => [...prevLocations, userLocation]);
       updateUserMarker(userLocation);
@@ -280,17 +322,18 @@ export default function SharePage() {
 
     session.on('signal:userData', async (e: any) => {
       const userDetail = JSON.parse(e.data);
+      console.log('signal userData', userDetail);
       usersProfile.set(userDetail.username, userDetail);
 
       setUsersProfile((prev) => {
-        const updated = new Map(prev);
+        const updated = new Map(prev.entries());
         updated.set(userDetail.username, userDetail);
         return updated;
       });
     });
 
     try {
-      const token = await getToken(sessionId);
+      const token = await apiService.fetchShareMapToken(sessionId);
       if (!token) {
         throw new Error('토큰이 정의되지 않았습니다');
       }
@@ -305,29 +348,6 @@ export default function SharePage() {
       setPublisher(publisher);
     } catch (error) {
       console.error('세션 연결 중 오류 발생:', (error as Error).message);
-    }
-  };
-
-  const getToken = async (sessionId: string) => {
-    try {
-      const responseToken = await fetch(
-        `https://api.wagubook.shop:8080/api/sessions/${sessionId}/connections/voice`,
-        {
-          method: 'POST',
-          credentials: 'include',
-        },
-      );
-
-      if (!responseToken.ok) {
-        throw new Error(`토큰 요청 실패: ${responseToken.statusText}`);
-      }
-
-      const { token } = await responseToken.json();
-
-      return token;
-    } catch (error) {
-      console.error('토큰 생성 중 오류 발생:', error);
-      return null;
     }
   };
 
@@ -363,6 +383,8 @@ export default function SharePage() {
   /* 좌표를 맵에 추가하는 함수 */
   const addMarkers = (mapInstance: any, storeData: StoreData[]) => {
     removeMarkers();
+
+    console.log('addmarker stores', storeData);
 
     if (!Array.isArray(storeData)) {
       console.error('storeData가 배열이 아닙니다:', storeData);
@@ -477,7 +499,7 @@ export default function SharePage() {
   ) => {
     e.stopPropagation();
 
-    const { dataset } = e.currentTarget;
+    const { dataset } = e.currentTarget as HTMLButtonElement;
     const { storeId } = dataset;
 
     if (!sessionId || !storeId) throw new Error('세션 ID가 없습니다.');
@@ -605,50 +627,92 @@ export default function SharePage() {
     setPublisher(() => null);
   };
 
-  const updateUserMarker = ({ userId, lat, lng }: UserLocation) => {
-    console.log('user marker 업데이트 !!', userId, lat, lng);
-
+  const updateUserMarker = ({ userId: username, lat, lng }: UserLocation) => {
     const markerPosition = new window.kakao.maps.LatLng(lat, lng);
-    let marker = userMarkers.current.get(userId);
+    let overlay = userMarkers.current.get(username);
+    // const name = localStorageApi.getName();
+    // const userName = localStorageApi.getUserName();
+    // console.log('name : ', name);
+    console.log('userNAme : ', username);
+    const profileImg = usersProfile.get(username)?.imageUrl;
+    console.log(profileImg);
+    console.log(usersProfile);
 
-    const profileImg = usersProfile.get(userId)?.userImage;
-    const imageSrc = profileImg ?? '/profile/profile-default-icon-male.svg';
-    const imageSize = new window.kakao.maps.Size(40, 40);
-    const imageOption = { offset: new window.kakao.maps.Point(20, 20) };
+    const imageSrc = profileImg || '/profile/profile-default-icon-male.svg';
+    const currentLevel = map.getLevel();
 
-    const userMarkerImage = new window.kakao.maps.MarkerImage(
-      imageSrc,
-      imageSize,
-      imageOption,
-    );
+    const content = document.createElement('div');
+    content.style.width = '40px';
+    content.style.height = '40px';
+    content.style.overflow = 'hidden';
+    content.style.borderRadius = '50%';
+    content.style.border = '2px solid #ff9900';
+    content.style.boxShadow = '0 0 5px rgba(0,0,0,0.5)';
+    content.dataset.lat = String(lat);
+    content.dataset.lng = String(lng);
+    content.dataset.level = currentLevel;
+    content.dataset.userName = localStorageApi.getUserName()!;
+    content.ondragstart = () => false;
 
-    if (marker) {
-      console.log(
-        'user marker 업데이트 !! => 기존 마커가 있어서 포지션을 변경합니다.',
-      );
+    const img = document.createElement('img');
+    img.src = imageSrc;
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'cover';
+    img.dataset.lat = String(lat);
+    img.dataset.lng = String(lng);
+    img.dataset.level = currentLevel;
+    img.dataset.userName = localStorageApi.getUserName()!;
+    img.ondragstart = () => false;
 
-      marker.setPosition(markerPosition);
+    content.appendChild(img);
+
+    img.onclick = (e) => {
+      const target = e.target as HTMLImageElement;
+      const { lat, lng, level } = target.dataset;
+      const movePosition = new window.kakao.maps.LatLng(lat, lng);
+
+      // console.log('e.target : ', e.target);
+      // console.log('e.target.lat:', lat, 'e.target.lng:', lng);
+      // map.setLevel(level, {
+      //   anchor: movePosition,
+      //   animate: { duration: 1000 },
+      // });
+
+      // map.setCenter(movePostion);
+
+      // const movePosition = new window.kakao.maps.LatLng(lat, lng);
+      map.panTo(movePosition);
+      // map.setLevel(level);
+      // map.setLevel(4, {
+      //   anchor: movePosition,
+      //   animate: { duration: 1000 },
+      // });
+    };
+
+    if (overlay) {
+      overlay.setPosition(markerPosition);
     } else {
-      console.log('마커가 없습니다. 새로 생성합니다.');
-      marker = new window.kakao.maps.Marker({
+      overlay = new window.kakao.maps.CustomOverlay({
         position: markerPosition,
-        map,
-        title: userId,
-        image: userMarkerImage,
+        content,
+        yAnchor: 1,
+        zIndex: 10,
       });
-      marker.setMap(map);
-      userMarkers.current.set(userId, marker);
+      overlay.setMap(map);
+      userMarkers.current.set(username, overlay);
     }
   };
 
   // 내 프로필을 SIG으로 subscriber에게 보냄
-  const sendUserData = ({ imgUrl, username, name }: UserProfile) => {
+  const sendUserData = ({ imageUrl, username, name }: UserProfile) => {
     // if (!session) throw new Error(MSG.NO_SESSION_INSTANCE);
+    console.log(imageUrl);
 
     if (session) {
       console.log('세션있음');
       session.signal({
-        data: JSON.stringify({ imgUrl, username, name }),
+        data: JSON.stringify({ imageUrl, username, name }),
         to: [],
         type: 'userData',
       });
@@ -678,12 +742,7 @@ export default function SharePage() {
   /* 투표화면으로 들어갔을때 실행되지 않도록
      ✅ TODO: isVoteDone 일때도 실행되지 않아야한다. */
   const updateCenterLocation = () => {
-    console.log('로케이션 업데이트 !!');
-
-    if (!markers || isVoteStart) {
-      console.log('마커없음');
-      return;
-    }
+    if (!markers || isVoteStart) return;
 
     const center = map.getCenter();
 
@@ -784,7 +843,7 @@ export default function SharePage() {
     return (
       <main className={s.container}>
         <div className={s.userContainer}>
-          {[...usersProfile].map(([username, { userImage, name }]) => {
+          {[...usersProfile].map(([username, { imageUrl, name }]) => {
             return (
               <UserIconWithText
                 key={username}
@@ -793,8 +852,8 @@ export default function SharePage() {
                 shape="circle"
                 size="small"
                 imgSrc={
-                  !!userImage
-                    ? userImage
+                  !!imageUrl
+                    ? imageUrl
                     : '/profile/profile-default-icon-female.svg'
                 }
                 alt="profile-icon"

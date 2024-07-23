@@ -2,6 +2,7 @@ import {
   AddressSearchDetails,
   LoginUserInputs,
   MapVertexes,
+  ProfileWithoutFollowResponse,
   SignupDetails,
 } from '@/types';
 
@@ -13,12 +14,6 @@ interface ProfileDetailsResponse {
   postNum: number;
 }
 
-interface ProfileWithoutFollowResponse {
-  memberId: number;
-  imgUrl: string;
-  username: string;
-  name: string;
-}
 interface ShareMapPublishSessionResponse {
   memberId: number;
   sessionId: string;
