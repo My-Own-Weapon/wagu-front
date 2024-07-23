@@ -166,6 +166,8 @@ export default function SharePage() {
         return res.json();
       })
       .then((data) => {
+        console.log('--- profile fetch', data);
+
         sendUserData(data.imageUrl, data.username, data.name);
       });
   }, [subscribers]);
@@ -222,21 +224,17 @@ export default function SharePage() {
       const userLocation = JSON.parse(event.data);
       // console.log('user위치 받음  내용 : ', userLocation);
       setUserLocations((prevLocations) => [...prevLocations, userLocation]);
+
+      console.log('[SIG] userLocation : ', userLocation);
+
       updateUserMarker(userLocation);
     });
 
     session.on('streamDestroyed', (event) => {
       setSubscribers((prevSubscribers) => {
-        return prevSubscribers.filter((sub) => {
-          console.log('sub', sub);
-          console.log('event.stream.streamManager', event.stream.streamManager);
-          console.log(
-            'sub !== event.stream.streamManager',
-            sub !== event.stream.streamManager,
-          );
-
-          return sub !== event.stream.streamManager;
-        });
+        return prevSubscribers.filter(
+          (sub) => sub !== event.stream.streamManager,
+        );
       });
     });
 
@@ -258,10 +256,13 @@ export default function SharePage() {
 
     session.on('signal:userData', async (event: any) => {
       const userDetail = JSON.parse(event.data);
+      console.log('---userDetails before', userDetail);
       userDetails.set(userDetail.username, userDetail);
+      console.log('---userDetails after', userDetail);
       setUserDetails((prev) => {
         const updated = new Map(prev);
         updated.set(userDetail.username, userDetail);
+        console.log('---updated', updated);
         return updated;
       });
     });
@@ -347,18 +348,26 @@ export default function SharePage() {
     }
 
     const newMarkers = storeData.map((store) => {
-      const markerPosition = new window.kakao.maps.LatLng(
-        store.posy,
-        store.posx,
+      const { kakao } = window;
+      const imageSrc = '/images/map/ping_orange.svg';
+      const imageSize = new kakao.maps.Size(32, 32);
+      const imageOption = { offset: new kakao.maps.Point(16, 32) };
+      const markerImage = new kakao.maps.MarkerImage(
+        imageSrc,
+        imageSize,
+        imageOption,
       );
-      const marker = new window.kakao.maps.Marker({
+
+      const markerPosition = new kakao.maps.LatLng(store.posy, store.posx);
+      const marker = new kakao.maps.Marker({
         position: markerPosition,
         key: store.storeId,
+        image: markerImage,
       });
 
       marker.setMap(mapInstance);
 
-      window.kakao.maps.event.addListener(marker, 'click', () => {
+      kakao.maps.event.addListener(marker, 'click', () => {
         setStoreId(store.storeId);
         fetchPostsAndSet(store.storeId);
       });
@@ -581,8 +590,6 @@ export default function SharePage() {
     }
 
     if (publisher) {
-      console.log('publisher', publisher);
-
       const mediaStream = publisher.stream.getMediaStream();
       if (mediaStream && mediaStream.getTracks) {
         // 모든 미디어 트랙 중지
@@ -597,15 +604,15 @@ export default function SharePage() {
     setPublisher(null);
   };
 
-  useEffect(() => {
-    console.log(subscribers);
-  }, [subscribers]);
-
   const updateUserMarker = ({ userId, lat, lng }: UserLocation) => {
+    console.log('--- updateUserMarker', userId, lat, lng);
+    console.log('--- userMarkers :', userMarkers);
+
     const markerPosition = new window.kakao.maps.LatLng(lat, lng);
     let marker = userMarkers.current.get(userId);
 
-    const imageSrc = '/profile/profile-default-icon-male.svg'; // 마커이미지의 주소입니다
+    const profileImg = userDetails.get(userId)?.userImage;
+    const imageSrc = profileImg ?? '/profile/profile-default-icon-male.svg'; // 마커이미지의 주소입니다
     const imageSize = new window.kakao.maps.Size(40, 40); // 마커이미지의 크기입니다
     const imageOption = { offset: new window.kakao.maps.Point(20, 20) }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
 
@@ -617,8 +624,12 @@ export default function SharePage() {
     );
 
     if (marker) {
+      console.log('마커있음', marker, markerPosition, userId);
+
       marker.setPosition(markerPosition);
     } else {
+      console.log('마커없음', marker, markerPosition, userId);
+
       marker = new window.kakao.maps.Marker({
         position: markerPosition,
         map,
@@ -649,8 +660,8 @@ export default function SharePage() {
   // 내 위치를 SIG으로 subscriber에게 보냄
   const sendLocation = (lat: number, lng: number) => {
     // if (!session) throw new Error(MSG.NO_SESSION_INSTANCE);
-
     const username = localStorageApi.getUserName();
+
     if (session) {
       session.signal({
         // ✅ 이전코드임
@@ -674,8 +685,6 @@ export default function SharePage() {
   };
 
   const getStoreLive = async (storeId: number) => {
-    console.log(storeId);
-
     const res = await fetch(
       `https://wagubook.shop:8080/map/live?storeId=${storeId}`,
       {
@@ -683,8 +692,6 @@ export default function SharePage() {
         credentials: 'include',
       },
     );
-
-    console.log(res);
 
     return res.json();
   };
@@ -775,10 +782,7 @@ export default function SharePage() {
     return (
       <main className={s.container}>
         <div className={s.userContainer}>
-          {[...userDetails].map(([username, { imageUrl, name }]) => {
-            console.log('userDetails', userDetails);
-            console.log('imageUrl', imageUrl);
-
+          {[...userDetails].map(([username, { userImage, name }]) => {
             return (
               <UserIconWithText
                 key={username}
@@ -787,8 +791,8 @@ export default function SharePage() {
                 shape="circle"
                 size="small"
                 imgSrc={
-                  !!imageUrl
-                    ? imageUrl
+                  !!userImage
+                    ? userImage
                     : '/profile/profile-default-icon-female.svg'
                 }
                 alt="profile-icon"
