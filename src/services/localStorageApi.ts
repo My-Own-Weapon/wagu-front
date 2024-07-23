@@ -6,19 +6,30 @@ class LocalStorage {
   private USERNAME = 'username';
 
   getUserName() {
-    return localStorage.getItem(this.USERNAME);
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(this.USERNAME);
+    }
+
+    return null;
   }
 
   setUserName(name: string) {
-    localStorage.setItem(this.USERNAME, name);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(this.USERNAME, name);
+    }
   }
 
   getName() {
-    return localStorage.getItem(this.NAME);
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(this.NAME);
+    }
+    return null; // or any other default value
   }
 
   setName(name: string) {
-    localStorage.setItem(this.NAME, name);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(this.NAME, name);
+    }
   }
 }
 
