@@ -9,7 +9,11 @@ interface Props {
 
 function UserVideoComponent({ streamManager }: Props) {
   return (
-    <div>
+    <div
+      style={{
+        width: '100%',
+      }}
+    >
       {streamManager ? (
         <OpenViduVideoComponent streamManager={streamManager} />
       ) : null}

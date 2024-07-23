@@ -22,6 +22,7 @@ function OpenViduVideoComponent({ streamManager }: Props) {
   return (
     <video
       style={{
+        width: 'inherit',
         height: '100dvh',
       }}
       autoPlay
