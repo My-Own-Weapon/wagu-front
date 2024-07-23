@@ -103,7 +103,7 @@ export default function SharePage() {
     console.log('--- 1');
 
     // 세션 생성 및 오디오 태그에 오디오 소스 연결
-    joinSessionAndPatchAudioTag(sessionId);
+    // joinSessionAndPatchAudioTag(sessionId);
 
     // kakao map 생성
     const script = document.createElement('script');
@@ -181,6 +181,10 @@ export default function SharePage() {
         'center_changed',
         updateCenterLocation,
       );
+
+      if (sessionId) {
+        joinSessionAndPatchAudioTag(sessionId);
+      }
     }
   }, [map]);
 
