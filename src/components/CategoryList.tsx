@@ -1,5 +1,7 @@
-import React, { useState, MouseEventHandler } from 'react';
+import React, { MouseEventHandler } from 'react';
+
 import * as Icons from '@public/newDesign/categories/index';
+
 import s from './CategoryList.module.scss';
 
 type CategoriesKR = keyof typeof categoryMap;
@@ -16,6 +18,7 @@ const categoryMap = {
 } as const;
 
 interface Props {
+  selectedCategory: CategoriesKR;
   onClick: MouseEventHandler<HTMLButtonElement>;
 }
 
@@ -25,9 +28,7 @@ interface Category {
   Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 }
 
-export default function CategoryList({ onClick }: Props) {
-  const [focusedCategory, setFocusedCategory] = useState<CategoriesKR>('전체');
-
+export default function CategoryList({ selectedCategory, onClick }: Props) {
   return (
     <div className={s.mainPageContainer}>
       <ul className={s.categoriesWrapper}>
@@ -39,11 +40,10 @@ export default function CategoryList({ onClick }: Props) {
               data-category={name}
               name="postCategory"
               onClick={onClick}
-              onFocus={() => setFocusedCategory(name)}
             >
-              <Icon fill={name === focusedCategory ? '#000' : '#b0b2b8'} />
+              <Icon fill={name === selectedCategory ? '#000' : '#b0b2b8'} />
               <p
-                className={`${s.categoryText} ${name === focusedCategory ? s.active : ''}`}
+                className={`${s.categoryText} ${name === selectedCategory ? s.active : ''}`}
               >
                 {name}
               </p>
