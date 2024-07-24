@@ -32,3 +32,21 @@
   justify-content: center;
   align-items: flex-start;
 }
+
+@mixin BorderRainbow {
+  border: 1.5px solid transparent;
+  border-radius: $radiusMedium;
+  background-image: linear-gradient($white, $white),
+    linear-gradient(
+      to bottom right,
+      red,
+      orange,
+      yellow,
+      green,
+      blue,
+      indigo,
+      violet
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
