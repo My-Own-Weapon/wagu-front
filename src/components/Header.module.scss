@@ -8,8 +8,6 @@
 
 .container {
   position: sticky;
-  // top: 0;
-  // z-index: $header;
 
   padding: 0 24px;
   height: 60px;
@@ -19,9 +17,6 @@
   align-items: center;
 
   background-color: $bgBrown;
-
-  // background-color: rgba($bgColor, 0.5);
-  // backdrop-filter: blur(10px);
 
   .logoTitle {
     color: $primaryOrange;
