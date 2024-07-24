@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import Link from 'next/link';
 
 import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
@@ -22,35 +21,21 @@ export default function LiveFriends({
 
   return (
     <div className={s.container}>
-      {liveFriends.length > 0 ? (
-        <div className={s.titleArea}>
-          <Image
-            src="/images/emoji/tv.svg"
-            width={20}
-            height={20}
-            alt="tv-icon"
-          />
-          <p className={s.title}>방송중인 친구가 있어요 !</p>
-        </div>
-      ) : (
-        <div className={s.titleArea}>
-          <Image
-            src="/images/emoji/sad-face.svg"
-            width={20}
-            height={20}
-            alt="tv-icon"
-          />
-          <p className={s.title}>방송중인 친구가 없어요...</p>
-        </div>
-      )}
+      <div className={s.titleArea}>
+        <p className={s.title}>
+          {liveFriends.length > 0
+            ? '방송중인 친구가 있어요 !'
+            : '방송중인 친구가 없어요...'}
+        </p>
+      </div>
       {liveFriends.length > 0 ? (
         <ul className={s.friends}>
           {liveFriends.map(({ profileImage, sessionId, userName }) => (
             <Link href={`/live/${sessionId}`} key={sessionId}>
               <li>
                 <UserIconWithText
-                  width={40}
-                  height={40}
+                  width={48}
+                  height={48}
                   shape="circle"
                   size="small"
                   imgSrc={
