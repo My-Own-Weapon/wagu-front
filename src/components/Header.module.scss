@@ -1,21 +1,39 @@
+@import url('https://fonts.cdnfonts.com/css/nats');
 @import '@styles/variables/colors.scss';
 @import '@styles/variables/radius.scss';
+@import '@styles/variables/textSize.scss';
+@import '@styles/variables/fontWeight.scss';
 @import '@styles/variables/zIndex.scss';
+@import '@styles/mixins/index.scss';
 
 .container {
   position: sticky;
-  top: 0;
-  z-index: $header;
+  // top: 0;
+  // z-index: $header;
 
-  width: 100%;
+  padding: 0 24px;
   height: 60px;
 
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
 
-  background-color: rgba($bgColor, 0.5);
-  backdrop-filter: blur(10px);
+  background-color: $bgBrown;
+
+  // background-color: rgba($bgColor, 0.5);
+  // backdrop-filter: blur(10px);
+
+  .logoTitle {
+    color: $primaryOrange;
+    font-family: 'NATS', sans-serif;
+    font-size: $textTitle;
+    font-weight: $regular;
+  }
+
+  .navBtnArea {
+    @include flexCenter;
+    gap: 16px;
+  }
 }
 
 .profileArea {

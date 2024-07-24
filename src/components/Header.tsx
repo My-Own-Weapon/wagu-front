@@ -6,32 +6,12 @@ import {
   useSelectedLayoutSegment,
   useSelectedLayoutSegments,
 } from 'next/navigation';
-import { useEffect, useState } from 'react';
-
-import { localStorageApi } from '@/services/localStorageApi';
-import HeaderLogo from '@public/images/header-logo.svg';
-import { ProfileWithoutFollowResponse } from '@/types';
-import { apiService } from '@/services/apiService';
 
 import s from './Header.module.scss';
 
 export default function Header() {
   const segment = useSelectedLayoutSegment();
   const segments = useSelectedLayoutSegments();
-  const username = localStorageApi.getUserName() as string;
-  const [profile, setProfile] = useState<ProfileWithoutFollowResponse | null>(
-    null,
-  );
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const profileRes = await apiService.fetchProfileWithoutFollow(username);
-
-      setProfile(profileRes);
-    };
-
-    fetchProfile();
-  }, []);
 
   if (segment === '(auth)' || segment === '(post)' || segment === 'live') {
     return null;
@@ -47,27 +27,16 @@ export default function Header() {
       className={s.container}
       style={segment === 'search' ? { backgroundColor: '#fffaf3' } : {}}
     >
-      <div className={s.profileArea}>
-        <Image
-          style={{
-            borderRadius: '8px',
-          }}
-          src={profile?.imageUrl ?? '/profile/profile-default-icon-male.svg'}
-          alt="profile"
-          width={40}
-          height={40}
-        />
-      </div>
       <div>
         <Link href="/">
-          <HeaderLogo />
+          <p className={s.logoTitle}>WAGU BOOK</p>
         </Link>
       </div>
-      <div>
+      <div className={s.navBtnArea}>
         {segment !== 'search' ? (
           <Link href="/search">
             <Image
-              src="/images/search-glass.svg"
+              src="/newDesign/search_glass.svg"
               alt="search-btn"
               width={24}
               height={24}
@@ -81,6 +50,15 @@ export default function Header() {
             }}
           />
         )}
+
+        <Link href="/profile">
+          <Image
+            src="/newDesign/user_profile.svg"
+            alt="heart-btn"
+            width={24}
+            height={24}
+          />
+        </Link>
       </div>
     </header>
   );
