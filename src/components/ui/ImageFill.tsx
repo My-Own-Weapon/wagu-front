@@ -17,7 +17,7 @@ interface props {
 export default function ImageFill({
   id = undefined,
   width = '100%',
-  height,
+  height = 'auto',
   src,
   alt,
   fill = false,
@@ -43,7 +43,10 @@ export default function ImageFill({
         src={src}
         alt={alt}
         fill={fill}
-        style={borderRadius ? { borderRadius } : { borderRadius: '0' }}
+        style={{
+          borderRadius: borderRadius || '0',
+          objectFit: 'cover',
+        }}
       />
     </div>
   );
