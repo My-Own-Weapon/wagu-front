@@ -9,9 +9,9 @@ export default function EntryPage() {
         <div className={s.logoTitleArea}>
           <div className={s.logoWrapper}>
             <Image
-              src="/wagu-logo.svg"
+              src="/newDesign/logos/wagu_logo.svg"
               alt="WAGU BOOK Logo"
-              width={83.5}
+              width={85}
               height={85}
               priority
             />

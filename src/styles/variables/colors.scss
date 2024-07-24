@@ -1,7 +1,7 @@
 /* primary color */
-$primaryOrange: #ff9900;
+$primaryOrange: #ff6b00;
 $primaryOrangeLight: #fdaf38;
-$white: #fffdfb;
+$white: #fff;
 
 /* secondary color */
 $red: #e71d36;
@@ -11,18 +11,29 @@ $coral: #fa6050;
 $lilac: #af47d2;
 $yellow: #f5ed15;
 
+/* header */
+$headerColor: #444444;
+
 /* text color */
-$textTitleColor: #444444;
+$textTitleColor: #2e2e2e;
+$textWhite: #ffffff;
 $textContent: #5c5c5c;
 $textSub-content: #747474;
 
 /* icon svg color */
-$iconColor: #444444;
+$iconColor: #b0b2b8;
+$iconFocusColor: #000;
+$iconTextColor: #b0b2b8;
+
+/* card */
+$cardTitleColor: #444444;
+$cardSubContentColor: #767676;
 
 /* buttons */
 $btnSub: #ffefd6;
 $btnFocus: #ff9900;
 $btnHober: #ff9900b0;
+$btnDisabled: #ff960080;
 
 /* input */
 $inputBgColor: #ece6d9;
@@ -31,6 +42,8 @@ $placeholderSize: 14px;
 
 /* Etc.. */
 $bgColor: #fffaf3;
+$bgBrown: #1c0a00;
+$bgWhite: #fff;
 
 $border: #d6d6d6;
 $borderDark: #747474;

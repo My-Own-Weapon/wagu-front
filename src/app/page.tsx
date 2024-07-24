@@ -1,15 +1,15 @@
 'use client';
 
 import { MouseEventHandler, useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
 
 import { consoleArt } from '@/utils';
 import { apiService } from '@/services/apiService';
-import { Post } from '@/components/Post';
-import CategoryList from '@/components/CategoryList';
-import LiveFriends, { Friend } from '@/components/LiveFriendsList';
 import { useCheckSession } from '@/hooks/useCheckSession';
 import { PostCardProps } from '@/types';
+import { Post } from '@/components/Post';
+import LiveFriends, { Friend } from '@/components/LiveFriendsList';
+import CategoryList from '@/components/CategoryList';
+import Heading from '@/components/ui/Heading';
 
 import s from './page.module.scss';
 
@@ -21,7 +21,7 @@ interface PostReponse extends PostCardProps {
 }
 
 const categoryMap = {
-  전부: 'ALL',
+  전체: 'ALL',
   한식: 'KOREAN',
   일식: 'JAPANESE',
   중식: 'CHINESE',
@@ -39,9 +39,8 @@ export default function Home() {
   const [filteredPosts, setFilteredPosts] = useState<PostReponse[]>([]);
   const [liveFriends, setLiveFriends] = useState<Friend[]>([]);
   const [selectedCategory, setSelectedCategory] =
-    useState<CategoriesKR>('전부');
+    useState<CategoriesKR>('전체');
   useCheckSession();
-  const path = usePathname();
 
   const handleCategoryClick: MouseEventHandler = (e) => {
     e.stopPropagation();
@@ -74,7 +73,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (selectedCategory === '전부') {
+    if (selectedCategory === '전체') {
       setFilteredPosts(allPosts);
       return;
     }
@@ -87,25 +86,24 @@ export default function Home() {
 
   return (
     <main className={s.container}>
-      <LiveFriends liveFriends={liveFriends} />
-      <CategoryList
-        heading="카테고리"
-        path={path}
-        selectedCategory={selectedCategory}
-        onClick={handleCategoryClick}
-      />
-      <Post.Wrapper>
+      <div className={s.top}>
+        <LiveFriends liveFriends={liveFriends} />
+      </div>
+      <div className={s.bottom}>
+        <Heading
+          as="h3"
+          fontSize="20px"
+          fontWeight="semiBold"
+          title="MY POST"
+        />
+        <CategoryList
+          selectedCategory={selectedCategory}
+          onClick={handleCategoryClick}
+        />
         <Post>
-          {filteredPosts.length === 0 ? (
-            <Post.Title
-              title={`${selectedCategory} 카테고리에 등록된 포스트가 없습니다`}
-            />
-          ) : (
-            <Post.Title title={`${selectedCategory}  Posts`} />
-          )}
           {filteredPosts.length > 0 && <Post.PostCards posts={filteredPosts} />}
         </Post>
-      </Post.Wrapper>
+      </div>
     </main>
   );
 }

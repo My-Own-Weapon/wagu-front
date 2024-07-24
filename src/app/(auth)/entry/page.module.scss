@@ -31,7 +31,7 @@
   justify-content: center;
   align-items: center;
 
-  background-color: $bgColor;
+  background-color: $bgWhite;
 }
 
 .wrapper {
@@ -97,6 +97,6 @@
 }
 
 .loginBtn {
-  @include button-styles($btnSub, $textTitleColor, 1px solid $primaryOrange);
+  @include button-styles($white, $primaryOrange, 1px solid $primaryOrange);
   font-weight: $semiBold;
 }

@@ -3,31 +3,13 @@
 @import '@styles/variables/fontWeight.scss';
 @import '@styles/variables/radius.scss';
 
-.container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  gap: 4px;
-
-  .smallUserName {
-    color: $textContent;
-    font-size: $textSmall;
-    font-weight: $regular;
-  }
-
-  .largeUserName {
-    color: $textContent;
-    font-size: $textSmall;
-    font-weight: $regular;
-  }
-}
-
 .circleIcon {
+  width: 56px;
+  height: 56px;
+
   background-color: transparent;
 
-  border: 1px solid $primaryOrange;
+  border: 1.5px solid $primaryOrange;
   border-radius: 50%;
 
   display: flex;
@@ -35,6 +17,11 @@
   align-items: center;
 
   cursor: pointer;
+
+  img {
+    background-color: pink;
+    border-radius: 50%;
+  }
 }
 
 .squareIcon {
@@ -48,4 +35,25 @@
   align-items: center;
 
   cursor: pointer;
+}
+
+.withtextIconContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  gap: 4px;
+
+  .smallUserName {
+    color: $white;
+    font-size: $textMedium;
+    font-weight: $medium;
+  }
+
+  .largeUserName {
+    color: $white;
+    font-size: $textMedium;
+    font-weight: $medium;
+  }
 }
