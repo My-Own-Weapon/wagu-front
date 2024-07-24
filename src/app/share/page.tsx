@@ -938,23 +938,23 @@ export default function SharePage() {
             투표 시작
           </button>
         </div>
-        <audio
-          id="publisherAudio"
+        {/* <video
+          id="publisherVideo"
           autoPlay
-          ref={(audio) => {
-            if (audio && publisher) {
-              audio.srcObject = publisher.stream.getMediaStream();
+          ref={(video) => {
+            if (video && publisher) {
+              video.srcObject = publisher.stream.getMediaStream();
             }
           }}
-        />
+        /> */}
         {subscribers.map((subscriber, index) => (
-          <audio
+          <video
             key={index}
-            id={`subscriberAudio${index}`}
+            id={`subscriberVideo${index}`}
             autoPlay
-            ref={(audio) => {
-              if (audio) {
-                audio.srcObject = subscriber.stream.getMediaStream();
+            ref={(video) => {
+              if (video) {
+                video.srcObject = subscriber.stream.getMediaStream();
               }
             }}
           />
