@@ -9,7 +9,7 @@ import React, {
   useState,
   useEffect,
 } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import { apiService } from '@services/apiService';
 import { CategoriesKR } from '@/app/page';
@@ -48,12 +48,12 @@ interface PageState {
   image?: File | null;
 }
 
-type WritePageCategoriesKR = Exclude<CategoriesKR, '전부'>;
+type WritePageCategoriesKR = Exclude<CategoriesKR, '전체'>;
 
 type PageStates = Record<number, PageState>;
 
 const categoryMap = {
-  전부: 'ALL',
+  전체: 'ALL',
   한식: 'KOREAN',
   일식: 'JAPANESE',
   중식: 'CHINESE',
@@ -78,7 +78,6 @@ export default function BoardPage() {
       posx: '',
       posy: '',
     });
-  const path = usePathname();
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -254,8 +253,6 @@ export default function BoardPage() {
           {pageNumber === 1 && (
             <>
               <CategoryList
-                heading="카테고리"
-                path={path}
                 selectedCategory={selectedCategory}
                 onClick={handleCategoryClick}
               />

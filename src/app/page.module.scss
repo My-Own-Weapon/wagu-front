@@ -3,13 +3,31 @@
 @import '@/styles/variables/colors.scss';
 
 .container {
-  @include mainStyle;
-
-  margin-top: 14px;
+  height: 100%;
+  padding-bottom: 80px;
 
   display: flex;
   flex-direction: column;
   gap: 20px;
+
+  background-color: $bgBrown;
+
+  .top {
+    background-color: $bgBrown;
+  }
+
+  .bottom {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 20px;
+
+    padding: 24px 24px 80px 24px;
+
+    background-color: $white;
+
+    border-radius: 32px 32px 0 0;
+  }
 }
 
 .btn {
@@ -17,23 +35,23 @@
   height: 60px;
 }
 
-.liveFriendsContainer {
-  width: 88%;
+// .liveFriendsContainer {
+//   width: 88%;
 
-  margin: 0 auto;
+//   margin: 0 auto;
 
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: center;
+//   align-items: flex-start;
 
-  overflow: hidden;
+//   overflow: hidden;
 
-  p {
-    font-weight: 600;
-    font-size: 12px;
-  }
-}
+//   p {
+//     font-weight: 600;
+//     font-size: 12px;
+//   }
+// }
 
 .friendsList {
   width: 100%;

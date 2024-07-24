@@ -1,15 +1,51 @@
-import { MouseEventHandler } from 'react';
-import useDragScroll from '@/hooks/useDragScroll';
-import Image from 'next/image';
-import classNames from 'classnames';
+import React, { MouseEventHandler } from 'react';
+
+import * as Icons from '@public/newDesign/categories/index';
 
 import s from './CategoryList.module.scss';
 
-type CategoriesKR = keyof typeof categoryMap | null;
-// type CategoriesEN = (typeof categoryMap)[CategoriesKR];
+type CategoriesKR = keyof typeof categoryMap;
+
+interface Props {
+  selectedCategory: CategoriesKR | null;
+  onClick: MouseEventHandler<HTMLButtonElement>;
+}
+
+export default function CategoryList({ selectedCategory, onClick }: Props) {
+  return (
+    <div className={s.mainPageContainer}>
+      <ul className={s.categoriesWrapper}>
+        {getCategories().map(({ id, name, Icon }) => (
+          <li key={id} className={s.category}>
+            <button
+              type="button"
+              className={s.categoryBtn}
+              data-category={name}
+              name="postCategory"
+              onClick={onClick}
+            >
+              <Icon fill={name === selectedCategory ? '#000' : '#b0b2b8'} />
+              <p
+                className={`${s.categoryText} ${name === selectedCategory ? s.active : ''}`}
+              >
+                {name}
+              </p>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+interface Category {
+  id: string;
+  name: CategoriesKR;
+  Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+}
 
 const categoryMap = {
-  전부: 'ALL',
+  전체: 'ALL',
   한식: 'KOREAN',
   일식: 'JAPANESE',
   중식: 'CHINESE',
@@ -19,111 +55,47 @@ const categoryMap = {
   디저트: 'DESSERT',
 } as const;
 
-interface Props {
-  path: string;
-  heading: string;
-  selectedCategory: CategoriesKR;
-  onClick: MouseEventHandler<HTMLButtonElement>;
-}
-
-export default function CategoryList({
-  path,
-  heading,
-  selectedCategory,
-  onClick,
-}: Props) {
-  const ref = useDragScroll();
-  const categoryBookSize = path === '/write' ? 24 : 40;
-  const containerClassName = classNames({
-    [s.mainPageContainer]: path === '/',
-    [s.writePageContainer]: path === '/write',
-  });
-
-  return (
-    <div className={containerClassName}>
-      <div className={s.titleArea}>
-        <Image
-          src="/images/books/books.svg"
-          width={20}
-          height={20}
-          alt="books-icon"
-        />
-        <p className={s.title}>{heading}</p>
-      </div>
-      <ul className={s.categoriesWrapper} ref={ref}>
-        {getCategories(path).map(({ id, name, imgUrl }) => (
-          <li key={id} className={name === selectedCategory ? s.active : ''}>
-            <button
-              type="button"
-              className={s.categoryBtn}
-              data-category={name}
-              name="postCategory"
-              onClick={onClick}
-            >
-              <Image
-                width={categoryBookSize}
-                height={categoryBookSize}
-                src={imgUrl}
-                alt="category"
-              />
-              <p
-                className={s.categoryText}
-              >{`${path === '/write' ? '#' : ''}${name}`}</p>
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function getCategories(path: string) {
-  const initialCategories = [
+function getCategories(): Category[] {
+  return [
     {
-      id: 'category1',
+      id: 'category-0',
+      name: '전체',
+      Icon: Icons.FoodAllSVG,
+    },
+    {
+      id: 'category-1',
       name: '한식',
-      imgUrl: 'images/books/red-book.svg',
+      Icon: Icons.KoreanSVG,
     },
     {
-      id: 'category2',
+      id: 'category-2',
       name: '중식',
-      imgUrl: 'images/books/purple-book.svg',
+      Icon: Icons.ChineseSVG,
     },
     {
-      id: 'category3',
-      name: '일식',
-      imgUrl: 'images/books/mint-book.svg',
-    },
-    {
-      id: 'category4',
+      id: 'category-3',
       name: '양식',
-      imgUrl: 'images/books/yellow-book.svg',
+      Icon: Icons.WesternSVG,
     },
     {
-      id: 'category5',
+      id: 'category-4',
+      name: '일식',
+      Icon: Icons.JapaneseSVG,
+    },
+    {
+      id: 'category-5',
       name: '분식',
-      imgUrl: 'images/books/lilac-book.svg',
+      Icon: Icons.FastFoodSVG,
     },
     {
-      id: 'category6',
+      id: 'category-6',
       name: '카페',
-      imgUrl: 'images/books/gray-book.svg',
+      Icon: Icons.CafeSVG,
     },
     {
-      id: 'category7',
+      id: 'category-7',
       name: '디저트',
-      imgUrl: 'images/books/coral-book.svg',
+      Icon: Icons.DessertSVG,
     },
   ];
-
-  return path === '/'
-    ? [
-        {
-          id: 'category0',
-          name: '전부',
-          imgUrl: 'images/books/orange-book.svg',
-        },
-        ...initialCategories,
-      ]
-    : initialCategories;
 }

@@ -10,6 +10,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
+  gap: 20px;
 
   overflow: hidden;
 
@@ -18,13 +19,10 @@
     justify-content: flex-start;
     align-items: center;
 
-    gap: 4px;
-
-    margin-bottom: 12px;
-
     .title {
+      color: $textWhite;
       font-weight: $semiBold;
-      font-size: $textSmall;
+      font-size: $textTitle;
     }
   }
 
@@ -32,24 +30,7 @@
     padding: 12px 12px 10px 12px;
 
     display: flex;
-    gap: 16px;
-
-    /* 무지개 그라데이션 */
-    border: 1.5px solid transparent;
-    border-radius: $radiusMedium;
-    background-image: linear-gradient($white, $white),
-      linear-gradient(
-        to bottom right,
-        red,
-        orange,
-        yellow,
-        green,
-        blue,
-        indigo,
-        violet
-      );
-    background-origin: border-box;
-    background-clip: padding-box, border-box;
+    gap: 12px;
   }
 }
 

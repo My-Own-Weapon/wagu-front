@@ -32,3 +32,55 @@
   justify-content: center;
   align-items: flex-start;
 }
+
+@mixin BorderRainbow {
+  border: 1.5px solid transparent;
+  border-radius: $radiusMedium;
+  background-image: linear-gradient($white, $white),
+    linear-gradient(
+      to bottom right,
+      red,
+      orange,
+      yellow,
+      green,
+      blue,
+      indigo,
+      violet
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+@mixin Scroll {
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+
+  &::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
+}
+
+@mixin ItemTopRightCirclePoint {
+  &::after {
+    content: '';
+
+    position: absolute;
+
+    width: 12px;
+    height: 12px;
+
+    top: 2px;
+    right: 2px;
+
+    border-radius: 50%;
+    background-color: $primaryOrange;
+  }
+}
+
+@mixin ellipseOneLine {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

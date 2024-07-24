@@ -1,18 +1,20 @@
 'use client';
 
+import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useSelectedLayoutSegment } from 'next/navigation';
+
+import * as Icon from '@public/newDesign/nav/index';
+import { COLORS } from '@/constants/colors';
 
 import s from './Footer.module.scss';
 
-const footerMap = [
-  { id: 1, icon: 'home', text: 'Home', href: '/' },
-  { id: 2, icon: 'vote', text: 'Vote', href: '/map' },
-  { id: 3, icon: 'pencil', text: 'Write', href: '/write' },
-  { id: 4, icon: 'compass', text: 'Map', href: '/map' },
-  { id: 5, icon: 'tv', text: 'Live', href: '/live' },
-];
+interface NavItem {
+  id: number;
+  IconComponent: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  text: string;
+  href: string;
+}
 
 export default function Footer() {
   const segment = useSelectedLayoutSegment();
@@ -22,19 +24,24 @@ export default function Footer() {
 
   return (
     <nav className={s.container}>
-      {footerMap.map(({ icon, text, href, id }) => (
+      {getNavMap().map(({ IconComponent, text, href, id }) => (
         <Link className={s.wrapper} key={`footer-${id}`} href={href}>
           <div className={s.iconArea}>
-            <Image
-              src={`/images/emoji/${icon}.svg`}
-              alt="footer-icon"
-              width={24}
-              height={24}
-            />
-            <p>{text}</p>
+            <IconComponent fill={COLORS.ICON_FILL} />
+            <p className={s.text}>{text}</p>
           </div>
         </Link>
       ))}
     </nav>
   );
+}
+
+function getNavMap(): NavItem[] {
+  return [
+    { id: 1, IconComponent: Icon.HomeSVG, text: 'Home', href: '/' },
+    { id: 2, IconComponent: Icon.TropySVG, text: 'Vote', href: '/map' },
+    { id: 3, IconComponent: Icon.PlusSVG, text: '', href: '/write' },
+    { id: 4, IconComponent: Icon.MapPinSVG, text: 'Map', href: '/map' },
+    { id: 5, IconComponent: Icon.LiveSVG, text: 'Live', href: '/live' },
+  ] as const;
 }

@@ -1,81 +1,59 @@
+@import '@styles/mixins/index.scss';
 @import '@styles/variables/colors.scss';
 @import '@styles/variables/radius.scss';
 @import '@styles/variables/textSize.scss';
 @import '@styles/variables/fontWeight.scss';
 
-.titleArea {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 4px;
-
-  margin-bottom: 12px;
-}
-
 .mainPageContainer {
-  background-color: $bgColor;
-
-  margin: 0 24px;
-
-  .title {
-    color: $textTitleColor;
-    font-size: $textMedium;
-    font-weight: $semiBold;
-  }
+  background-color: $white;
 
   .categoriesWrapper {
-    padding: 8px 12px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    column-gap: 8px;
+    row-gap: 4px;
 
-    border: 1px solid $border;
-    border-radius: $radiusMedium;
+    .category {
+      @include flexCenter;
+      gap: 4px;
 
-    background-color: $white;
+      .categoryBtn {
+        position: relative;
 
-    display: flex;
-    flex-direction: row;
-    gap: 8px;
+        flex-grow: 1;
 
-    overflow-x: auto;
-    white-space: nowrap;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* Internet Explorer 10+ */
+        cursor: pointer;
 
-    &::-webkit-scrollbar {
-      display: none; /* Safari and Chrome */
-    }
+        &::after {
+          content: '';
+          position: absolute;
+          width: 50px;
+          height: 50px;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          border-radius: 50%;
+          background-color: transparent; // 기본 상태에서는 투명
+          transition: background-color 0.3s ease; // transition 적용
+        }
 
-    li {
-      position: relative;
-
-      background-color: $white;
-
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      border-radius: $radiusMedium;
-
-      p {
-        font-size: $textXSmall;
+        &:hover::after {
+          background-color: rgba(0, 0, 0, 0.03); // hover 시에 색상 변경
+        }
       }
-    }
-  }
 
-  .active {
-    // 원 안에 체크 표시
-    &::after {
-      content: '';
+      .categoryText {
+        @include flexCenter;
 
-      position: absolute;
+        color: $iconTextColor;
+        font-size: $textSmall;
+        font-weight: $semiBold;
+        letter-spacing: 0.3px;
 
-      width: 12px;
-      height: 12px;
-
-      top: 2px;
-      right: 2px;
-
-      border-radius: 50%;
-      background-color: $primaryOrange;
+        &.categoryText.active {
+          color: #000; /* Adjust $primaryColor to your desired active color */
+        }
+      }
     }
   }
 
