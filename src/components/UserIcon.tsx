@@ -34,13 +34,9 @@ export function UserIcon({
   });
 
   return (
-    <Image
-      className={className}
-      src={imgSrc}
-      alt={alt}
-      width={width}
-      height={height}
-    />
+    <div className={className}>
+      <Image src={imgSrc} alt={alt} width={width} height={height} />
+    </div>
   );
 }
 
@@ -59,7 +55,7 @@ export function WithText<T extends WithTextProps>(
     });
 
     return (
-      <div className={s.container}>
+      <div className={s.withtextIconContainer}>
         <Component {...(rest as T)} />
         <p className={className}>{children}</p>
       </div>
