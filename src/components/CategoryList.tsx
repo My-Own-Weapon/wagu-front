@@ -6,26 +6,9 @@ import s from './CategoryList.module.scss';
 
 type CategoriesKR = keyof typeof categoryMap;
 
-const categoryMap = {
-  전체: 'ALL',
-  한식: 'KOREAN',
-  일식: 'JAPANESE',
-  중식: 'CHINESE',
-  분식: 'FASTFOOD',
-  양식: 'WESTERN',
-  카페: 'CAFE',
-  디저트: 'DESSERT',
-} as const;
-
 interface Props {
-  selectedCategory: CategoriesKR;
+  selectedCategory: CategoriesKR | null;
   onClick: MouseEventHandler<HTMLButtonElement>;
-}
-
-interface Category {
-  id: string;
-  name: CategoriesKR;
-  Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 }
 
 export default function CategoryList({ selectedCategory, onClick }: Props) {
@@ -54,6 +37,23 @@ export default function CategoryList({ selectedCategory, onClick }: Props) {
     </div>
   );
 }
+
+interface Category {
+  id: string;
+  name: CategoriesKR;
+  Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+}
+
+const categoryMap = {
+  전체: 'ALL',
+  한식: 'KOREAN',
+  일식: 'JAPANESE',
+  중식: 'CHINESE',
+  분식: 'FASTFOOD',
+  양식: 'WESTERN',
+  카페: 'CAFE',
+  디저트: 'DESSERT',
+} as const;
 
 function getCategories(): Category[] {
   return [

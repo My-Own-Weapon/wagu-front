@@ -3,7 +3,6 @@ import { Children, ReactNode } from 'react';
 import Image from 'next/image';
 
 import ImageFill from '@/components/ui/ImageFill';
-import { formatNumberToKRW } from '@/utils';
 import useDragScroll from '@/hooks/useDragScroll';
 import { PostCardProps } from '@/types';
 
@@ -54,7 +53,6 @@ Post.PostCard = function PostCard({
   storeName,
   menuImage,
   postMainMenu,
-  menuPrice,
   createdDate,
 }: PostCardProps) {
   if (!menuImage) return null;
