@@ -18,7 +18,28 @@
       gap: 4px;
 
       .categoryBtn {
-        flex: 1;
+        position: relative;
+
+        flex-grow: 1;
+
+        cursor: pointer;
+
+        &::after {
+          content: '';
+          position: absolute;
+          width: 50px;
+          height: 50px;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          border-radius: 50%;
+          background-color: transparent; // 기본 상태에서는 투명
+          transition: background-color 0.3s ease; // transition 적용
+        }
+
+        &:hover::after {
+          background-color: rgba(0, 0, 0, 0.03); // hover 시에 색상 변경
+        }
       }
 
       .categoryText {

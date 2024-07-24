@@ -1,6 +1,7 @@
 @import '@styles/variables/colors.scss';
 @import '@styles/variables/textSize.scss';
 @import '@styles/variables/fontWeight.scss';
+@import '@styles/mixins/index.scss';
 
 .titleArea {
   display: flex;
@@ -20,11 +21,10 @@
 }
 
 .cardsContainer {
-  width: 100%;
-
   display: flex;
+  flex-direction: column;
 
-  gap: 12px;
+  gap: 24px;
 
   overflow-x: auto;
   white-space: nowrap;
@@ -39,57 +39,61 @@
 }
 
 .cardContainer {
-  padding: 3px;
+  width: 100%;
 
   display: flex;
   flex-direction: row;
 
-  background: #fff6ea;
   border-radius: 4px;
-}
 
-.cardWrapper {
-  flex: none;
-  order: 0;
-  flex-grow: 0;
+  .cardWrapper {
+    flex-grow: 1;
 
-  width: 77px;
-  border: 1px solid #747474;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
 
-  padding: 6px;
+    border-radius: 4px;
 
-  background: #fff6ea;
-  border-radius: 4px;
-}
+    .postDetailsArea {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
 
-.storeName {
-  margin-bottom: 4px;
+      p {
+        letter-spacing: -0.03em;
+        line-height: 150%;
+      }
 
-  color: $textSub-content;
+      .storeName {
+        color: $cardTitleColor;
+        font-size: $textLarge;
+        font-weight: $semiBold;
 
-  font-size: $textSmall;
-  font-weight: $medium;
-  text-align: center;
-  letter-spacing: -0.03rem;
+        @include ellipseOneLine;
+      }
 
-  /* for ellipsis */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+      .subDetailsArea {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
 
-.postDetailsArea {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+        .menuName {
+          color: $cardSubContentColor;
+          font-size: $textMedium;
+          font-weight: $regular;
+        }
 
-  margin-top: 6px;
-
-  p {
-    letter-spacing: -0.01rem;
-    font-size: 10px;
-    font-weight: $medium;
-    color: $textSub-content;
+        .createDate {
+          color: $cardSubContentColor;
+          font-size: $textSmall;
+          font-weight: $regular;
+        }
+      }
+    }
   }
 }
 

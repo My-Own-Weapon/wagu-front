@@ -64,21 +64,20 @@ Post.PostCard = function PostCard({
 
   return (
     <li className={s.cardContainer} data-id={postId}>
-      <Link href={`/posts/${postId}`}>
-        <div className={s.cardWrapper}>
+      <Link className={s.cardWrapper} href={`/posts/${postId}`}>
+        <ImageFill
+          id={menuImage.id}
+          src={menuImage.url}
+          height="240px"
+          fill
+          borderRadius="16px"
+          alt="post-image"
+        />
+        <div className={s.postDetailsArea}>
           <p className={s.storeName}>{storeName}</p>
-          <ImageFill
-            id={menuImage.id}
-            src={menuImage.url}
-            height="60px"
-            fill
-            borderRadius="4px"
-            alt="post-image"
-          />
-          <div className={s.postDetailsArea}>
-            <p>{postMainMenu}</p>
-            <p>{formatNumberToKRW(Number(menuPrice))}</p>
-            <p>{`${year}. ${month}. ${day}`}</p>
+          <div className={s.subDetailsArea}>
+            <p className={s.menuName}>{postMainMenu}</p>
+            <p className={s.createDate}>{`${year}. ${month}. ${day}`}</p>
           </div>
         </div>
       </Link>
