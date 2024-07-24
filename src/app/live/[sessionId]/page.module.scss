@@ -17,13 +17,9 @@
   height: 100dvh;
 
   .streamerVideoWrapper {
-    position: absolute;
-    top: 0;
-    left: -15px;
-    // width: 100%;
+    width: 100%;
     height: 100dvh;
-
-    // background-color: rebeccapurple;
+    overflow: hidden;
   }
 
   .chatBoxContianer {
