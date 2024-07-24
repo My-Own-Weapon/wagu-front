@@ -78,3 +78,9 @@
     background-color: $primaryOrange;
   }
 }
+
+@mixin ellipseOneLine {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
