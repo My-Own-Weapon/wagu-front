@@ -2,7 +2,7 @@
 
 import { Post } from '@/components/Post';
 import { apiService } from '@/services/apiService';
-import { PostCardProps } from '@/types';
+import { PostOfStoreResponse } from '@/types';
 import { useEffect, useState } from 'react';
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
 
 export default function StorePage({ params }: Props) {
   const { storeId } = params;
-  const [posts, setPosts] = useState<PostCardProps[]>([]);
+  const [posts, setPosts] = useState<PostOfStoreResponse[]>([]);
 
   useEffect(() => {
     apiService
