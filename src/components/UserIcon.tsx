@@ -12,19 +12,20 @@ import s from './UserIcon.module.scss';
  * ✅ TODO: 전반적인 타입 정의가 미흡.
  */
 export interface UserIconProps {
-  width: number;
-  height: number;
-  size?: 'small' | 'large';
+  size?: 'small' | 'medium' | 'large';
   shape?: 'circle' | 'square';
+  border?: string;
+  fontSize?: 'small' | 'medium' | 'large';
+  color?: 'white' | 'black';
   imgSrc: string;
   alt: string;
   children?: ReactElement | string;
 }
 
 export function UserIcon({
-  width,
-  height,
   shape = 'circle',
+  border = 'none',
+  size = 'medium',
   imgSrc,
   alt,
 }: UserIconProps) {
@@ -33,31 +34,53 @@ export function UserIcon({
     [s.squareIcon]: shape === 'square',
   });
 
+  const sizeMap = {
+    small: 40,
+    medium: 44,
+    large: 48,
+  };
+
   return (
-    <div className={className}>
-      <Image src={imgSrc} alt={alt} width={width} height={height} />
+    <div className={className} style={{ border }}>
+      <Image
+        src={imgSrc}
+        alt={alt}
+        width={sizeMap[size]}
+        height={sizeMap[size]}
+      />
     </div>
   );
 }
 
 interface WithTextProps {
   children?: ReactElement | string;
-  size?: 'small' | 'large';
+  fontSize?: 'small' | 'medium' | 'large';
+  color?: 'white' | 'black';
 }
 
 export function WithText<T extends WithTextProps>(
   Component: React.ComponentType<T>,
 ) {
-  return ({ children, ...rest }: T) => {
+  return ({ children, fontSize = 'small', color = 'white', ...rest }: T) => {
+    console.log(fontSize);
+
     const className = classNames({
-      [s.smallUserName]: rest.size === 'small',
-      [s.largeUserName]: rest.size === 'large',
+      [s.smallName]: fontSize === 'small',
+      [s.mediumName]: fontSize === 'medium',
+      [s.largeName]: fontSize === 'large',
     });
 
     return (
       <div className={s.withtextIconContainer}>
         <Component {...(rest as T)} />
-        <p className={className}>{children}</p>
+        <p
+          className={className}
+          style={{
+            color: color === 'white' ? '#fff' : '#5C5C5C',
+          }}
+        >
+          {children}
+        </p>
       </div>
     );
   };

@@ -34,10 +34,9 @@ export default function LiveFriends({
             <Link href={`/live/${sessionId}`} key={sessionId}>
               <li>
                 <UserIconWithText
-                  width={48}
-                  height={48}
                   shape="circle"
-                  size="small"
+                  size="large"
+                  fontSize="large"
                   imgSrc={
                     !!profileImage
                       ? profileImage

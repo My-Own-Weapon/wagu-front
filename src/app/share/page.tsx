@@ -847,8 +847,6 @@ export default function SharePage() {
             return (
               <UserIconWithText
                 key={username}
-                width={24}
-                height={24}
                 shape="circle"
                 size="small"
                 imgSrc={
