@@ -54,6 +54,40 @@
         gap: 14px;
       }
 
+      .reviewWrapper {
+        position: relative;
+
+        .AIBtn {
+          position: absolute;
+          top: -8px;
+          right: 0;
+
+          padding: 8px 16px;
+
+          background-color: $bgWhite;
+
+          background-color: rgb(255, 124, 146);
+          color: $white;
+
+          border-radius: $radiusMedium;
+
+          font-size: $textSmall;
+          font-weight: $medium;
+
+          cursor: pointer;
+
+          &:hover {
+            background-color: $white;
+            border: 1px solid rgb(255, 124, 146);
+            color: rgb(255, 124, 146);
+          }
+
+          &:disabled {
+            opacity: 0.5;
+          }
+        }
+      }
+
       .writeNavBar {
         position: fixed;
         left: 0;
@@ -69,10 +103,6 @@
 
         @include flexCenter;
         gap: 20px;
-
-        @media (min-width: 375px) {
-          max-width: calc(410px - 48px);
-        }
 
         .addMenuBtn {
           width: 100%;
@@ -127,4 +157,12 @@
 .imgs {
   @include flexCenter;
   gap: 8px;
+}
+
+@media (min-width: 375px) {
+  .writeNavBar {
+    max-width: calc(410px - 48px);
+
+    margin: 0 auto;
+  }
 }

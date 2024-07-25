@@ -7,6 +7,14 @@
 
 $iconHeight: 20px;
 
+@media (min-width: 375px) {
+  .container {
+    max-width: calc(410px - 48px);
+
+    margin: 0 auto;
+  }
+}
+
 .container {
   position: fixed;
   z-index: $header;

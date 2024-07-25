@@ -3,28 +3,13 @@
 @import '@styles/variables/fontWeight.scss';
 @import '@styles/variables/radius.scss';
 
-/* Frame 1707482141 */
+@media (min-width: 375px) {
+  .container {
+    max-width: 410px;
 
-// box-sizing: border-box;
-
-/* Auto layout */
-// display: flex;
-// flex-direction: row;
-// justify-content: center;
-// align-items: center;
-// padding: 10px 24px;
-// gap: 28px;
-
-// position: relative;
-// width: 375px;
-// height: 60px;
-
-// background: #FFFFFF;
-// border-width: 0.5px 0.5px 0px 0.5px;
-// border-style: solid;
-// border-color: #E6E6EA;
-// box-shadow: 2px 0px 6px rgba(51, 61, 75, 0.15);
-// border-radius: 0px;
+    margin: 0 auto;
+  }
+}
 
 .container {
   position: fixed;

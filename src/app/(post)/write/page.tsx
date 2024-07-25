@@ -10,6 +10,7 @@ import React, {
   useEffect,
 } from 'react';
 import { useRouter } from 'next/navigation';
+import { useMutation } from '@tanstack/react-query';
 
 import { apiService } from '@services/apiService';
 import InputBox from '@/components/ui/InputBox';
@@ -19,8 +20,26 @@ import AddressInput from '@/components/AddressInput';
 import { AddressSearchDetails, CategoriesEN } from '@/types';
 import Heading from '@/components/ui/Heading';
 import CategorySelect from '@/app/(post)/write/_component/CategorySelect';
+import Spinner from '@/app/(post)/write/_component/Spinnner';
 
 import s from './page.module.scss';
+
+interface AIAutoReviewResponse {
+  menuContent: string;
+}
+
+interface UseFetchAIAutoReviewProps {
+  category: CategoriesEN;
+  menuName: string;
+}
+
+const useFetchAIAutoReview = () => {
+  return useMutation<AIAutoReviewResponse, Error, UseFetchAIAutoReviewProps>({
+    mutationFn: ({ category, menuName }) => {
+      return apiService.fetchAIAutoReview({ category, menuName });
+    },
+  });
+};
 
 interface RequsetSchema {
   postCategory: string;
@@ -70,6 +89,34 @@ export default function BoardPage() {
   );
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
+
+  // Define the mutation using useMutation hook
+  const {
+    mutate: fetchAIAutoReview,
+    data: autoReviewData,
+    isPending,
+  } = useFetchAIAutoReview();
+
+  const handleFetchAIAutoReview = () => {
+    if (selectedCategory) {
+      fetchAIAutoReview({
+        category: selectedCategory,
+        menuName: pageStates[1].menuName,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (autoReviewData) {
+      setPageStates((prevStates) => ({
+        ...prevStates,
+        1: {
+          ...prevStates[1],
+          menuContent: autoReviewData.menuContent,
+        },
+      }));
+    }
+  }, [autoReviewData]);
 
   useEffect(() => {
     document.forms[0].addEventListener('keydown', (e) => {
@@ -192,6 +239,7 @@ export default function BoardPage() {
 
   return (
     <main className={s.container}>
+      {isPending && <Spinner />}
       <div className={s.wrapper}>
         {pageNumber > 1 && (
           <button
@@ -306,15 +354,24 @@ export default function BoardPage() {
                 value={currentState.menuPrice}
                 onChange={handleChange}
               />
-              <InputBox
-                height="200px"
-                label="리뷰"
-                name="menuContent"
-                placeholder="리뷰를 입력해주세요 !"
-                type="textarea"
-                value={currentState.menuContent}
-                onChange={handleChange}
-              />
+              <div className={s.reviewWrapper}>
+                <button
+                  className={s.AIBtn}
+                  type="button"
+                  onClick={handleFetchAIAutoReview}
+                >
+                  리뷰 자동 완성
+                </button>
+                <InputBox
+                  height="200px"
+                  label="리뷰"
+                  name="menuContent"
+                  placeholder="리뷰를 입력해주세요 !"
+                  type="textarea"
+                  value={currentState.menuContent}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
           </Wrapper>
           <nav className={s.writeNavBar}>
