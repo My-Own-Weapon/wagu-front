@@ -128,3 +128,12 @@
   @include flexCenter;
   gap: 8px;
 }
+
+@media (min-width: 375px) {
+  .writeNavBar {
+    max-width: 410px;
+    height: 100dvh;
+
+    margin: 0 auto;
+  }
+}
