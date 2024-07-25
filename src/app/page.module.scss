@@ -11,6 +11,13 @@
 
   .top {
     background-color: $bgBrown;
+
+    .streamerWrapper {
+      @include flexColumnStart;
+      gap: 20px;
+
+      padding: 16px 24px 40px;
+    }
   }
 
   .bottom {

@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
 import { usePathname } from 'next/navigation';
+import { COLORS } from '@/constants/colors';
 
 import s from './LiveFriendsList.module.scss';
 
@@ -15,30 +16,14 @@ export interface Friend {
 
 interface Props {
   liveFriends: Friend[];
-  storeName?: string;
 }
 
-export default function LiveFriends({ storeName = '', liveFriends }: Props) {
-  const path = usePathname();
+export default function LiveFriends({ liveFriends }: Props) {
   const UserIconWithText = WithText<UserIconProps>(UserIcon);
+  const path = usePathname();
 
   return (
     <div className={s.container}>
-      <div className={s.titleArea}>
-        <p
-          className={s.title}
-          style={{
-            color:
-              path.includes('/map') || path.includes('/share')
-                ? '#2E2E37'
-                : '#fff',
-          }}
-        >
-          {liveFriends.length > 0
-            ? `${storeName && `${storeName}에서 `}방송중인 친구가 있어요 !`
-            : `${storeName && `${storeName}에서 `}방송중인 친구가 없어요...`}
-        </p>
-      </div>
       {liveFriends.length > 0 ? (
         <ul className={s.friendsWrapper}>
           {liveFriends.map(({ profileImage, sessionId, userName }) => (
@@ -48,7 +33,8 @@ export default function LiveFriends({ storeName = '', liveFriends }: Props) {
                   shape="circle"
                   size="large"
                   fontSize="large"
-                  color="black"
+                  color={path === '/' ? 'white' : 'black'}
+                  border={`1.5px solid ${COLORS.PRIMARY_ORANGE}`}
                   imgSrc={
                     !!profileImage
                       ? profileImage

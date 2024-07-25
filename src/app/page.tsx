@@ -72,12 +72,26 @@ export default function Home() {
   return (
     <main className={s.container}>
       <div className={s.top}>
-        <LiveFriends liveFriends={liveFriends} />
+        <div className={s.streamerWrapper}>
+          <Heading
+            as="h3"
+            title={
+              liveFriends.length > 0
+                ? '방송중인 친구가 있어요 !'
+                : '방송중인 친구가 없어요...'
+            }
+            color="white"
+            fontSize="20px"
+            fontWeight="semiBold"
+          />
+          <LiveFriends liveFriends={liveFriends} />
+        </div>
       </div>
       <div className={s.bottom}>
         <Heading
           as="h3"
           fontSize="20px"
+          color="black"
           fontWeight="semiBold"
           title="MY POST"
         />
