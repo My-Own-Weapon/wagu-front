@@ -5,7 +5,11 @@ import { MouseEventHandler, useEffect, useState } from 'react';
 import { consoleArt } from '@/utils';
 import { apiService } from '@/services/apiService';
 import { useCheckSession } from '@/hooks/useCheckSession';
-import { CategoriesEN, CategoriesWithAllEN, PostCardProps } from '@/types';
+import {
+  CategoriesEN,
+  CategoriesWithAllEN,
+  PostOfStoreResponse,
+} from '@/types';
 import { Post } from '@/components/Post';
 import LiveFriends, { Friend } from '@/components/LiveFriendsList';
 import CategoryList from '@/components/CategoryList';
@@ -15,14 +19,9 @@ import s from './page.module.scss';
 
 consoleArt();
 
-interface PostReponse extends PostCardProps {
-  memberUsername: string;
-  category: string;
-}
-
 export default function Home() {
-  const [allPosts, setAllPosts] = useState<PostReponse[]>([]);
-  const [filteredPosts, setFilteredPosts] = useState<PostReponse[]>([]);
+  const [allPosts, setAllPosts] = useState<PostOfStoreResponse[]>([]);
+  const [filteredPosts, setFilteredPosts] = useState<PostOfStoreResponse[]>([]);
   const [liveFriends, setLiveFriends] = useState<Friend[]>([]);
   const [selectedCategory, setSelectedCategory] =
     useState<CategoriesWithAllEN>('ALL');
