@@ -7,11 +7,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Post } from '@/components/Post';
 import LiveFriends from '@/components/LiveFriendsList';
 import VoteUrlModal from '@/components/VoteUrlModal';
-import { MapVertexes, PostCardProps } from '@/types';
+import { MapVertexes, PostOfStoreResponse } from '@/types';
 import { apiService } from '@/services/apiService';
+
+import PostsOfMap from '@/app/map/_components/PostsOfMap';
+import Heading from '@/components/ui/Heading';
 
 import s from './page.module.scss';
 
@@ -21,12 +23,13 @@ declare global {
   }
 }
 
-interface StoreData {
-  name: string;
+interface StoreResponse {
+  storeName: string;
   address: string;
   storeId: number;
   posx: number;
   posy: number;
+  liveStore: boolean;
 }
 
 interface Streamer {
@@ -36,13 +39,16 @@ interface Streamer {
   address: string;
   storeName: string;
 }
-export default function KakaoMap() {
+
+export default function MapPage() {
   const [markers, setMarkers] = useState<any[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [map, setMap] = useState<any>(null);
-  const [posts, setPosts] = useState<PostCardProps[]>([]);
+  const [, setMap] = useState<any>(null);
+  const [posts, setPosts] = useState<PostOfStoreResponse[]>([]);
   const [streamers, setStreamers] = useState<Streamer[]>([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [selectedStore, setSelectedStore] = useState<StoreResponse | null>(
+    null,
+  );
   const [voteUrl, setVoteUrl] = useState('');
 
   useEffect(() => {
@@ -101,12 +107,16 @@ export default function KakaoMap() {
     addMarkers(mapInstance, stores);
   };
 
-  const addMarkers = (mapInstance: any, stores: StoreData[]) => {
+  const addMarkers = (mapInstance: any, stores: StoreResponse[]) => {
     removeMarkers();
 
+    const { kakao } = window;
+
     const newMarkers = stores.map((store) => {
-      const { kakao } = window;
-      const imageSrc = '/images/map/ping_orange.svg';
+      const { liveStore } = store;
+      const imageSrc = liveStore
+        ? '/newDesign/map/pin_book_live.svg'
+        : '/newDesign/map/pin_book.svg';
       const imageSize = new kakao.maps.Size(32, 32);
       const imageOption = { offset: new kakao.maps.Point(16, 32) };
       const markerImage = new kakao.maps.MarkerImage(
@@ -126,6 +136,7 @@ export default function KakaoMap() {
       window.kakao.maps.event.addListener(marker, 'click', () => {
         fetchStreamers(store.storeId);
         fetchPosts(store.storeId);
+        setSelectedStore(store);
       });
 
       return marker;
@@ -136,6 +147,7 @@ export default function KakaoMap() {
 
   const removeMarkers = () => {
     markers.forEach((marker) => marker.setMap(null));
+
     setMarkers([]);
   };
 
@@ -149,10 +161,12 @@ export default function KakaoMap() {
   const fetchPosts = async (storeId: number) => {
     const posts = await apiService.fetchPostsOfStore(storeId);
 
+    console.log(posts);
+
     setPosts(posts);
   };
 
-  const createShareMapUrl = async () => {
+  const getShareUrl = async () => {
     const BASE_URL =
       process.env.NODE_ENV === 'development'
         ? 'http://localhost:3000'
@@ -166,31 +180,36 @@ export default function KakaoMap() {
 
   return (
     <main className={s.container}>
-      <div className={s.mapContainer}>
+      <div className={s.top}>
         <div id="map" className={s.map} />
       </div>
-      <div>
-        <LiveFriends liveFriends={streamers} />
-        <div className={s.postContainer}>
-          <Post.Wrapper>
-            <Post>
-              {posts.length === 0 ? (
-                <Post.Title title="Post를 선택해보세요!" />
-              ) : (
-                <Post.Title title={`${posts[0].storeName}  Posts`} />
-              )}
-              {posts.length > 0 && <Post.PostCards posts={posts} />}
-            </Post>
-          </Post.Wrapper>
-        </div>
+      <div className={s.bottom}>
+        {selectedStore?.liveStore && selectedStore?.storeName && (
+          <>
+            <Heading
+              as="h3"
+              fontSize="16px"
+              fontWeight="bold"
+              color="black"
+              title={`${selectedStore.storeName}에서 방송중이에요 !`}
+            />
+            <LiveFriends liveFriends={streamers} />
+          </>
+        )}
+
+        <PostsOfMap
+          selectedStoreName={selectedStore?.storeName}
+          selectedStoreId={selectedStore?.storeId}
+          posts={posts}
+        />
       </div>
-      <div className={s.urlContainer}>
+      <div className={s.urlButtonContainer}>
         <button
           className={s.createUrlButton}
           type="button"
-          onClick={createShareMapUrl}
+          onClick={getShareUrl}
         >
-          투표 URL 생성하기
+          함께 투표 링크 생성
         </button>
       </div>
       <VoteUrlModal
