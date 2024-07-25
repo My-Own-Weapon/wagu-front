@@ -373,6 +373,21 @@ class ApiService {
     return data;
   }
 
+  async removeLiveSession(sessionId: string) {
+    const res = await fetch(`${this.baseUrl}/api/sessions/${sessionId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
+    return res.text();
+  }
+
   async checkIsStreamerUserOfSession(sessionId: string) {
     const res = await fetch(
       `${this.baseUrl}/api/sessions/${sessionId}/creator`,
@@ -602,6 +617,7 @@ class ApiService {
     return res.json();
   }
 
+  /* AI auto review */
   async fetchAIAutoReview({
     category,
     menuName,
