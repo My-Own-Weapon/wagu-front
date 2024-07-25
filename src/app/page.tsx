@@ -5,7 +5,7 @@ import { MouseEventHandler, useEffect, useState } from 'react';
 import { consoleArt } from '@/utils';
 import { apiService } from '@/services/apiService';
 import { useCheckSession } from '@/hooks/useCheckSession';
-import { PostCardProps } from '@/types';
+import { CategoriesEN, CategoriesWithAllEN, PostCardProps } from '@/types';
 import { Post } from '@/components/Post';
 import LiveFriends, { Friend } from '@/components/LiveFriendsList';
 import CategoryList from '@/components/CategoryList';
@@ -20,33 +20,19 @@ interface PostReponse extends PostCardProps {
   category: string;
 }
 
-const categoryMap = {
-  전체: 'ALL',
-  한식: 'KOREAN',
-  일식: 'JAPANESE',
-  중식: 'CHINESE',
-  분식: 'FASTFOOD',
-  양식: 'WESTERN',
-  카페: 'CAFE',
-  디저트: 'DESSERT',
-} as const;
-
-export type CategoriesKR = keyof typeof categoryMap;
-export type CategoriesEN = (typeof categoryMap)[CategoriesKR];
-
 export default function Home() {
   const [allPosts, setAllPosts] = useState<PostReponse[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<PostReponse[]>([]);
   const [liveFriends, setLiveFriends] = useState<Friend[]>([]);
   const [selectedCategory, setSelectedCategory] =
-    useState<CategoriesKR>('전체');
+    useState<CategoriesWithAllEN>('ALL');
   useCheckSession();
 
   const handleCategoryClick: MouseEventHandler = (e) => {
     e.stopPropagation();
 
     const target = e.currentTarget as HTMLElement;
-    const category = target.dataset.category as CategoriesKR;
+    const category = target.dataset.category as CategoriesEN;
 
     setSelectedCategory(category);
   };
@@ -73,14 +59,13 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (selectedCategory === '전체') {
+    if (selectedCategory === 'ALL') {
       setFilteredPosts(allPosts);
       return;
     }
 
-    const formattedCategory = categoryMap[selectedCategory];
     setFilteredPosts(
-      allPosts.filter(({ category }) => category === formattedCategory),
+      allPosts.filter(({ category }) => category === selectedCategory),
     );
   }, [allPosts, selectedCategory]);
 

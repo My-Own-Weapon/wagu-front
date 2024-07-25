@@ -3,9 +3,6 @@
 @import '@/styles/variables/colors.scss';
 
 .container {
-  height: 100%;
-  padding-bottom: 80px;
-
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -13,7 +10,6 @@
   background-color: $bgBrown;
 
   .top {
-    padding-top: 16px;
     background-color: $bgBrown;
   }
 
