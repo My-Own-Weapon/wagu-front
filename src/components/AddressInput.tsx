@@ -16,7 +16,7 @@ import { AddressSearchDetails } from '@/types';
 import s from './AddressInput.module.scss';
 
 interface AddressInputProps {
-  title: string;
+  title?: string;
   value: string;
   onSelect: (addressSearchResult: AddressSearchDetails) => void;
 }
@@ -31,7 +31,7 @@ interface KAKAOSearchAddressResponse {
 }
 
 export default function AddressInput({
-  title,
+  title = undefined,
   value,
   onSelect,
 }: AddressInputProps) {
@@ -103,6 +103,21 @@ export default function AddressInput({
 
   return (
     <div className={`${s.container} ${isFocused ? s.blur : ''}`}>
+      {!isFocused && (
+        <div>
+          <InputBox
+            height="30px"
+            label={title}
+            placeholder="주소를 검색하면 식당 정보가 자동으로 입력됩니다."
+            name="address"
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            readOnly={!isFocused}
+          />
+        </div>
+      )}
       {isFocused && (
         <div ref={inputRef}>
           <div
@@ -164,21 +179,6 @@ export default function AddressInput({
               )}
             </ul>
           </div>
-        </div>
-      )}
-      {!isFocused && (
-        <div>
-          <InputBox
-            height="30px"
-            label={title}
-            placeholder="가게 이름을 입력하면 주소가 자동완성됩니다."
-            name="address"
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => setIsFocused(true)}
-            readOnly={!isFocused}
-          />
         </div>
       )}
     </div>
