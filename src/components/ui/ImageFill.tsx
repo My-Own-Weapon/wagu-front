@@ -20,7 +20,7 @@ export default function ImageFill({
   height = 'auto',
   src,
   alt,
-  fill = false,
+  fill = true,
   borderRadius = '0',
   backgroundColor = 'transparent',
 }: props) {
