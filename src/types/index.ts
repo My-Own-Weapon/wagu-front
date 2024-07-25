@@ -33,12 +33,14 @@ export interface AddPostProps {
   auto: true;
 }
 
-export interface PostCardProps {
-  postId: string;
+export interface PostOfStoreResponse {
   storeName: string;
+  postId: number;
   postMainMenu: string;
+  category: CategoriesEN;
   menuImage: PostImage;
-  menuPrice: string;
+  menuPrice: number;
+  memberUsername: string;
   createdDate: string;
 }
 
