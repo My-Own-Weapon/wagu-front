@@ -1,13 +1,13 @@
 import React, { MouseEventHandler } from 'react';
 
+import { CategoriesWithAllEN } from '@/types';
 import * as Icons from '@public/newDesign/categories/index';
+import { categoryMapWithAll } from '@/constants/categoty';
 
 import s from './CategoryList.module.scss';
 
-type CategoriesKR = keyof typeof categoryMap;
-
 interface Props {
-  selectedCategory: CategoriesKR | null;
+  selectedCategory: CategoriesWithAllEN;
   onClick: MouseEventHandler<HTMLButtonElement>;
 }
 
@@ -15,7 +15,7 @@ export default function CategoryList({ selectedCategory, onClick }: Props) {
   return (
     <div className={s.mainPageContainer}>
       <ul className={s.categoriesWrapper}>
-        {getCategories().map(({ id, name, Icon }) => (
+        {getCategoryIcon().map(({ id, name, Icon }) => (
           <li key={id} className={s.category}>
             <button
               type="button"
@@ -28,7 +28,7 @@ export default function CategoryList({ selectedCategory, onClick }: Props) {
               <p
                 className={`${s.categoryText} ${name === selectedCategory ? s.active : ''}`}
               >
-                {name}
+                {categoryMapWithAll[name as CategoriesWithAllEN]}
               </p>
             </button>
           </li>
@@ -40,61 +40,50 @@ export default function CategoryList({ selectedCategory, onClick }: Props) {
 
 interface Category {
   id: string;
-  name: CategoriesKR;
+  name: CategoriesWithAllEN;
   Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 }
 
-const categoryMap = {
-  전체: 'ALL',
-  한식: 'KOREAN',
-  일식: 'JAPANESE',
-  중식: 'CHINESE',
-  분식: 'FASTFOOD',
-  양식: 'WESTERN',
-  카페: 'CAFE',
-  디저트: 'DESSERT',
-} as const;
-
-function getCategories(): Category[] {
+function getCategoryIcon(): Category[] {
   return [
     {
       id: 'category-0',
-      name: '전체',
+      name: 'ALL',
       Icon: Icons.FoodAllSVG,
     },
     {
       id: 'category-1',
-      name: '한식',
+      name: 'KOREAN',
       Icon: Icons.KoreanSVG,
     },
     {
       id: 'category-2',
-      name: '중식',
+      name: 'CHINESE',
       Icon: Icons.ChineseSVG,
     },
     {
       id: 'category-3',
-      name: '양식',
+      name: 'WESTERN',
       Icon: Icons.WesternSVG,
     },
     {
       id: 'category-4',
-      name: '일식',
+      name: 'JAPANESE',
       Icon: Icons.JapaneseSVG,
     },
     {
       id: 'category-5',
-      name: '분식',
+      name: 'FASTFOOD',
       Icon: Icons.FastFoodSVG,
     },
     {
       id: 'category-6',
-      name: '카페',
+      name: 'CAFE',
       Icon: Icons.CafeSVG,
     },
     {
       id: 'category-7',
-      name: '디저트',
+      name: 'DESSERT',
       Icon: Icons.DessertSVG,
     },
   ];

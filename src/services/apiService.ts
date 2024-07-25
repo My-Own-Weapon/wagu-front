@@ -19,6 +19,10 @@ interface ShareMapPublishSessionResponse {
   sessionId: string;
 }
 
+interface AIAutoReviewResponse {
+  menuContent: string;
+}
+
 type SuccessMessageResponse = Promise<string>;
 
 class ApiService {
@@ -319,11 +323,10 @@ class ApiService {
       }),
       credentials: 'include',
     });
-
     if (!res.ok) {
-      const { status, error } = await res.json();
+      const { status, message, error } = await res.json();
 
-      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+      throw new Error(`[${status}, ${error}] ${message}`);
     }
 
     const data = await res.json();
@@ -341,9 +344,9 @@ class ApiService {
     );
 
     if (!res.ok) {
-      const { status, error } = await res.json();
+      const { status, message, error } = await res.json();
 
-      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+      throw new Error(`[${status}, ${error}] ${message}`);
     }
 
     const data = await res.json();
@@ -361,11 +364,10 @@ class ApiService {
     );
 
     if (!res.ok) {
-      const { status, error } = await res.json();
+      const { status, message, error } = await res.json();
 
-      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+      throw new Error(`[${status}, ${error}] ${message}`);
     }
-
     const data = await res.json();
 
     return data;
@@ -381,9 +383,9 @@ class ApiService {
     );
 
     if (!res.ok) {
-      const { status, error } = await res.json();
+      const { status, message, error } = await res.json();
 
-      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+      throw new Error(`[${status}, ${error}] ${message}`);
     }
 
     const data = await res.json();
@@ -398,9 +400,9 @@ class ApiService {
     });
 
     if (!res.ok) {
-      const { status, error } = await res.json();
+      const { status, message, error } = await res.json();
 
-      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+      throw new Error(`[${status}, ${error}] ${message}`);
     }
 
     const data = await res.json();
@@ -417,6 +419,13 @@ class ApiService {
         credentials: 'include',
       },
     );
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
     const stores = await res.json();
 
     return stores;
@@ -430,9 +439,9 @@ class ApiService {
     });
 
     if (!res.ok) {
-      const { status, error } = await res.json();
+      const { status, message, error } = await res.json();
 
-      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+      throw new Error(`[${status}, ${error}] ${message}`);
     }
 
     const sessionIdForShareUrl = await res.text();
@@ -454,9 +463,9 @@ class ApiService {
     });
 
     if (!res.ok) {
-      const { status, error } = await res.json();
+      const { status, message, error } = await res.json();
 
-      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+      throw new Error(`[${status}, ${error}] ${message}`);
     }
 
     return res.json();
@@ -478,9 +487,9 @@ class ApiService {
     );
 
     if (!res.ok) {
-      const { status, error } = await res.json();
+      const { status, message, error } = await res.json();
 
-      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+      throw new Error(`[${status}, ${error}] ${message}`);
     }
 
     return res.text();
@@ -493,9 +502,9 @@ class ApiService {
     });
 
     if (!res.ok) {
-      const { status, error } = await res.json();
+      const { status, message, error } = await res.json();
 
-      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+      throw new Error(`[${status}, ${error}] ${message}`);
     }
 
     const voteList = await res.json();
@@ -513,9 +522,9 @@ class ApiService {
     );
 
     if (!res.ok) {
-      const { status, error } = await res.json();
+      const { status, message, error } = await res.json();
 
-      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+      throw new Error(`[${status}, ${error}] ${message}`);
     }
 
     return res.text();
@@ -532,6 +541,7 @@ class ApiService {
 
     if (!res.ok) {
       const { status, message, error } = await res.json();
+
       throw new Error(`[${status}, ${error}] ${message}`);
     }
 
@@ -551,9 +561,9 @@ class ApiService {
     );
 
     if (!res.ok) {
-      const { status, error } = await res.json();
+      const { status, message, error } = await res.json();
 
-      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+      throw new Error(`[${status}, ${error}] ${message}`);
     }
 
     return res.text();
@@ -569,9 +579,9 @@ class ApiService {
     );
 
     if (!res.ok) {
-      const { status, error } = await res.json();
+      const { status, message, error } = await res.json();
 
-      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+      throw new Error(`[${status}, ${error}] ${message}`);
     }
 
     return res.text();
@@ -584,9 +594,36 @@ class ApiService {
     });
 
     if (!res.ok) {
-      const { status, error } = await res.json();
+      const { status, message, error } = await res.json();
 
-      throw new Error(`[${status}, ${error}] 세션이 만료되었습니다.`);
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
+    return res.json();
+  }
+
+  async fetchAIAutoReview({
+    category,
+    menuName,
+  }: {
+    category: string;
+    menuName: string;
+  }): Promise<AIAutoReviewResponse> {
+    const res = await fetch(`${this.baseUrl}/posts/auto`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        postCategory: category,
+        menuName,
+      }),
+    });
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
     }
 
     return res.json();

@@ -12,13 +12,13 @@ import React, {
 import { useRouter } from 'next/navigation';
 
 import { apiService } from '@services/apiService';
-import { CategoriesKR } from '@/app/page';
 import InputBox from '@/components/ui/InputBox';
 import ImageFill from '@/components/ui/ImageFill';
 import Button from '@/components/ui/Button';
-import CategoryList from '@/components/CategoryList';
 import AddressInput from '@/components/AddressInput';
-import { AddressSearchDetails } from '@/types';
+import { AddressSearchDetails, CategoriesEN } from '@/types';
+import Heading from '@/components/ui/Heading';
+import CategorySelect from '@/app/(post)/write/_component/CategorySelect';
 
 import s from './page.module.scss';
 
@@ -48,20 +48,7 @@ interface PageState {
   image?: File | null;
 }
 
-type WritePageCategoriesKR = Exclude<CategoriesKR, '전체'>;
-
 type PageStates = Record<number, PageState>;
-
-const categoryMap = {
-  전체: 'ALL',
-  한식: 'KOREAN',
-  일식: 'JAPANESE',
-  중식: 'CHINESE',
-  분식: 'FASTFOOD',
-  양식: 'WESTERN',
-  카페: 'CAFE',
-  디저트: 'DESSERT',
-} as const;
 
 export default function BoardPage() {
   const [pageNumber, setPageNumber] = useState<number>(1);
@@ -78,6 +65,9 @@ export default function BoardPage() {
       posx: '',
       posy: '',
     });
+  const [selectedCategory, setSelectedCategory] = useState<CategoriesEN | null>(
+    null,
+  );
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -88,17 +78,6 @@ export default function BoardPage() {
       }
     });
   });
-
-  const [selectedCategory, setSelectedCategory] =
-    useState<WritePageCategoriesKR | null>(null);
-
-  const handleCategoryClick: MouseEventHandler<HTMLButtonElement> = (e) => {
-    e.stopPropagation();
-
-    setSelectedCategory(
-      e.currentTarget.dataset.category as WritePageCategoriesKR,
-    );
-  };
 
   const handleAddReview: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.stopPropagation();
@@ -161,7 +140,7 @@ export default function BoardPage() {
     const { storeName, address, posx, posy } = addressSearchResult;
     const formObj: RequsetSchema = {
       postMainMenu: menuName,
-      postCategory: categoryMap[selectedCategory],
+      postCategory: selectedCategory,
       storeName,
       storeLocation: {
         address,
@@ -190,7 +169,6 @@ export default function BoardPage() {
     });
 
     const objString = JSON.stringify(formObj);
-    console.log(objString);
     const blobObj = new Blob([objString], { type: 'application/json' });
 
     formData.append('data', blobObj);
@@ -225,95 +203,132 @@ export default function BoardPage() {
           </button>
         )}
         <form className={s.formContainer} onSubmit={handleSubmit} ref={formRef}>
-          <div className={s.imageArea}>
-            <InputBox
-              width="80px"
-              height="80px"
-              name="menu"
-              placeholder="+"
-              accept="image/*"
-              type="file"
-              onChange={
-                handleFileChange as ChangeEventHandler<
-                  HTMLInputElement | HTMLTextAreaElement
-                >
-              }
+          <Wrapper gap={addressSearchResult.address ? '16px' : '12px'}>
+            <Heading
+              title="식당 정보"
+              as="h3"
+              fontWeight="semiBold"
+              fontSize="16px"
             />
-            {currentState.image && (
-              <ImageFill
+            {!!addressSearchResult.address &&
+              !!addressSearchResult.storeName && (
+                <div className={s.storeDetails}>
+                  <p className={s.storeName}>{addressSearchResult.address}</p>
+                  <p className={s.storeAddress}>
+                    {addressSearchResult.storeName}
+                  </p>
+                </div>
+              )}
+            <AddressInput
+              value={addressSearchResult.storeName || ''}
+              onSelect={handleAddressSelect}
+            />
+          </Wrapper>
+          <Wrapper gap="16px">
+            <Heading
+              title="카테고리 선택"
+              as="h3"
+              fontWeight="semiBold"
+              fontSize="16px"
+            />
+            <CategorySelect
+              selectedCategory={selectedCategory}
+              onSelectCategory={setSelectedCategory}
+            />
+          </Wrapper>
+
+          <Wrapper gap="16px">
+            <Heading
+              title="이미지"
+              as="h3"
+              fontWeight="semiBold"
+              fontSize="16px"
+            />
+            <div className={s.imgs}>
+              {currentState.image && (
+                <ImageFill
+                  width="80px"
+                  height="80px"
+                  fill
+                  src={URL.createObjectURL(currentState.image)}
+                  alt="preview"
+                  borderRadius="8px"
+                />
+              )}
+              <InputBox
                 width="80px"
                 height="80px"
-                fill
-                src={URL.createObjectURL(currentState.image)}
-                alt="preview"
-                borderRadius="8px"
+                label="이미지 추가"
+                name="menu"
+                placeholder="+"
+                accept="image/*"
+                type="file"
+                onChange={
+                  handleFileChange as ChangeEventHandler<
+                    HTMLInputElement | HTMLTextAreaElement
+                  >
+                }
               />
-            )}
-          </div>
-          {pageNumber === 1 && (
-            <>
-              <CategoryList
-                selectedCategory={selectedCategory}
-                onClick={handleCategoryClick}
-              />
-              <AddressInput
-                title="·&nbsp;&nbsp;주소"
-                value={addressSearchResult.address || ''}
-                onSelect={handleAddressSelect}
-              />
+            </div>
+          </Wrapper>
+          <Wrapper gap="16px">
+            <Heading
+              title="메뉴 1"
+              as="h3"
+              fontWeight="semiBold"
+              fontSize="16px"
+            />
+            <div
+              style={{
+                width: '100%',
+
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '40px',
+              }}
+            >
               <InputBox
                 height="30px"
-                label="·&nbsp;&nbsp;가게 이름"
-                name="storeName"
-                placeholder="가게 이름을 입력해주세요"
+                label="대표 메뉴"
+                name="menuName"
+                placeholder="대표 메뉴를 입력해주세요"
                 type="text"
-                value={addressSearchResult?.storeName || ''}
+                value={currentState.menuName}
                 onChange={handleChange}
               />
-            </>
-          )}
-          <InputBox
-            height="30px"
-            label="·&nbsp;&nbsp;대표 메뉴"
-            name="menuName"
-            placeholder="대표 메뉴를 입력해주세요"
-            type="text"
-            value={currentState.menuName}
-            onChange={handleChange}
-          />
-          <InputBox
-            height="30px"
-            label="·&nbsp;&nbsp;가격"
-            name="menuPrice"
-            placeholder="메뉴 가격을 입력해주세요"
-            type="number"
-            value={currentState.menuPrice}
-            onChange={handleChange}
-          />
-          <InputBox
-            height="200px"
-            label="·&nbsp;&nbsp;리뷰"
-            name="menuContent"
-            placeholder="리뷰를 입력해주세요 !"
-            type="textarea"
-            value={currentState.menuContent}
-            onChange={handleChange}
-          />
-          <div className={s.btnArea}>
-            <Button
-              width="100%"
-              height="48px"
-              text="메뉴 추가"
+              {/* ✅ TODO: 세자리수마다 , 붙이기 */}
+              <InputBox
+                height="30px"
+                label="가격"
+                name="menuPrice"
+                placeholder="메뉴 가격을 입력해주세요"
+                type="number"
+                value={currentState.menuPrice}
+                onChange={handleChange}
+              />
+              <InputBox
+                height="200px"
+                label="리뷰"
+                name="menuContent"
+                placeholder="리뷰를 입력해주세요 !"
+                type="textarea"
+                value={currentState.menuContent}
+                onChange={handleChange}
+              />
+            </div>
+          </Wrapper>
+          <nav className={s.writeNavBar}>
+            <button
+              className={s.addMenuBtn}
               type="button"
               onClick={handleAddReview}
-            />
-            <Button
-              width="100%"
-              height="48px"
-              text="게시글 등록"
-              type="submit"
-            />
-          </div>
+            >
+              메뉴 추가
+            </button>
+            <button className={s.submitBtn} type="submit">
+              포스트 등록
+            </button>
+          </nav>
         </form>
         {pageNumber > 1 && (
           <Button
@@ -356,4 +371,30 @@ function getMainReviewPageState(): PageState {
     menuContent: '',
     image: null,
   };
+}
+
+function Wrapper({
+  gap,
+  children,
+}: {
+  gap: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      style={{
+        backgroundColor: '#fff',
+        padding: '16px',
+        borderRadius: '16px',
+
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        gap,
+      }}
+    >
+      {children}
+    </div>
+  );
 }

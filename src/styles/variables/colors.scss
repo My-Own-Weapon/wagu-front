@@ -17,8 +17,12 @@ $headerColor: #444444;
 /* text color */
 $textTitleColor: #2e2e2e;
 $textWhite: #ffffff;
+$textTitleGray: #444444;
 $textContent: #5c5c5c;
 $textSub-content: #747474;
+
+/* post */
+$postTitleColor: #444444;
 
 /* icon svg color */
 $iconColor: #b0b2b8;
@@ -36,9 +40,14 @@ $btnHober: #ff9900b0;
 $btnDisabled: #ff960080;
 
 /* input */
-$inputBgColor: #ece6d9;
-$placeholderColor: #979797;
+$inputBgColor: #fff;
+$inputTextColor: #2e2e37;
+$placeholderColor: #acaeb3;
+$inputBorderColor: #cdd0d8;
 $placeholderSize: 14px;
+
+/* write page */
+$writeBgColor: #f5f6f8;
 
 /* Etc.. */
 $bgColor: #fffaf3;

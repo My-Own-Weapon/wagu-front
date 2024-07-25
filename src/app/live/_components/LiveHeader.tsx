@@ -34,8 +34,7 @@ export default function LiveHeader({
           imgSrc={streamerProfileImage}
           shape="circle"
           alt={streamerName}
-          width={24}
-          height={24}
+          size="xSmall"
         />
         <p className={s.streamerName}>{streamerName}</p>
       </div>

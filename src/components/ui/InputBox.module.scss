@@ -1,83 +1,100 @@
 @import '@styles/variables/colors.scss';
 @import '@styles/variables/radius.scss';
 @import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/textSize.scss';
+@import '@styles/mixins/index.scss';
 
 .container {
   display: flex;
   flex-direction: column;
   gap: 8px;
-}
 
-.inputBoxs {
-  width: 100%;
+  .inputBoxs {
+    width: 100%;
 
-  box-sizing: border-box;
-  padding-left: 12px;
+    padding: 16px 0;
 
-  background-color: $inputBgColor;
-  color: $placeholderColor;
+    background-color: transparent;
 
-  font-size: $placeholderSize;
+    color: $inputTextColor;
+    font-size: $textMedium;
+    font-weight: $medium;
+    letter-spacing: -0.025em;
 
-  border: 1px solid $borderDark;
-  border-radius: $radiusMedium;
+    border: none;
+    border-bottom: 1px solid $inputBorderColor;
 
-  &:focus {
-    border: 1px solid $primaryOrange;
+    &::placeholder {
+      color: $placeholderColor;
+      font-size: $placeholderSize;
+      font-weight: $medium;
+    }
+  }
+  .label {
+    color: $inputTextColor;
+    font-size: $textMedium;
+    font-weight: $medium;
+    letter-spacing: -0.025em;
   }
 
-  & ~ label {
-    color: $textTitleColor;
+  .fileInputBox {
+    display: none;
   }
-}
+  .fileLabel {
+    position: relative;
 
-.label {
-  margin-left: 8px;
+    @include flexColumnCenter;
+    gap: 4px;
 
-  font-size: 14px;
-  font-weight: $medium;
-  color: $textTitleColor;
-}
+    width: 80px;
+    height: 80px;
 
-.fileInputBox {
-  display: none;
-}
+    box-sizing: border-box;
 
-.overwrapLabelOfFileInput {
-  position: relative;
+    background-color: transparent;
+    color: $placeholderColor;
 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
+    font-size: $placeholderSize;
 
-  width: 80px;
-  height: 80px;
+    border: 1px solid $inputBorderColor;
+    border-radius: $radiusMedium;
 
-  box-sizing: border-box;
-  padding-left: 12px;
-
-  background-color: $inputBgColor;
-  color: $placeholderColor;
-
-  font-size: $placeholderSize;
-
-  border: 1px solid $borderDark;
-  border-radius: $radiusMedium;
-
-  cursor: pointer;
-
-  &::after {
-    content: '📷';
-    position: absolute;
-
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-    pointer-events: none;
     cursor: pointer;
 
-    font-size: 40px;
+    .labelText {
+      color: $placeholderColor;
+      font-size: $textSmall;
+      font-weight: $medium;
+      line-height: 150%;
+    }
+  }
+
+  .reviewInput {
+    width: 100%;
+    height: auto;
+    min-height: 120px;
+
+    padding: 16px 0;
+
+    background-color: transparent;
+
+    color: $inputTextColor;
+    font-size: $textMedium;
+    font-weight: $medium;
+    letter-spacing: -0.025em;
+
+    border: none;
+    resize: none;
+    overflow: hidden;
+
+    &::placeholder {
+      color: $placeholderColor;
+      font-size: $placeholderSize;
+      font-weight: $medium;
+    }
+
+    &:focus {
+      outline: none;
+    }
   }
 }

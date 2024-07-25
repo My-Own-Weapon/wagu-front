@@ -1,11 +1,17 @@
+/* eslint-disable no-shadow */
+
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 import ImageFill from '@/components/ui/ImageFill';
 import { apiService } from '@/services/apiService';
-import { getCookieValue } from '@/utils';
-import { CategoriesEN } from '@/app/page';
+import { CategoriesEN, ProfileWithoutFollowResponse } from '@/types';
+import { formatNumberToKRW } from '@/utils';
+import { UserIcon, WithText } from '@/components/UserIcon';
+import { PROFILE_IMG } from '@/constants/path';
+import PostHeader from './_components/PostHeader';
 
 import s from './page.module.scss';
 
@@ -25,7 +31,7 @@ interface PostDetailsResponse {
     posy: string;
   };
   postMainMenu: string;
-  postCategory: Exclude<CategoriesEN, 'ALL'>;
+  postCategory: CategoriesEN;
   permission: 'PRIVATE';
   menus: MenuResponse[];
   auto: boolean;
@@ -43,26 +49,36 @@ interface MenuResponse {
   menuContent: string;
 }
 
+const UserIconWithText = WithText(UserIcon);
+
 export default function PostPage({ params: { postId } }: Props) {
   const [postDetails, setPostDetails] = useState<PostDetailsResponse | null>(
     null,
   );
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [profile, setProfile] = useState<ProfileWithoutFollowResponse | null>(
+    null,
+  );
   const [currentMenuIndex, setCurrentMenuIndex] = useState(0); // 추가된 상태
-
-  const usernameFromCookie = getCookieValue('username');
-  const postModdable = postDetails?.memberUsername === usernameFromCookie;
+  const router = useRouter();
 
   useEffect(() => {
-    apiService
-      .fetchPost(postId)
-      .then((data) => {
-        setPostDetails(data);
-      })
-      .catch((e) => {
-        if (e instanceof Error) setErrorMsg(e.message);
-      });
-  }, [postId]);
+    const fetchPostDetails = async () => {
+      try {
+        const postDetails = await apiService.fetchPost(postId);
+        setPostDetails(postDetails);
+        const { memberUsername: writer } = postDetails;
+        const profile = await apiService.fetchProfileWithoutFollow(writer);
+        setProfile(profile);
+      } catch (e) {
+        if (e instanceof Error) {
+          alert(e.message);
+          router.back();
+        }
+      }
+    };
+
+    fetchPostDetails();
+  }, []);
 
   const goToNextMenu = () => {
     if (postDetails && postDetails.menus.length > currentMenuIndex + 1) {
@@ -74,46 +90,51 @@ export default function PostPage({ params: { postId } }: Props) {
   const { address } = postDetails?.storeLocation || {};
 
   return (
-    <div>
-      {postModdable && <div>수정하기</div>}
-      {errorMsg && <div>{errorMsg}</div>}
+    <>
+      {/* ✅ TODO: 수정하기 구현 */}
+      <PostHeader modable={false} />
       {postDetails && (
-        <div>
-          <div className={s.container} data-id={postDetails.postId}>
-            <div className={s.imageWrapper}>
-              <ImageFill
-                src={menu?.menuImage.url || '/images/mock-food.png'}
-                alt={menu?.menuName || 'food-image'}
-                fill
-                height="246px"
-              />
-            </div>
-            <div className={s.content}>
-              <div className={s.contentHeader}>
-                <div>
-                  <div className={s.storeName}>{postDetails.storeName}</div>
+        <div className={s.container} data-id={postDetails?.postId}>
+          <ImageFill
+            src={menu?.menuImage.url || '/images/mock-food.png'}
+            alt={menu?.menuName || 'food-image'}
+            fill
+            height="360px"
+          />
+          <div className={s.contentWrapper}>
+            <div className={s.postInfoArea}>
+              <div className={s.postHeader}>
+                <div className={s.storeInfo}>
+                  <div className={s.storeName}>{postDetails?.storeName}</div>
                   <div className={s.address}>{address}</div>
-                  <div className={s.menuName}>{menu?.menuName}</div>
-                  <div className={s.priceBox}>
-                    <div>{menu?.menuPrice}</div>
-                  </div>
                 </div>
-
-                <div>
-                  <div>작성자 : {postDetails.memberUsername}</div>
-                </div>
+                <UserIconWithText
+                  size="small"
+                  fontSize="small"
+                  color="black"
+                  imgSrc={profile?.imageUrl ?? PROFILE_IMG.DEFAULT_MALE}
+                  alt="profile-img"
+                >
+                  {postDetails?.memberUsername}
+                </UserIconWithText>
               </div>
-              <div className={s.review}>{menu?.menuContent}</div>
-              {postDetails.menus.length > 1 &&
-                currentMenuIndex < postDetails.menus.length - 1 && (
-                  <button type="button" onClick={goToNextMenu}>
-                    다음 메뉴 보기
-                  </button>
-                )}
+              <div className={s.menuInfoArea}>
+                <div className={s.menuName}>{menu?.menuName}</div>
+                <p className={s.price}>
+                  💰 {formatNumberToKRW(Number(menu?.menuPrice))}
+                </p>
+              </div>
             </div>
+            <div className={s.review}>{menu?.menuContent}</div>
+            {postDetails.menus.length > 1 &&
+              currentMenuIndex < postDetails.menus.length - 1 && (
+                <button type="button" onClick={goToNextMenu}>
+                  다음 메뉴 보기
+                </button>
+              )}
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

@@ -1,0 +1,44 @@
+@import '@/styles/variables/colors.scss';
+@import '@/styles/variables/textSize.scss';
+@import '@/styles/variables/fontWeight.scss';
+@import '@/styles/variables/zIndex.scss';
+
+.container {
+  position: fixed;
+  z-index: $header;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  padding: 0 24px;
+  height: 60px;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  background-color: transparent;
+
+  .wrapper {
+    width: 100%;
+
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    gap: 16px;
+
+    .backBtn {
+      background-color: transparent;
+
+      cursor: pointer;
+    }
+
+    .modifyBtn {
+      background-color: transparent;
+
+      cursor: pointer;
+    }
+  }
+}

@@ -4,12 +4,13 @@
 @import '@styles/variables/radius.scss';
 
 .circleIcon {
-  width: 56px;
-  height: 56px;
+  // width: 56px;
+  // height: 56px;
+  padding: 2px;
 
   background-color: transparent;
 
-  border: 1.5px solid $primaryOrange;
+  outline: 1.5px solid $primaryOrange;
   border-radius: 50%;
 
   display: flex;
@@ -45,13 +46,19 @@
 
   gap: 4px;
 
-  .smallUserName {
+  .smallName {
+    color: $white;
+    font-size: $textSmall;
+    font-weight: $medium;
+  }
+
+  .mediumName {
     color: $white;
     font-size: $textMedium;
     font-weight: $medium;
   }
 
-  .largeUserName {
+  .largeName {
     color: $white;
     font-size: $textMedium;
     font-weight: $medium;
