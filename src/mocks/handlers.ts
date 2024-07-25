@@ -102,6 +102,10 @@ export const handlers = [
 
     return HttpResponse.json(getStoresNotIncludeA());
   }),
+
+  http.get('/map/posts', () => {
+    return HttpResponse.json(getMockPostsOfStroe());
+  }),
 ];
 
 function getStoresIncludeA(): Store[] {
@@ -511,6 +515,81 @@ function getFollowings() {
       memberImageUrl: null,
       each: true,
       isLive: false,
+    },
+  ];
+}
+
+function getMockPostsOfStroe() {
+  return [
+    {
+      postId: 1,
+      memberUsername: '신짱구',
+      storeName: '김치찜',
+      postMainMenu: '김치',
+      menuImage: {
+        id: 1,
+        url: '/images/mock-food.png',
+      },
+      menuPrice: 1,
+      createdDate: '2024-07-25T14:40:32.916Z',
+      updatedDate: '2024-07-25T14:40:32.916Z',
+      category: 'KOREAN',
+    },
+    {
+      postId: 2,
+      memberUsername: '신짱구',
+      storeName: '김치찜',
+      postMainMenu: '김치',
+      menuImage: {
+        id: 1,
+        url: '/images/mock-food.png',
+      },
+      menuPrice: 1,
+      createdDate: '2024-07-25T14:40:32.916Z',
+      updatedDate: '2024-07-25T14:40:32.916Z',
+      category: 'KOREAN',
+    },
+    {
+      postId: 3,
+      memberUsername: '신짱구',
+      storeName: '김치찜',
+      postMainMenu: '김치',
+      menuImage: {
+        id: 1,
+        url: '/images/mock-food.png',
+      },
+      menuPrice: 1,
+      createdDate: '2024-07-25T14:40:32.916Z',
+      updatedDate: '2024-07-25T14:40:32.916Z',
+      category: 'KOREAN',
+    },
+    {
+      postId: 4,
+      memberUsername: '신짱구',
+      storeName: '김치찜',
+      postMainMenu: '김치',
+      menuImage: {
+        id: 1,
+        url: '/images/mock-food.png',
+      },
+      menuPrice: 1,
+      createdDate: '2024-07-25T14:40:32.916Z',
+      updatedDate: '2024-07-25T14:40:32.916Z',
+      category: 'KOREAN',
+    },
+    {
+      postId: 5,
+      memberUsername: '신짱구',
+      storeName: '김치찜',
+      postMainMenu: '김치',
+      menuImage: {
+        id: 1,
+        url: '/images/mock-food.png',
+      },
+      menuPrice: 1,
+      createdDate: '2024-07-25T14:40:32.916Z',
+      updatedDate: '2024-07-25T14:40:32.916Z',
+      category: 'KOREAN',
     },
   ];
 }
