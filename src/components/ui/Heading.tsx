@@ -28,6 +28,8 @@ export default function Heading({
       style={{
         fontSize,
         fontWeight: getFontWeight(fontWeight),
+        lineHeight: '150%',
+        letterSpacing: '-0.05em',
       }}
     >
       {title}

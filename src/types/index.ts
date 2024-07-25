@@ -1,3 +1,5 @@
+import { categoryMap } from '../constants/categoty';
+
 export interface LoginUserInputs {
   username: string;
   password: string;
@@ -69,3 +71,8 @@ export interface ProfileWithoutFollowResponse {
   username: string;
   name: string;
 }
+
+export type CategoriesKR = (typeof categoryMap)[keyof typeof categoryMap];
+export type CategoriesEN = keyof typeof categoryMap;
+export type CategoriesWithAllEN = CategoriesEN | 'ALL';
+export type CategoriesWithAllKR = CategoriesKR | '전부';

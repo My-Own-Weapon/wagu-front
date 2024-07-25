@@ -11,6 +11,7 @@ function UserVideoComponent({ streamManager }: Props) {
   return (
     <div
       style={{
+        position: 'relative',
         width: '100%',
       }}
     >

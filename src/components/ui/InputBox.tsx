@@ -1,6 +1,7 @@
 'use client';
 
-import { ChangeEventHandler, useId } from 'react';
+import { ChangeEventHandler, useEffect, useId, useRef } from 'react';
+import * as Icon from '@public/newDesign/index';
 import classNames from 'classnames';
 import s from './InputBox.module.scss';
 
@@ -34,6 +35,7 @@ export default function InputBox({
   onChange = undefined,
   readOnly = false,
 }: InputBoxProps) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const id = useId();
   const inputClassNames = classNames(
     {
@@ -43,9 +45,18 @@ export default function InputBox({
     className,
   );
   const labelClassNames = classNames({
-    [s.overwrapLabelOfFileInput]: type === 'file',
+    [s.fileLabel]: type === 'file',
     [s.label]: type !== 'file',
   });
+
+  useEffect(() => {
+    if (type === 'textarea' && textareaRef.current) {
+      /* auto로 갱신해줘야 글을 지웠을때 줄어듭니다. */
+      const $textarea = textareaRef.current;
+      $textarea.style.height = 'auto';
+      $textarea.style.height = `calc(${$textarea.scrollHeight}px - 48px)`;
+    }
+  }, [value, type]);
 
   const handleChange: ChangeEventHandler<
     HTMLInputElement | HTMLTextAreaElement
@@ -57,20 +68,23 @@ export default function InputBox({
 
   return (
     <div className={s.container}>
-      {(label || type === 'file') && (
+      {type === 'file' && (
         <label className={labelClassNames} htmlFor={id}>
-          {label}
+          <Icon.CameraSVG />
+          {label && <p className={s.labelText}>{label}</p>}
+        </label>
+      )}
+
+      {type !== 'file' && label && (
+        <label className={labelClassNames} htmlFor={id}>
+          <p className={s.labelText}>{label}</p>
         </label>
       )}
       {type === 'textarea' ? (
         <textarea
-          className={s.inputBoxs}
+          ref={textareaRef}
+          className={s.reviewInput}
           id={id}
-          style={{
-            width,
-            height,
-            padding: 16,
-          }}
           name={name}
           placeholder={placeholder}
           value={value}

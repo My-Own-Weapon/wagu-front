@@ -1,10 +1,10 @@
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css');
 @import url('https://cdn.jsdelivr.net/gh/toss/tossface/dist/tossface.css');
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css');
 
 :root {
   --mainBgColor: #ffffff;
   --mainBorderColor: #efefef;
-  --bgColor: #fffaf3;
+  --bgColor: #fff;
 }
 
 body {
@@ -28,6 +28,38 @@ body {
 
   width: 100dvw;
   height: 100dvh;
-
   background-color: var(--bgColor);
+}
+@media (min-width: 375px) {
+  html {
+    max-width: 410px;
+    height: 100dvh;
+
+    margin: 0 auto;
+
+    background-color: #ffd8c0;
+  }
+
+  body {
+    max-width: 410px;
+    height: 100dvh;
+
+    margin: 0 auto;
+
+    nav {
+      max-width: 410px;
+
+      margin: 0 auto;
+    }
+
+    header {
+      max-width: calc(410px - 48px);
+
+      margin: 0 auto;
+    }
+
+    nav {
+      max-width: 410px;
+    }
+  }
 }

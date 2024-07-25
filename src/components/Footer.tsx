@@ -2,7 +2,10 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useSelectedLayoutSegment } from 'next/navigation';
+import {
+  useSelectedLayoutSegment,
+  useSelectedLayoutSegments,
+} from 'next/navigation';
 
 import * as Icon from '@public/newDesign/nav/index';
 import { COLORS } from '@/constants/colors';
@@ -18,7 +21,13 @@ interface NavItem {
 
 export default function Footer() {
   const segment = useSelectedLayoutSegment();
-  if (segment === '(auth)' || segment === 'live') {
+  const segments = useSelectedLayoutSegments();
+
+  if (
+    segment === '(auth)' ||
+    segment === 'live' ||
+    segments.includes('write')
+  ) {
     return null;
   }
 
