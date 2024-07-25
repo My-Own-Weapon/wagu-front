@@ -19,7 +19,8 @@ export default function Header() {
     segment === '(auth)' ||
     segment === '(post)' ||
     segment === 'live' ||
-    path === '/map'
+    path === '/map' ||
+    path === '/share'
   ) {
     return null;
   }
@@ -41,14 +42,6 @@ export default function Header() {
         </Link>
       </div>
       <div className={s.navBtnArea}>
-        <Link href="/profile">
-          <Image
-            src="/newDesign/nav/user_profile.svg"
-            alt="heart-btn"
-            width={24}
-            height={24}
-          />
-        </Link>
         {segment !== 'search' ? (
           <Link href="/search">
             <Image
@@ -66,6 +59,14 @@ export default function Header() {
             }}
           />
         )}
+        <Link href="/profile">
+          <Image
+            src="/newDesign/nav/user_profile.svg"
+            alt="heart-btn"
+            width={24}
+            height={24}
+          />
+        </Link>
       </div>
     </header>
   );
