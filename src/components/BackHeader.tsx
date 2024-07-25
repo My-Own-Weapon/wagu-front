@@ -26,16 +26,16 @@ const headerConfig = {
 export default function BackHeader() {
   const segment = useSelectedLayoutSegment();
 
-  if (!segment || segment === 'entry') return null;
+  if (!segment || segment === 'entry' || segment === 'posts') return null;
 
   const { title, goto } = headerConfig[segment as keyof typeof headerConfig];
 
   return (
-    <div className={s.headerContainer}>
+    <header className={s.container}>
       <div className={s.wrapper}>
         <BackBtn goto={goto} />
         <h2 className={s.headerTitle}>{title}</h2>
       </div>
-    </div>
+    </header>
   );
 }

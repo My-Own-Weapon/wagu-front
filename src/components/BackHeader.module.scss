@@ -3,21 +3,23 @@
 @import '@/styles/variables/fontWeight.scss';
 @import '@/styles/variables/zIndex.scss';
 
-.headerContainer {
+.container {
   position: sticky;
   z-index: $header;
   top: 0;
+  left: 0;
+  right: 0;
 
-  width: 100%;
+  padding: 0 24px;
   height: 60px;
+  margin: 0;
 
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
 
-  background-color: rgba($bgColor, 0.5);
-  backdrop-filter: blur(10px);
+  background-color: $bgWhite;
 }
 
 .wrapper {
@@ -26,8 +28,6 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-
-  margin-left: 24px;
 
   gap: 16px;
 
