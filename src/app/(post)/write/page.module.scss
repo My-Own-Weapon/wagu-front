@@ -70,10 +70,6 @@
         @include flexCenter;
         gap: 20px;
 
-        @media (min-width: 375px) {
-          max-width: calc(410px - 48px);
-        }
-
         .addMenuBtn {
           width: 100%;
           height: 48px;
@@ -131,8 +127,7 @@
 
 @media (min-width: 375px) {
   .writeNavBar {
-    max-width: 410px;
-    height: 100dvh;
+    max-width: calc(410px - 48px);
 
     margin: 0 auto;
   }
