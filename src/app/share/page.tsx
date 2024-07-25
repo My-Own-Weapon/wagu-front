@@ -769,6 +769,19 @@ export default function SharePage() {
     fetchLiveStores();
   }, [voteWinStores]);
 
+  useEffect(() => {
+    if (!selectedStoreId) return;
+
+    const fetchLiveStores = async (selectedStoreId: number) => {
+      const streamers =
+        await apiService.fetchLiveOnStreamersOfStore(selectedStoreId);
+      console.log('streamers : ', streamers);
+      setStreamerFromStores(() => streamers);
+    };
+
+    fetchLiveStores(selectedStoreId);
+  }, [selectedStoreId]);
+
   // 투표가 시작되었습니다.
   if (isVoteStart) {
     return (
@@ -864,6 +877,9 @@ export default function SharePage() {
         <div className={s.mapContainer}>
           <div id="map" className={s.map} />
         </div>
+
+        <LiveFriends liveFriends={streamerFromStores} />
+
         <div className={s.postContainer}>
           <Post.Wrapper>
             <Post>
