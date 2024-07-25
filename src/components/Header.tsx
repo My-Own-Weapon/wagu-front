@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import {
+  usePathname,
   useSelectedLayoutSegment,
   useSelectedLayoutSegments,
 } from 'next/navigation';
@@ -12,10 +13,17 @@ import s from './Header.module.scss';
 export default function Header() {
   const segment = useSelectedLayoutSegment();
   const segments = useSelectedLayoutSegments();
+  const path = usePathname();
 
-  if (segment === '(auth)' || segment === '(post)' || segment === 'live') {
+  if (
+    segment === '(auth)' ||
+    segment === '(post)' ||
+    segment === 'live' ||
+    path === '/map'
+  ) {
     return null;
   }
+
   if (segments.length >= 2) {
     if (segments[segments.length - 1] === 'board') return null;
     const [, , postid] = segments;
