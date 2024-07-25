@@ -4,13 +4,11 @@
 @import '@styles/variables/textSize.scss';
 
 .container {
-  margin: 0 24px;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  gap: 20px;
+  gap: 16px;
 
   overflow: hidden;
 
@@ -21,14 +19,12 @@
 
     .title {
       color: $textWhite;
-      font-weight: $semiBold;
-      font-size: $textTitle;
+      font-weight: $bold;
+      font-size: $textLarge;
     }
   }
 
-  .friends {
-    padding: 12px 12px 10px 12px;
-
+  .friendsWrapper {
     display: flex;
     gap: 12px;
   }
