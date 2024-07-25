@@ -12,7 +12,7 @@ import s from './UserIcon.module.scss';
  * ✅ TODO: 전반적인 타입 정의가 미흡.
  */
 export interface UserIconProps {
-  size?: 'small' | 'medium' | 'large';
+  size?: 'xSmall' | 'small' | 'medium' | 'large';
   shape?: 'circle' | 'square';
   border?: string;
   fontSize?: 'small' | 'medium' | 'large';
@@ -35,6 +35,7 @@ export function UserIcon({
   });
 
   const sizeMap = {
+    xSmall: 24,
     small: 40,
     medium: 44,
     large: 48,
