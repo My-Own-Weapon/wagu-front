@@ -30,6 +30,7 @@ body {
   height: 100dvh;
   background-color: var(--bgColor);
 }
+
 @media (min-width: 375px) {
   html {
     max-width: 410px;
@@ -60,6 +61,8 @@ body {
 
     nav {
       max-width: 410px;
+
+      margin: 0 auto;
     }
   }
 }
