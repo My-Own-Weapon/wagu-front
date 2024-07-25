@@ -9,8 +9,7 @@ $iconHeight: 20px;
 
 @media (min-width: 375px) {
   .container {
-    max-width: 410px;
-    height: 100dvh;
+    max-width: calc(410px - 48px);
 
     margin: 0 auto;
   }
