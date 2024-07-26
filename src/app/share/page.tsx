@@ -463,7 +463,7 @@ export default function SharePage() {
     try {
       const result = await apiService.fetchVoteResults(sessionId);
 
-      setVoteWinStores(result);
+      setVoteWinStores(() => result);
     } catch (e) {
       if (e instanceof Error) {
         alert(e.message);
@@ -599,12 +599,13 @@ export default function SharePage() {
   };
 
   const handleMyVoteDoneClick = () => {
+    voteAllDone();
     broadcastImVoteDoneSIG();
     setDisableButton(true);
   };
 
-  const voteAllDone = () => {
-    fetchVoteResults();
+  const voteAllDone = async () => {
+    await fetchVoteResults();
     setIsVoteEnd(true);
     setIsVoteStart(false);
   };
@@ -786,6 +787,10 @@ export default function SharePage() {
 
     fetchLiveStores(selectedStoreId);
   }, [selectedStoreId]);
+
+  useEffect(() => {
+    console.log('------ win store', voteWinStores);
+  }, [voteWinStores]);
 
   // [ing 투표]
   if (isVoteStart) {
