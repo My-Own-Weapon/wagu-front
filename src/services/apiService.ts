@@ -68,6 +68,21 @@ class ApiService {
     return data;
   }
 
+  async logout() {
+    const res = await fetch(`${this.baseUrl}/logout`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
+    return res.text();
+  }
+
   async signup({
     username,
     password,
