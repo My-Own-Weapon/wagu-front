@@ -57,7 +57,7 @@ export default function LiveHeader({
             width={16}
             height={16}
           />
-          <p className={s.viewersCount}>30</p>
+          <p className={s.viewersCount}>4</p>
         </div>
         {!isStreamer && isLiveOn && (
           <button
