@@ -1,5 +1,6 @@
 @import url('https://cdn.jsdelivr.net/gh/toss/tossface/dist/tossface.css');
 @import '@styles/mixins/index.scss';
+@import '@styles/variables/colors.scss';
 @import '@styles/variables/fontWeight.scss';
 @import '@styles/variables/textSize.scss';
 
@@ -7,6 +8,8 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+
+  background-color: $bgWhite;
 
   padding-bottom: 80px;
 
