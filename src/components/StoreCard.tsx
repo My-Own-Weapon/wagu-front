@@ -7,6 +7,7 @@ import { MouseEvent, MouseEventHandler, useState } from 'react';
 
 import { UserIcon } from '@/components/UserIcon';
 import ImageFill from '@/components/ui/ImageFill';
+import Image from 'next/image';
 
 import s from './StoreCard.module.scss';
 
@@ -34,13 +35,7 @@ export default function StoreCards({ stores }: { stores: Store[] }) {
 export interface VotedStoreCardProps {
   storeId: number;
   storeName: string;
-  menuImage: {
-    id: number;
-    url: string;
-  };
-  nobutton: boolean;
-  handleAddVote: (e: MouseEvent) => void;
-  handleDeleteVote: (e: MouseEvent) => void;
+  handleRemoveVotedStore: MouseEventHandler<HTMLButtonElement>;
 }
 
 export interface AddedStore {
@@ -77,25 +72,33 @@ export function StoreCard({ storeId, storeName, menuImage, postCount }: Store) {
   );
 }
 
-export function VotedStoreCards({ stores }: { stores: VotedStoreCardProps[] }) {
+export function VotedStoreCards({
+  stores,
+  handleRemoveVotedStore,
+}: {
+  stores: VotedStoreCardProps[];
+  handleRemoveVotedStore: MouseEventHandler<HTMLButtonElement>;
+}) {
   console.log('in voted stores :', stores);
 
   return (
-    <ul className={s.votedStoresContainer}>
+    <ul className={s.votedStoreCardsContainer}>
       {stores.map((store) => (
-        <VotedStoreCard key={store.storeId} {...store} />
+        <VotedStoreCard
+          key={store.storeId}
+          {...store}
+          handleRemoveVotedStore={handleRemoveVotedStore}
+        />
       ))}
     </ul>
   );
 }
 
-export function VotedStoreCard({
+/* ✅ TODO: 리사이저블한 SVG 만들기 */
+function VotedStoreCard({
   storeId,
   storeName,
-  menuImage,
-  nobutton,
-  handleAddVote,
-  handleDeleteVote,
+  handleRemoveVotedStore,
 }: VotedStoreCardProps) {
   // const [isVoteDone, setIsVoteDone] = useState<boolean>(false);
   // const { url } = menuImage;
@@ -109,36 +112,14 @@ export function VotedStoreCard({
         imgSrc="/profile/profile-default-icon-male.svg"
         alt="profile-img"
       />
-
-      {/* {!nobutton && (
-          <div>
-            {isVoted ? (
-              <button
-                className={s.deleteVoteBtn}
-                data-store-id={storeId}
-                type="button"
-                onClick={(e) => {
-                  handleDeleteVote(e);
-                  setIsVoted(false);
-                }}
-              >
-                투표 삭제
-              </button>
-            ) : (
-              <button
-                className={s.addVoteBtn}
-                type="button"
-                data-store-id={storeId}
-                onClick={(e) => {
-                  handleAddVote(e);
-                  setIsVoted(true);
-                }}
-              >
-                투표 추가
-              </button>
-            )}
-          </div>
-        )} */}
+      <button
+        className={s.removeBtn}
+        type="button"
+        data-store-id={storeId}
+        onClick={handleRemoveVotedStore}
+      >
+        remove
+      </button>
     </li>
   );
 }
