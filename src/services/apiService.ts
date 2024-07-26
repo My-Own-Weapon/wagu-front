@@ -645,6 +645,23 @@ class ApiService {
     return res.json();
   }
 
+  async fetchConnectionPeopleCount(sessionId: string): Promise<number> {
+    const res = await fetch(
+      `${this.baseUrl}/api/sessions/${sessionId}/connections`,
+      {
+        method: 'GET',
+        credentials: 'include',
+      },
+    );
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
+    return res.json();
+  }
+
   /* AI auto review */
   async fetchAIAutoReview({
     category,
