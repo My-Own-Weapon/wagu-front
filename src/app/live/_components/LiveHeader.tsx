@@ -57,7 +57,8 @@ export default function LiveHeader({
             width={16}
             height={16}
           />
-          <p className={s.viewersCount}>30</p>
+          {/* ✅ TODO: back api와 연결 및 갱신로직 구현 */}
+          <p className={s.viewersCount}>4</p>
         </div>
         {!isStreamer && isLiveOn && (
           <button

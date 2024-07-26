@@ -175,7 +175,7 @@ export default function AddressInput({
                   </li>
                 ))
               ) : (
-                <p>검색결과가 없습니다.</p>
+                <p className={s.resultText}>검색결과가 없습니다.</p>
               )}
             </ul>
           </div>
