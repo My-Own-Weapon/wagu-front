@@ -14,7 +14,7 @@ interface Props {
     | 'bold'
     | 'extraBold'
     | 'black';
-  color: 'white' | 'black';
+  color?: 'white' | 'black';
   title: string;
 }
 
