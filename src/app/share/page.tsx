@@ -19,17 +19,11 @@
 import React, { useEffect, useState, useRef, MouseEventHandler } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { OpenVidu, Subscriber } from 'openvidu-browser';
-import Header from '@/components/Header';
+
 import Link from 'next/link';
 import Image from 'next/image';
 
-import {
-  Store,
-  StoreCard,
-  VotableCards,
-  VotedStoreCard,
-  VotedStoreCards,
-} from '@/components/StoreCard';
+import { Store, VotableCards, VotedStoreCards } from '@/components/StoreCard';
 import LiveFriends from '@/components/LiveFriendsList';
 import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
 import { localStorageApi } from '@/services/localStorageApi';
@@ -308,7 +302,7 @@ export default function SharePage() {
       e.preventDefault();
 
       const voteList = await apiService.fetchStoresInVoteList(sessionId);
-      setVotedStores(() => voteList);
+      setVotedStores([...voteList]);
     });
 
     session.on('signal:voteStart', (e: any) => {
@@ -482,7 +476,7 @@ export default function SharePage() {
       const selectedStoreDetails = await apiService.fetchStoreDetails(storeId);
       const succMsg = await apiService.addStoreToVoteList(sessionId, storeId);
       const voteList = await apiService.fetchStoresInVoteList(sessionId);
-      setVotedStores(() => voteList);
+      setVotedStores([...voteList]);
 
       alert(succMsg);
       broadcastUpdateVoteListSIG();
@@ -516,11 +510,17 @@ export default function SharePage() {
   };
 
   // [BEFORE 투표] 투표가 ⛔️시작되기전⛔️에 가게 카드에서 투표버튼 ⭐️ 핸들러
-  const deleteStoreFromVoteList = async (url: string, storeId: string) => {
-    if (!sessionId || !storeId) {
+  const deleteStoreFromVoteList: MouseEventHandler<HTMLButtonElement> = async (
+    e,
+  ) => {
+    if (!sessionId) {
       alert('세션 ID 또는 store id가 없습니다.');
       return;
     }
+
+    const { storeId } = e.currentTarget.dataset;
+
+    if (!storeId) return;
 
     try {
       const succMsg = await apiService.deleteStoreFromVoteList(
@@ -946,7 +946,10 @@ export default function SharePage() {
                 color="black"
                 title="투표에 추가된 STORE"
               />
-              <VotedStoreCards stores={votedStores} />
+              <VotedStoreCards
+                stores={votedStores}
+                handleRemoveVotedStore={deleteStoreFromVoteList}
+              />
               {/* <div className={s.voteListContainer}>
                 {votedStores.map((store) => {
                   return (
