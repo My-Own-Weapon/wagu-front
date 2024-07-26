@@ -824,7 +824,6 @@ export default function SharePage() {
         <ResultHeader />
         <div className={s.endVoteContainer}>
           <div className={s.top}>
-            <LiveFriends liveFriends={streamerFromStores} />
             <div className={s.winningMsgArea}>
               <KingSVG />
               <Heading
@@ -982,20 +981,22 @@ function WinStoreCard({
   const { url } = menuImage;
 
   return (
-    <div className={s.winStoreCardContainer}>
-      <ImageFill
-        src={url}
-        id={String(storeId)}
-        alt="vote-win-store-img"
-        height="280px"
-        fill
-        borderRadius="24px"
-      />
-      <div className={s.titleArea}>
-        <p className={s.storeName}>{storeName}</p>
-        <p className={s.menuName}>{menuName}</p>
+    <Link className={s.winStoreCardAnchor} href={`/store/${storeId}`}>
+      <div className={s.winStoreCardContainer}>
+        <ImageFill
+          src={url}
+          id={String(storeId)}
+          alt="vote-win-store-img"
+          height="280px"
+          fill
+          borderRadius="24px"
+        />
+        <div className={s.titleArea}>
+          <p className={s.storeName}>{storeName}</p>
+          <p className={s.menuName}>{menuName}</p>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
