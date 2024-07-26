@@ -46,6 +46,7 @@ interface UserProfile {
   imageUrl: string;
   username: string;
   name: string;
+  isVoted: boolean;
 }
 interface UserLocation {
   userId: string;
@@ -62,6 +63,10 @@ export interface VoteStoreInfo {
     url: string;
   };
   postCount: number;
+}
+
+interface UsersProfile {
+  [key: string]: UserProfile;
 }
 
 const SEND_LOCATION_INTERVAL = 10000;
@@ -124,10 +129,10 @@ export default function SharePage() {
       const { imageUrl, username, name } = profile;
 
       localStorageApi.setName(name);
-      setMyProfile({ imageUrl, username, name });
+      setMyProfile({ imageUrl, username, name, isVoted: false });
       setUsersProfile((prev) => {
         const updated = new Map(prev.entries());
-        updated.set(username, { imageUrl, username, name });
+        updated.set(username, { imageUrl, username, name, isVoteEnd: false });
         return updated;
       });
     };
@@ -203,7 +208,7 @@ export default function SharePage() {
       const { imageUrl, username, name } = profile;
       localStorageApi.setName(name);
 
-      sendUserData({ imageUrl, username, name });
+      sendUserData({ imageUrl, username, name, isVoted: false });
     };
 
     fetchcurrUserProfile();
@@ -322,7 +327,16 @@ export default function SharePage() {
 
     session.on('signal:voteDone', (e: any) => {
       e.preventDefault();
+      const { userName } = JSON.parse(e.data);
 
+      setUsersProfile((prev) => {
+        const updated = new Map(prev.entries());
+        const user = updated.get(userName);
+        if (user) {
+          updated.set(userName, { ...user, isVoted: true });
+        }
+        return updated;
+      });
       setVoteEndCnt((voteCount) => voteCount + 1);
     });
 
@@ -572,7 +586,10 @@ export default function SharePage() {
   const broadcastImVoteDoneSIG = () => {
     // if (!session) throw new Error(MSG.NO_SESSION_INSTANCE);
     if (session) {
+      const userName = localStorageApi.getUserName();
+
       session.signal({
+        data: JSON.stringify({ userName }),
         to: [],
         type: 'voteDone',
       });
@@ -787,16 +804,39 @@ export default function SharePage() {
       <>
         <ShareHeader />
         <div className={s.startVoteContainer}>
-          {/* 하위 태그 생성시 map이 안사라짐 */}
-          <div className={s.voteDoneCountMsg}>
-            <Heading
-              as="h2"
-              fontSize="18px"
-              fontWeight="semiBold"
-              color="black"
-              title={`${voteEndCnt}명이 투표를 완료했어요 !`}
-            />
+          <div className={s.userContainer}>
+            {[...usersProfile].map(
+              ([username, { imageUrl, name, isVoted }]) => {
+                return (
+                  <div key={username} className={s.votingUsers}>
+                    {isVoted && (
+                      <Image
+                        src="/newDesign/vote/vote_done.svg"
+                        alt="vote-done"
+                        width={54}
+                        height={25}
+                      />
+                    )}
+                    <UserIconWithText
+                      shape="circle"
+                      size="large"
+                      fontSize="medium"
+                      color="black"
+                      imgSrc={
+                        !!imageUrl
+                          ? imageUrl
+                          : '/profile/profile-default-icon-female.svg'
+                      }
+                      alt="profile-icon"
+                    >
+                      {name}
+                    </UserIconWithText>
+                  </div>
+                );
+              },
+            )}
           </div>
+
           <div className={s.startVoteWrapper}>
             <VotableCards
               stores={votedStores}

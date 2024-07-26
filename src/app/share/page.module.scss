@@ -114,11 +114,31 @@
 .startVoteContainer {
   background-color: $white;
 
-  .voteDoneCountMsg {
-    padding: 40px 24px 24px 24px;
+  @include flexColumnStart;
+  gap: 24px;
+
+  .userContainer {
+    width: auto;
+
+    padding: 0 24px;
+    @include flexRowStart;
+    gap: 8px;
+
+    .votingUsers {
+      width: 60px;
+      height: 106px;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 4px;
+    }
   }
 
   .startVoteWrapper {
+    width: calc(100% - 48px);
+
     padding: 0 24px 140px 24px;
   }
 }
