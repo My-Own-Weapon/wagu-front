@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-undef */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
 /* eslint-disable eqeqeq */
@@ -18,8 +19,12 @@
 import React, { useEffect, useState, useRef, MouseEventHandler } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { OpenVidu, Subscriber } from 'openvidu-browser';
+import Header from '@/components/Header';
+import Link from 'next/link';
+import Image from 'next/image';
 
 import {
+  Store,
   StoreCard,
   VotableCards,
   VotedStoreCard,
@@ -32,6 +37,8 @@ import { apiService } from '@/services/apiService';
 import { StoreResponse } from '@/types';
 import PostsOfMap from '@/app/map/_components/PostsOfMap';
 import Heading from '@/components/ui/Heading';
+import ImageFill from '@/components/ui/ImageFill';
+import { KingSVG } from '@public/newDesign/vote';
 
 import s from './page.module.scss';
 
@@ -171,8 +178,8 @@ export default function SharePage() {
             mapInstance.panTo(
               new window.kakao.maps.LatLng(37.5035685391056, 127.0416472341673),
             );
-          }, 500);
-        }, 1000);
+          }, 300);
+        }, 500);
 
         window.kakao.maps.event.addListener(mapInstance, 'idle', () => {
           const mapBounds = mapInstance.getBounds();
@@ -780,19 +787,20 @@ export default function SharePage() {
     fetchLiveStores(selectedStoreId);
   }, [selectedStoreId]);
 
-  // 투표가 시작되었습니다.
+  // [ing 투표]
   if (isVoteStart) {
     return (
-      <main className={s.container}>
+      <div className={s.startVoteContainer}>
         {/* 하위 태그 생성시 map이 안사라짐 */}
-        {/* <div className={s.afterVoteContainer}> */}
-        <div className={s.votableCardsWrapper}>
+        <div className={s.startVoteWrapper}>
           <VotableCards
             stores={votedStores}
             handleAddVote={handleVoteStoreClick}
             handleDeleteVote={handleCancelVote}
           />
+
           {/* {votedStores.map((store) => {
+
             return (
               <VotedStoreCard
                 key={store.storeId}
@@ -802,21 +810,7 @@ export default function SharePage() {
               />
             );
           })} */}
-          {/* </div> */}
-          <div
-            style={{
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              fontSize: '16px',
-              color: '#212025',
-              fontWeight: 'bold',
-            }}
-          >
-            투표 종료한 사람 수 : {voteEndCnt}
-          </div>
-          <div className={s.urlButtonContainer}>
+          <div className={s.navUpperBtnContainer}>
             <button
               className={s.myVoteDoneBtn}
               type="button"
@@ -828,44 +822,52 @@ export default function SharePage() {
             </button>
           </div>
         </div>
-      </main>
-    );
-  } else if (isVoteEnd) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-          alignItems: 'center',
-          alignContent: 'center',
-          gap: '10px',
-        }}
-      >
-        {/* {liveStores.length > 0 ? (
-          <LiveFriends liveFriends={liveStores} />
-        ) : ( */}
-        <LiveFriends liveFriends={streamerFromStores} />
-        {/* )} */}
-        {voteWinStores.map(
-          ({ storeId, storeName, menuImage, postCount, menuName }) => {
-            return (
-              <StoreCard
-                key={storeId}
-                storeId={storeId}
-                storeName={storeName}
-                menuImage={menuImage}
-                menuName={menuName}
-                postCount={postCount}
-              />
-            );
-          },
-        )}
       </div>
     );
-  } else {
+  } else if (isVoteEnd) {
+    /* [end 개표] 결과 발표 */
     return (
-      <main className={s.container}>
+      <>
+        <ResultHeader />
+        <div className={s.endVoteContainer}>
+          <div className={s.top}>
+            <LiveFriends liveFriends={streamerFromStores} />
+            <div className={s.winningMsgArea}>
+              <KingSVG />
+              <Heading
+                as="h3"
+                color="white"
+                fontSize="24px"
+                fontWeight="medium"
+                title={`${voteWinStores[0].storeName}이 우승했어요 !`}
+              />
+            </div>
+          </div>
+          <div className={s.bottom}>
+            <div className={s.endVoteWrapper}>
+              {voteWinStores.map(
+                ({ storeId, storeName, menuImage, postCount, menuName }) => {
+                  return (
+                    <WinStoreCard
+                      key={storeId}
+                      storeId={storeId}
+                      storeName={storeName}
+                      menuImage={menuImage}
+                      menuName={menuName}
+                      postCount={postCount}
+                    />
+                  );
+                },
+              )}
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  } else {
+    /* [before 개표] 투표에 추가 첫화면 */
+    return (
+      <div className={s.addVoteContainer}>
         <div className={s.top}>
           <div id="map" className={s.map} />
           <div className={s.userContainer}>
@@ -907,7 +909,7 @@ export default function SharePage() {
             selectedStoreId={selectedStore?.storeId}
             posts={postsOfStore}
           />
-          <div className={s.urlButtonContainer}>
+          <div className={s.navUpperBtnContainer}>
             <button
               className={s.addVoteListBtn}
               type="button"
@@ -984,7 +986,64 @@ export default function SharePage() {
             />
           ))}
         </div>
-      </main>
+      </div>
     );
   }
+}
+
+function WinStoreCard({
+  storeId,
+  storeName,
+  menuImage,
+  postCount,
+  menuName,
+}: Store) {
+  const { url } = menuImage;
+
+  return (
+    <div className={s.winStoreCardContainer}>
+      <ImageFill
+        src={url}
+        id={String(storeId)}
+        alt="vote-win-store-img"
+        height="280px"
+        fill
+        borderRadius="24px"
+      />
+      <div className={s.titleArea}>
+        <p className={s.storeName}>{storeName}</p>
+        <p className={s.menuName}>{menuName}</p>
+      </div>
+    </div>
+  );
+}
+
+function ResultHeader() {
+  return (
+    <header className={s.resultHeaderContainer}>
+      <div>
+        <Link href="/">
+          <p className={s.logoTitle}>WAGU BOOK</p>
+        </Link>
+      </div>
+      <div className={s.navBtnArea}>
+        <Link href="/search">
+          <Image
+            src="/newDesign/nav/search_glass.svg"
+            alt="search-btn"
+            width={24}
+            height={24}
+          />
+        </Link>
+        <Link href="/profile">
+          <Image
+            src="/newDesign/nav/user_profile.svg"
+            alt="heart-btn"
+            width={24}
+            height={24}
+          />
+        </Link>
+      </div>
+    </header>
+  );
 }
