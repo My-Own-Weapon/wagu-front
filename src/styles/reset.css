@@ -78,6 +78,9 @@ a {
   background-color: transparent;
   text-decoration: none;
   color: black;
+
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 /**
@@ -150,6 +153,8 @@ sup {
 
 img {
   border-style: none;
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 /* Forms
@@ -387,6 +392,10 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+button {
+  cursor: pointer;
 }
 
 h1,
