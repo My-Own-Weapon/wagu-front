@@ -7,7 +7,6 @@ import { MouseEvent, MouseEventHandler, useState } from 'react';
 
 import { UserIcon } from '@/components/UserIcon';
 import ImageFill from '@/components/ui/ImageFill';
-import Image from 'next/image';
 
 import s from './StoreCard.module.scss';
 
@@ -79,8 +78,6 @@ export function VotedStoreCards({
   stores: VotedStoreCardProps[];
   handleRemoveVotedStore: MouseEventHandler<HTMLButtonElement>;
 }) {
-  console.log('in voted stores :', stores);
-
   return (
     <ul className={s.votedStoreCardsContainer}>
       {stores.map((store) => (
@@ -118,7 +115,7 @@ function VotedStoreCard({
         data-store-id={storeId}
         onClick={handleRemoveVotedStore}
       >
-        remove
+        x
       </button>
     </li>
   );

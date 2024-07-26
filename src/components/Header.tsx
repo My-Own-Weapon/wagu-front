@@ -1,16 +1,23 @@
 'use client';
 
+import { MouseEventHandler } from 'react';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import {
   usePathname,
+  useRouter,
   useSelectedLayoutSegment,
   useSelectedLayoutSegments,
 } from 'next/navigation';
 
+import { localStorageApi } from '@/services/localStorageApi';
+import { apiService } from '@/services/apiService';
+
 import s from './Header.module.scss';
 
 export default function Header() {
+  const router = useRouter();
   const segment = useSelectedLayoutSegment();
   const segments = useSelectedLayoutSegments();
   const path = usePathname();
@@ -30,6 +37,18 @@ export default function Header() {
     const [, , postid] = segments;
     if (!!postid) return null;
   }
+
+  const handleClickLogout: MouseEventHandler<HTMLButtonElement> = async () => {
+    try {
+      await apiService.logout();
+      localStorageApi.setName('');
+      router.push('/login');
+    } catch (e) {
+      if (e instanceof Error) {
+        alert(e.message);
+      }
+    }
+  };
 
   return (
     <header
@@ -59,14 +78,35 @@ export default function Header() {
             }}
           />
         )}
-        <Link href="/profile">
+        <div className={s.profileContainer}>
           <Image
+            className={s.profileIcon}
             src="/newDesign/nav/user_profile.svg"
-            alt="heart-btn"
+            alt="profile-btn"
             width={24}
             height={24}
           />
-        </Link>
+          <div className={s.dropdownMenu}>
+            <Link className={s.myPage} href="/profile">
+              마이페이지
+            </Link>
+            <div className={s.logout}>
+              <button
+                type="button"
+                className={s.logoutBtn}
+                onClick={handleClickLogout}
+              >
+                <p className={s.text}>로그아웃</p>
+              </button>
+              <Image
+                src="/newDesign/sign_out.svg"
+                alt="arrow-down"
+                width={20}
+                height={20}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </header>
   );
