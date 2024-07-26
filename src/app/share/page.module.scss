@@ -4,7 +4,7 @@
 @import '@/styles/variables/fontWeight.scss';
 @import '@/styles/mixins/index.scss';
 
-.container {
+.addVoteContainer {
   position: relative;
   width: 100%;
   height: 100%;
@@ -51,7 +51,7 @@
 
     border-radius: 24px 24px 0;
 
-    .urlButtonContainer {
+    .navUpperBtnContainer {
       position: fixed;
       z-index: $footer;
       bottom: 0;
@@ -106,115 +106,84 @@
   }
 }
 
-.voteListContainer {
-  width: calc(100% - 24px);
+/* [befroe 개표] */
+.startVoteContainer {
+  background-color: $white;
 
-  margin-top: 16px;
-  padding: 0 12px;
-
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  column-gap: 16px;
-  row-gap: 12px;
-}
-
-.mapContainer {
-  width: 100%;
-  padding: 0 24px;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.postContainer {
-  width: 100%;
-  padding-top: 27px;
-}
-
-.voteContainer {
-  display: flex;
-  margin: auto;
-}
-
-.afterVoteContainer {
-  width: 100%;
-  margin-top: 36px;
-
-  .votableCardsWrapper {
-    padding: 0 24px;
+  .startVoteWrapper {
+    padding: 40px 24px 140px 24px;
   }
 }
 
-.voteAddButton {
-  width: 150px;
-  height: 56px;
-  background: #ff9900;
-  border: none;
-  border-radius: 8px;
-  font-family: 'Roboto';
-  font-size: 16px;
-  color: #ffffff;
-  margin: 37px 16px;
-  overflow: auto;
-}
-
-.voteRemoveContainer {
-  margin: auto;
-}
-
-.voteRemoveButton {
-  width: 150px;
-  height: 56px;
-  background: #ff9900;
-  border: none;
-  border-radius: 8px;
-  font-family: 'Roboto';
-  font-size: 16px;
-  color: #ffffff;
-  margin: 37px 16px;
-  overflow: auto;
-}
-
-.voteStartContainer {
-  margin: auto;
-}
-
-.voteStartButton {
-  width: 311px;
-  height: 56px;
-  background: #ff9900;
-  border: none;
-  border-radius: 8px;
-  font-family: 'Roboto';
-  font-size: 16px;
-  color: #ffffff;
-  margin: 37px 16px;
-  overflow: auto;
-}
-
-.userContainer {
-  width: 100%;
-
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 12px;
-}
-
-.userProfileContainer {
+/* 투표 종료 (우승 가게 페이지) */
+.endVoteContainer {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding-right: 10px;
-}
-.userName {
-  padding-top: 3px;
-  font-size: x-large;
+  gap: 20px;
+
+  background-color: $bgBrown;
+
+  .top {
+    height: 200px;
+    background-color: $bgBrown;
+
+    .winningMsgArea {
+      @include flexCenter;
+      gap: 8px;
+    }
+  }
+
+  .bottom {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 20px;
+
+    padding: 24px 24px 80px 24px;
+
+    background-color: $white;
+
+    border-radius: 32px 32px 0 0;
+
+    .endVoteWrapper {
+      @include flexColumnCenter;
+      gap: 4px;
+
+      // padding: 24px 24px 0 24px;
+
+      border-radius: 24px 24px 0;
+    }
+  }
 }
 
-.urlButtonContainer {
+.winStoreCardContainer {
+  width: 100%;
+
+  @include flexColumnStart;
+  gap: 12px;
+
+  .titleArea {
+    @include flexColumnStart;
+    gap: 8px;
+
+    .storeName {
+      color: $textTitleColor;
+      font-size: $textTitle;
+      font-weight: $bold;
+      line-height: 150%;
+    }
+
+    .menuName {
+      color: $textTitleGray;
+      font-size: $textLarge;
+      font-weight: $medium;
+      line-height: 150%;
+    }
+  }
+}
+
+/* nav bar 위의 button */
+.navUpperBtnContainer {
   position: fixed;
   z-index: $footer;
   bottom: 0;
@@ -244,5 +213,30 @@
     font-size: $textLarge;
     font-weight: $semiBold;
     letter-spacing: -0.025em;
+  }
+}
+
+.resultHeaderContainer {
+  position: sticky;
+
+  padding: 0 24px;
+  height: 60px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background-color: $bgBrown;
+
+  .logoTitle {
+    color: $primaryOrange;
+    font-family: 'NATS', sans-serif;
+    font-size: $textTitle;
+    font-weight: $regular;
+  }
+
+  .navBtnArea {
+    @include flexCenter;
+    gap: 16px;
   }
 }

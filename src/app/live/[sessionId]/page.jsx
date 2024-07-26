@@ -157,7 +157,7 @@ export default function StreamingPage({ params }) {
     });
   }, []);
 
-  const handleLeaveSessionClick = useCallback(async () => {
+  const handleLeaveSessionClick = useCallback(() => {
     if (session) {
       session.disconnect();
     }
@@ -168,9 +168,7 @@ export default function StreamingPage({ params }) {
     setMessage('');
     setMessages([]);
 
-    apiService.removeLiveSession(sessionId);
-
-    router.push('/');
+    router.back();
   }, [session]);
 
   const handleSwitchCameraClick = useCallback(async () => {
@@ -222,6 +220,7 @@ export default function StreamingPage({ params }) {
   return (
     <>
       <LiveHeader
+        sessionId={sessionId}
         isLiveOn={isLiveOn}
         isStreamer={isStreamer}
         streamerName="왕도끼"
