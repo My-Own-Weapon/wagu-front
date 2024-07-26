@@ -37,7 +37,7 @@ export default function Footer() {
         <Link className={s.wrapper} key={`footer-${id}`} href={href}>
           <div className={s.iconArea}>
             <IconComponent fill={COLORS.ICON_FILL} />
-            <p className={s.text}>{text}</p>
+            {text && <p className={s.text}>{text}</p>}
           </div>
         </Link>
       ))}

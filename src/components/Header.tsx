@@ -34,7 +34,7 @@ export default function Header() {
   return (
     <header
       className={s.container}
-      style={segment === 'search' ? { backgroundColor: '#fffaf3' } : {}}
+      style={segment === 'search' ? { backgroundColor: '#1c0a00' } : {}}
     >
       <div>
         <Link href="/">
