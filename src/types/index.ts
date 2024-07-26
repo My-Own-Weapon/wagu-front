@@ -34,9 +34,9 @@ export interface AddPostProps {
 }
 
 export interface PostOfStoreResponse {
-  storeName: string;
   postId: number;
   postMainMenu: string;
+  storeName: string;
   category: CategoriesEN;
   menuImage: PostImage;
   menuPrice: number;
@@ -86,4 +86,15 @@ export interface StoreResponse {
   posx: number;
   posy: number;
   liveStore: boolean;
+}
+
+export interface VotedStoreResponse {
+  storeId: number;
+  storeName: string;
+  menuImage: {
+    id: number;
+    url: string;
+  };
+  postCount: number;
+  menuName: string;
 }

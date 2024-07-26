@@ -33,6 +33,7 @@ import PostsOfMap from '@/app/map/_components/PostsOfMap';
 import Heading from '@/components/ui/Heading';
 import ImageFill from '@/components/ui/ImageFill';
 import { KingSVG } from '@public/newDesign/vote';
+import { usePostsOfStore, useSelectedStore, useVotedStore } from '@/stores';
 
 import s from './page.module.scss';
 
@@ -94,11 +95,17 @@ export default function SharePage() {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
 
   const [usersProfile, setUsersProfile] = useState(new Map());
-  const [selectedStore, setSelectedStore] = useState<StoreResponse | null>();
+  // before zustand
+  // const [selectedStore, setSelectedStore] = useState<StoreResponse | null>();
+  const { selectedStore, setSelectedStore } = useSelectedStore();
 
-  const [votedStores, setVotedStores] = useState<any[]>([]);
+  // before zustand
+  // const [votedStores, setVotedStores] = useState<any[]>([]);
+  const { votedStores, setVotedStores } = useVotedStore();
   const [selectedStoreId, setSelectedStoreId] = useState<any>();
-  const [postsOfStore, setPostsOfStore] = useState<any[]>([]);
+  // before zustand
+  // const [postsOfStore, setPostsOfStore] = useState<any[]>([]);
+  const { postsOfStore, setPostsOfStore } = usePostsOfStore();
 
   const [isVoteStart, setIsVoteStart] = useState<boolean>(false);
   const [isVoteEnd, setIsVoteEnd] = useState<boolean>(false);
@@ -548,7 +555,9 @@ export default function SharePage() {
         storeId,
       );
       setVotedStores(
-        votedStores.filter(({ storeId: curStoreId }) => curStoreId != storeId),
+        votedStores.filter(
+          ({ storeId: curStoreId }) => curStoreId != Number(storeId),
+        ),
       );
       broadcastUpdateVoteListSIG();
       alert(succMsg);

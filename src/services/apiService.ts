@@ -4,6 +4,7 @@ import {
   MapVertexes,
   ProfileWithoutFollowResponse,
   SignupDetails,
+  VotedStoreResponse,
 } from '@/types';
 
 interface ProfileDetailsResponse {
@@ -21,17 +22,6 @@ interface ShareMapPublishSessionResponse {
 
 interface AIAutoReviewResponse {
   menuContent: string;
-}
-
-interface VotedStoreResponse {
-  storeId: number;
-  storeName: string;
-  menuImage: {
-    id: number;
-    url: string;
-  };
-  postCount: number;
-  menuName: string;
 }
 
 type SuccessMessageResponse = Promise<string>;
