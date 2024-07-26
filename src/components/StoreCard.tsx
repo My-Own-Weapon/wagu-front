@@ -7,6 +7,7 @@ import { MouseEvent, MouseEventHandler, useState } from 'react';
 
 import { UserIcon } from '@/components/UserIcon';
 import ImageFill from '@/components/ui/ImageFill';
+import { VotedStoreResponse } from '@/types';
 
 import s from './StoreCard.module.scss';
 
@@ -31,9 +32,7 @@ export default function StoreCards({ stores }: { stores: Store[] }) {
   );
 }
 
-export interface VotedStoreCardProps {
-  storeId: number;
-  storeName: string;
+export interface VotedStoreCardProps extends VotedStoreResponse {
   handleRemoveVotedStore: MouseEventHandler<HTMLButtonElement>;
 }
 
@@ -75,7 +74,7 @@ export function VotedStoreCards({
   stores,
   handleRemoveVotedStore,
 }: {
-  stores: VotedStoreCardProps[];
+  stores: VotedStoreResponse[];
   handleRemoveVotedStore: MouseEventHandler<HTMLButtonElement>;
 }) {
   return (

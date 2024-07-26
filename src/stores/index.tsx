@@ -1,25 +1,38 @@
+import {
+  PostOfStoreResponse,
+  StoreResponse,
+  VotedStoreResponse,
+} from '@/types';
 import { create } from 'zustand';
 
-interface UseVoteDoneCountStore {
-  voteDoneCount: number;
-  voteDoneUserNames: string[];
-  increaseVoteDoneCount: () => void;
-  addVoteDoneUserName: (userName: string) => void;
-  setVoteDoneUserNames: (userNames: string[]) => void;
+interface UseSelectedStore {
+  selectedStore: StoreResponse | null;
+  setSelectedStore: (selectedStore: StoreResponse) => void;
 }
 
-export const useVoteDoneCountStore = create<UseVoteDoneCountStore>((set) => ({
-  voteDoneCount: 1,
-  voteDoneUserNames: [],
-  increaseVoteDoneCount: () => {
-    set((state) => ({ voteDoneCount: state.voteDoneCount + 1 }));
+interface UsePostsOfStore {
+  postsOfStore: PostOfStoreResponse[];
+  setPostsOfStore: (postsOfStore: PostOfStoreResponse[]) => void;
+}
+
+interface UseVotedStore {
+  votedStores: VotedStoreResponse[];
+  setVotedStores: (votedStores: VotedStoreResponse[]) => void;
+}
+
+export const useSelectedStore = create<UseSelectedStore>((set) => ({
+  selectedStore: null,
+  setSelectedStore: (selectedStore: StoreResponse) => set({ selectedStore }),
+}));
+
+export const usePostsOfStore = create<UsePostsOfStore>((set) => ({
+  postsOfStore: [],
+  setPostsOfStore: (postsOfStore: PostOfStoreResponse[]) => {
+    set({ postsOfStore });
   },
-  addVoteDoneUserName: (userName: string) => {
-    set((state) => ({
-      voteDoneUserNames: [...state.voteDoneUserNames, userName],
-    }));
-  },
-  setVoteDoneUserNames: (userNames: string[]) => {
-    set({ voteDoneUserNames: [...userNames] });
-  },
+}));
+
+export const useVotedStore = create<UseVotedStore>((set) => ({
+  votedStores: [],
+  setVotedStores: (votedStores: VotedStoreResponse[]) => set({ votedStores }),
 }));
