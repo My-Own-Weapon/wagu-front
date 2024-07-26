@@ -55,7 +55,7 @@ export default function PostsOfMap({
         }) ? (
           posts?.map(({ menuImage, postId }) => {
             const { url } = menuImage;
-            return <PostCard key={postId} imgUrl={url} />;
+            return <PostCard key={postId} imgUrl={url} postId={postId} />;
           })
         ) : (
           <p className={s.noPostsText}>등록된 리뷰가 없어요...</p>
@@ -65,17 +65,19 @@ export default function PostsOfMap({
   );
 }
 
-function PostCard({ imgUrl }: { imgUrl: string }) {
+function PostCard({ imgUrl, postId }: { imgUrl: string; postId: number }) {
   return (
     <li>
-      <ImageFill
-        src={imgUrl}
-        width="120px"
-        height="120px"
-        fill
-        alt="post-img"
-        borderRadius="4px"
-      />
+      <Link href={`/posts/${postId}`}>
+        <ImageFill
+          src={imgUrl}
+          width="120px"
+          height="120px"
+          fill
+          alt="post-img"
+          borderRadius="4px"
+        />
+      </Link>
     </li>
   );
 }

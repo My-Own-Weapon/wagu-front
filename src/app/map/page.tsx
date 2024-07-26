@@ -9,7 +9,7 @@
 import { useEffect, useState } from 'react';
 import LiveFriends from '@/components/LiveFriendsList';
 import VoteUrlModal from '@/components/VoteUrlModal';
-import { MapVertexes, PostOfStoreResponse } from '@/types';
+import { MapVertexes, PostOfStoreResponse, StoreResponse } from '@/types';
 import { apiService } from '@/services/apiService';
 
 import PostsOfMap from '@/app/map/_components/PostsOfMap';
@@ -21,15 +21,6 @@ declare global {
   interface Window {
     kakao: any;
   }
-}
-
-interface StoreResponse {
-  storeName: string;
-  address: string;
-  storeId: number;
-  posx: number;
-  posy: number;
-  liveStore: boolean;
 }
 
 interface Streamer {
@@ -161,8 +152,6 @@ export default function MapPage() {
   const fetchPosts = async (storeId: number) => {
     const posts = await apiService.fetchPostsOfStore(storeId);
 
-    console.log(posts);
-
     setPosts(posts);
   };
 
@@ -196,7 +185,6 @@ export default function MapPage() {
             <LiveFriends liveFriends={streamers} />
           </>
         )}
-
         <PostsOfMap
           selectedStoreName={selectedStore?.storeName}
           selectedStoreId={selectedStore?.storeId}
