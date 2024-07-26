@@ -1,6 +1,8 @@
 import Link from 'next/link';
 
 import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
+import { usePathname } from 'next/navigation';
+import { COLORS } from '@/constants/colors';
 
 import s from './LiveFriendsList.module.scss';
 
@@ -12,24 +14,18 @@ export interface Friend {
   storeName: string;
 }
 
-export default function LiveFriends({
-  liveFriends,
-}: {
+interface Props {
   liveFriends: Friend[];
-}) {
+}
+
+export default function LiveFriends({ liveFriends }: Props) {
   const UserIconWithText = WithText<UserIconProps>(UserIcon);
+  const path = usePathname();
 
   return (
     <div className={s.container}>
-      <div className={s.titleArea}>
-        <p className={s.title}>
-          {liveFriends.length > 0
-            ? '방송중인 친구가 있어요 !'
-            : '방송중인 친구가 없어요...'}
-        </p>
-      </div>
       {liveFriends.length > 0 ? (
-        <ul className={s.friends}>
+        <ul className={s.friendsWrapper}>
           {liveFriends.map(({ profileImage, sessionId, userName }) => (
             <Link href={`/live/${sessionId}`} key={sessionId}>
               <li>
@@ -37,6 +33,8 @@ export default function LiveFriends({
                   shape="circle"
                   size="large"
                   fontSize="large"
+                  color={path === '/' ? 'white' : 'black'}
+                  border={`1.5px solid ${COLORS.PRIMARY_ORANGE}`}
                   imgSrc={
                     !!profileImage
                       ? profileImage
@@ -50,27 +48,25 @@ export default function LiveFriends({
             </Link>
           ))}
         </ul>
-      ) : (
-        <Cat />
-      )}
+      ) : null}
     </div>
   );
 }
 
-function Cat() {
-  return (
-    <pre
-      className={s.catAnimation}
-      style={{
-        margin: 0,
-        fontFamily: 'monospace',
-        whiteSpace: 'pre',
-        lineHeight: '1',
-      }}
-    >
-      {' '}
-      /\_/\
-      <br />( 8.8 )<br /> &gt; ^ &lt;
-    </pre>
-  );
-}
+// function Cat() {
+//   return (
+//     <pre
+//       className={s.catAnimation}
+//       style={{
+//         margin: 0,
+//         fontFamily: 'monospace',
+//         whiteSpace: 'pre',
+//         lineHeight: '1',
+//       }}
+//     >
+//       {' '}
+//       /\_/\
+//       <br />( 8.8 )<br /> &gt; ^ &lt;
+//     </pre>
+//   );
+// }

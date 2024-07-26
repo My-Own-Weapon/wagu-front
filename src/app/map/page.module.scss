@@ -9,62 +9,65 @@
   position: relative;
 
   width: 100%;
-  overflow: auto;
-
-  padding-bottom: 80px;
+  height: 100%;
 
   display: flex;
   flex-direction: column;
 
-  background: $bgColor;
-}
+  background: $bgWhite;
 
-.title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  .top {
+    .map {
+      position: absolute;
 
-  span {
-    font-size: 20px;
-    color: #f4b02b;
+      width: 100%;
+      height: 480px;
+    }
   }
-}
 
-.postContainer {
-  padding-top: 27px;
-}
+  .bottom {
+    position: absolute;
+    z-index: 1;
+    top: 424px;
+    left: 0;
+    right: 0;
 
-.mapContainer {
-  width: 100%;
-  flex: 0 1;
-  padding: 18px 23px 16px 23px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-}
+    padding: 24px 24px 152px 24px;
 
-.map {
-  width: 100%;
-  height: 315px;
-  border: 1px solid #ff9900;
-  border-radius: 8px;
-  overflow: hidden;
-  padding-bottom: 16px;
-}
+    @include flexColumnStart;
+    gap: 24px;
 
-.urlContainer {
-  padding: 0 24px;
-  margin-top: 16px;
+    background-color: $white;
 
-  .createUrlButton {
-    width: 100%;
-    height: 56px;
-    background: #ff9900;
-    border: none;
-    border-radius: 8px;
+    border-radius: 24px 24px 0;
+  }
 
-    color: $white;
-    font-size: $textMedium;
-    font-weight: $medium;
+  .urlButtonContainer {
+    position: fixed;
+    z-index: $footer;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    max-width: calc(410px - 48px);
+    height: 60px;
+
+    margin: 0 auto 60px;
+    padding: 16px 24px 0 24px;
+
+    background-color: $white;
+
+    .createUrlButton {
+      width: 100%;
+      height: 48px;
+      background: $primaryOrange;
+      border: none;
+      border-radius: 8px;
+
+      color: $white;
+      font-size: $textLarge;
+      font-weight: $semiBold;
+      letter-spacing: -0.025em;
+    }
   }
 }

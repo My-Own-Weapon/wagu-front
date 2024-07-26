@@ -102,6 +102,10 @@ export const handlers = [
 
     return HttpResponse.json(getStoresNotIncludeA());
   }),
+
+  http.get('/map/posts', () => {
+    return HttpResponse.json(getMockPostsOfStroe());
+  }),
 ];
 
 function getStoresIncludeA(): Store[] {
@@ -114,6 +118,7 @@ function getStoresIncludeA(): Store[] {
         url: '/images/mock-food.png',
       },
       postCount: 1,
+      menuName: '김치찜',
     },
     {
       storeId: 2,
@@ -123,6 +128,7 @@ function getStoresIncludeA(): Store[] {
         url: '/images/mock-food.png',
       },
       postCount: 1,
+      menuName: '김치찜',
     },
     {
       storeId: 3,
@@ -132,6 +138,7 @@ function getStoresIncludeA(): Store[] {
         url: '/images/mock-food.png',
       },
       postCount: 1,
+      menuName: '김치찜',
     },
     {
       storeId: 4,
@@ -141,6 +148,7 @@ function getStoresIncludeA(): Store[] {
         url: '/images/mock-food.png',
       },
       postCount: 1,
+      menuName: '김치찜',
     },
     {
       storeId: 5,
@@ -150,6 +158,7 @@ function getStoresIncludeA(): Store[] {
         url: '/images/mock-food.png',
       },
       postCount: 1,
+      menuName: '김치찜',
     },
   ];
 }
@@ -164,6 +173,7 @@ function getStoresNotIncludeA(): Store[] {
         url: '/images/mock-food.png',
       },
       postCount: 1,
+      menuName: '김치찜',
     },
     {
       storeId: 2,
@@ -173,6 +183,7 @@ function getStoresNotIncludeA(): Store[] {
         url: '/images/mock-food.png',
       },
       postCount: 1,
+      menuName: '김치찜',
     },
     {
       storeId: 3,
@@ -182,6 +193,7 @@ function getStoresNotIncludeA(): Store[] {
         url: '/images/mock-food.png',
       },
       postCount: 1,
+      menuName: '김치찜',
     },
     {
       storeId: 4,
@@ -191,6 +203,7 @@ function getStoresNotIncludeA(): Store[] {
         url: '/images/mock-food.png',
       },
       postCount: 1,
+      menuName: '김치찜',
     },
     {
       storeId: 5,
@@ -200,6 +213,7 @@ function getStoresNotIncludeA(): Store[] {
         url: '/images/mock-food.png',
       },
       postCount: 1,
+      menuName: '김치찜',
     },
   ];
 }
@@ -511,6 +525,81 @@ function getFollowings() {
       memberImageUrl: null,
       each: true,
       isLive: false,
+    },
+  ];
+}
+
+function getMockPostsOfStroe() {
+  return [
+    {
+      postId: 1,
+      memberUsername: '신짱구',
+      storeName: '김치찜',
+      postMainMenu: '김치',
+      menuImage: {
+        id: 1,
+        url: '/images/mock-food.png',
+      },
+      menuPrice: 1,
+      createdDate: '2024-07-25T14:40:32.916Z',
+      updatedDate: '2024-07-25T14:40:32.916Z',
+      category: 'KOREAN',
+    },
+    {
+      postId: 2,
+      memberUsername: '신짱구',
+      storeName: '김치찜',
+      postMainMenu: '김치',
+      menuImage: {
+        id: 1,
+        url: '/images/mock-food.png',
+      },
+      menuPrice: 1,
+      createdDate: '2024-07-25T14:40:32.916Z',
+      updatedDate: '2024-07-25T14:40:32.916Z',
+      category: 'KOREAN',
+    },
+    {
+      postId: 3,
+      memberUsername: '신짱구',
+      storeName: '김치찜',
+      postMainMenu: '김치',
+      menuImage: {
+        id: 1,
+        url: '/images/mock-food.png',
+      },
+      menuPrice: 1,
+      createdDate: '2024-07-25T14:40:32.916Z',
+      updatedDate: '2024-07-25T14:40:32.916Z',
+      category: 'KOREAN',
+    },
+    {
+      postId: 4,
+      memberUsername: '신짱구',
+      storeName: '김치찜',
+      postMainMenu: '김치',
+      menuImage: {
+        id: 1,
+        url: '/images/mock-food.png',
+      },
+      menuPrice: 1,
+      createdDate: '2024-07-25T14:40:32.916Z',
+      updatedDate: '2024-07-25T14:40:32.916Z',
+      category: 'KOREAN',
+    },
+    {
+      postId: 5,
+      memberUsername: '신짱구',
+      storeName: '김치찜',
+      postMainMenu: '김치',
+      menuImage: {
+        id: 1,
+        url: '/images/mock-food.png',
+      },
+      menuPrice: 1,
+      createdDate: '2024-07-25T14:40:32.916Z',
+      updatedDate: '2024-07-25T14:40:32.916Z',
+      category: 'KOREAN',
     },
   ];
 }

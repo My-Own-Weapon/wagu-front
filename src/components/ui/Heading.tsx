@@ -1,3 +1,4 @@
+import { COLORS } from '@/constants/colors';
 import s from './Heading.module.scss';
 
 interface Props {
@@ -13,6 +14,7 @@ interface Props {
     | 'bold'
     | 'extraBold'
     | 'black';
+  color?: 'white' | 'black';
   title: string;
 }
 
@@ -20,6 +22,7 @@ export default function Heading({
   as: Component,
   fontSize,
   fontWeight,
+  color = 'black',
   title,
 }: Props) {
   return (
@@ -30,6 +33,7 @@ export default function Heading({
         fontWeight: getFontWeight(fontWeight),
         lineHeight: '150%',
         letterSpacing: '-0.05em',
+        color: color === 'white' ? COLORS.FONT.WHITE : COLORS.FONT.BLACK,
       }}
     >
       {title}

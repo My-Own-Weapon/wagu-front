@@ -157,7 +157,7 @@ export default function StreamingPage({ params }) {
     });
   }, []);
 
-  const handleLeaveSessionClick = useCallback(() => {
+  const handleLeaveSessionClick = useCallback(async () => {
     if (session) {
       session.disconnect();
     }
@@ -167,6 +167,8 @@ export default function StreamingPage({ params }) {
     setPublisher(undefined);
     setMessage('');
     setMessages([]);
+
+    apiService.removeLiveSession(sessionId);
 
     router.push('/');
   }, [session]);

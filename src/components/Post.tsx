@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 import ImageFill from '@/components/ui/ImageFill';
 import useDragScroll from '@/hooks/useDragScroll';
-import { PostCardProps } from '@/types';
+import { PostOfStoreResponse } from '@/types';
 
 import s from './Post.module.scss';
 
@@ -34,13 +34,17 @@ Post.Title = function Title({ title }: PostTitleProps) {
   );
 };
 
-Post.PostCards = function PostList({ posts }: { posts: PostCardProps[] }) {
+Post.PostCards = function PostList({
+  posts,
+}: {
+  posts: PostOfStoreResponse[];
+}) {
   const ref = useDragScroll();
 
   return (
     <ul className={s.cardsContainer} ref={ref}>
       {posts.length > 0
-        ? posts.map((post: PostCardProps) => (
+        ? posts.map((post: PostOfStoreResponse) => (
             <Post.PostCard key={post.postId} {...post} />
           ))
         : '등록된 포스트가 없습니다.'}
@@ -54,7 +58,7 @@ Post.PostCard = function PostCard({
   menuImage,
   postMainMenu,
   createdDate,
-}: PostCardProps) {
+}: PostOfStoreResponse) {
   if (!menuImage) return null;
 
   const [date] = createdDate.split('T');

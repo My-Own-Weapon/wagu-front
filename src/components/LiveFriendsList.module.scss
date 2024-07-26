@@ -2,33 +2,18 @@
 @import '@styles/variables/radius.scss';
 @import '@styles/variables/fontWeight.scss';
 @import '@styles/variables/textSize.scss';
+@import '@styles/mixins/index.scss';
 
 .container {
-  margin: 0 24px;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  gap: 20px;
+  gap: 16px;
 
   overflow: hidden;
 
-  .titleArea {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-
-    .title {
-      color: $textWhite;
-      font-weight: $semiBold;
-      font-size: $textTitle;
-    }
-  }
-
-  .friends {
-    padding: 12px 12px 10px 12px;
-
+  .friendsWrapper {
     display: flex;
     gap: 12px;
   }

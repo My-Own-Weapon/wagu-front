@@ -6,16 +6,17 @@
 .circleIcon {
   // width: 56px;
   // height: 56px;
-  padding: 2px;
 
   background-color: transparent;
-
-  outline: 1.5px solid $primaryOrange;
-  border-radius: 50%;
 
   display: flex;
   justify-content: center;
   align-items: center;
+
+  padding: 3px;
+
+  border: 1.5px solid $primaryOrange;
+  border-radius: 50%;
 
   cursor: pointer;
 
