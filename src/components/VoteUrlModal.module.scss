@@ -1,21 +1,9 @@
-.modal {
-  box-sizing: border-box;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  right: auto;
-  bottom: auto;
-  transform: translate(-50%, -50%);
-  background: linear-gradient(
-    180deg,
-    rgba(255, 253, 251, 0.675) 0%,
-    rgba(239, 239, 239, 0.45) 100%
-  );
-  border: 1px solid #d6d6d6;
-  border-radius: 8px;
-  z-index: 1000; 
-  padding: 20px; 
-}
+@import '@styles/mixins/index.scss';
+@import '@styles/variables/zIndex.scss';
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/textSize.scss';
+@import '@styles/variables/radius.scss';
 
 .overlay {
   position: fixed;
@@ -23,37 +11,100 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(3px);
+  z-index: $modal;
 }
 
-.modalContent {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+.modal {
+  position: fixed;
+  z-index: $modal;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 
-.closeButton {
-  align-self: flex-end;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
+  width: 320px;
+  box-sizing: border-box;
 
-.urlBox {
-  background: #00c4b3;
-  color: white;
-  padding: 10px;
-  border-radius: 5px;
-  margin: 20px 0;
-  cursor: pointer;
-}
+  padding: 24px 24px 64px;
 
-.shareButton {
-  background: #ffe812;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
+  background: linear-gradient(
+    180deg,
+    rgba(188, 188, 188, 0.85) 0%,
+    rgba(150, 150, 150, 0.65) 100%
+  );
+
+  border: 1px solid $gray300;
+  border-radius: $radiusMedium;
+
+  .modalWrapper {
+    .closeButton {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+
+      background-color: transparent;
+
+      cursor: pointer;
+    }
+
+    .contentArea {
+      width: 100%;
+
+      margin-top: 40px;
+
+      @include flexColumnCenter;
+      gap: 32px;
+
+      .titleArea {
+        @include flexColumnCenter;
+        gap: 12px;
+
+        .subTitle {
+          font-size: $textSmall;
+          font-weight: $regular;
+          color: $textSub-content;
+        }
+      }
+
+      .urlBox {
+        padding: 12px 24px;
+
+        background-color: $mint;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+        border: 0.5px solid $gray400;
+        border-radius: $radiusMedium;
+
+        font-size: $textLarge;
+        font-weight: $regular;
+        color: $white;
+
+        text-align: center;
+
+        cursor: pointer;
+      }
+
+      .shareButton {
+        @include flexCenter;
+        gap: 4px;
+
+        width: 100%;
+        height: 56px;
+
+        background: #ffe812;
+
+        border-radius: $radiusMedium;
+        border: none;
+
+        cursor: pointer;
+
+        .shareText {
+          font-size: $textSmall;
+          font-weight: $medium;
+          color: $textContent;
+        }
+      }
+    }
+  }
 }

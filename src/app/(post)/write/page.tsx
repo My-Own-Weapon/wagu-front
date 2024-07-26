@@ -21,6 +21,7 @@ import { AddressSearchDetails, CategoriesEN } from '@/types';
 import Heading from '@/components/ui/Heading';
 import CategorySelect from '@/app/(post)/write/_component/CategorySelect';
 import Spinner from '@/app/(post)/write/_component/Spinnner';
+import { StarAISVG } from '@public/newDesign';
 
 import s from './page.module.scss';
 
@@ -362,7 +363,7 @@ export default function BoardPage() {
                   type="button"
                   onClick={handleFetchAIAutoReview}
                 >
-                  리뷰 자동 완성
+                  <StarAISVG />
                 </button>
                 <InputBox
                   height="200px"
