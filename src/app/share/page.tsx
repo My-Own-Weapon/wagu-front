@@ -46,6 +46,7 @@ interface UserProfile {
   imageUrl: string;
   username: string;
   name: string;
+  isVoted: boolean;
 }
 interface UserLocation {
   userId: string;
@@ -62,6 +63,10 @@ export interface VoteStoreInfo {
     url: string;
   };
   postCount: number;
+}
+
+interface UsersProfile {
+  [key: string]: UserProfile;
 }
 
 const SEND_LOCATION_INTERVAL = 10000;
@@ -89,10 +94,7 @@ export default function SharePage() {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
 
   const [usersProfile, setUsersProfile] = useState(new Map());
-  //
   const [selectedStore, setSelectedStore] = useState<StoreResponse | null>();
-  const [posts, setPosts] = useState<any[]>([]);
-  //
 
   const [votedStores, setVotedStores] = useState<any[]>([]);
   const [selectedStoreId, setSelectedStoreId] = useState<any>();
@@ -104,6 +106,10 @@ export default function SharePage() {
   const [voteWinStores, setVoteWinStores] = useState<VoteStoreInfo[]>([]);
   const [disableButton, setDisableButton] = useState<boolean>(false);
   const [streamerFromStores, setStreamerFromStores] = useState<any[]>([]);
+  const [subscribersCount, setSubscribersCount] = useState<number>(1);
+
+  const [myProfile, setMyProfile] = useState<UserProfile | null>(null);
+  const [connectionPeopleCount, setConnectionPeopleCount] = useState<number>(1);
 
   useEffect(() => {
     console.log('--- subscriber 배열 :', subscribers);
@@ -120,16 +126,13 @@ export default function SharePage() {
     const fetchcurrUserProfile = async () => {
       const userName = localStorageApi.getUserName() as string;
       const profile = await apiService.fetchProfileWithoutFollow(userName);
-
-      console.log('apiService profile', profile);
-
       const { imageUrl, username, name } = profile;
-      localStorageApi.setName(name);
 
-      // sendUserData({ imageUrl, username, name });
+      localStorageApi.setName(name);
+      setMyProfile({ imageUrl, username, name, isVoted: false });
       setUsersProfile((prev) => {
         const updated = new Map(prev.entries());
-        updated.set(username, { imageUrl, username, name });
+        updated.set(username, { imageUrl, username, name, isVoteEnd: false });
         return updated;
       });
     };
@@ -205,7 +208,7 @@ export default function SharePage() {
       const { imageUrl, username, name } = profile;
       localStorageApi.setName(name);
 
-      sendUserData({ imageUrl, username, name });
+      sendUserData({ imageUrl, username, name, isVoted: false });
     };
 
     fetchcurrUserProfile();
@@ -220,6 +223,7 @@ export default function SharePage() {
       );
 
       if (sessionId) {
+        console.log('------ session 접속');
         joinSessionAndPatchAudioTag(sessionId);
       }
     }
@@ -245,35 +249,47 @@ export default function SharePage() {
   }, []);
 
   useEffect(() => {
-    if (voteEndCnt == subscribers.length + 1) {
+    if (voteEndCnt === subscribers.length + 1) {
       voteAllDone();
     }
   }, [voteEndCnt]);
 
-  const joinSession = async (sessionId: string) => {
-    console.log('--- join session !!!');
+  useEffect(() => {
+    console.log('--- 세션에 연결된 사람 수 :', connectionPeopleCount);
+  }, [connectionPeopleCount]);
 
+  const joinSession = async (sessionId: string) => {
     const OV = new OpenVidu();
     setOV(OV);
     const session = OV.initSession();
     setSession(session);
 
     session.on('streamCreated', (event: any) => {
+      const fetchSubscribersCount = async () => {
+        const count = await apiService.fetchConnectionPeopleCount(sessionId);
+
+        setConnectionPeopleCount(() => count);
+      };
+
+      fetchSubscribersCount();
+
       const { clientData } = JSON.parse(event.stream.connection.data);
       const userName = localStorageApi.getUserName();
       if (clientData === userName) return;
 
-      //   let flag = false;
-
-      //   [...usersProfile].forEach(([key, vale]) => {
-      //     console.log('---- user name ', key, vale);
-      //     if (key === clientData) {
-      //       flag = true;
-      //     }
-      //   });
-
-      //   if (flag) return;
-      //   const subscriber = session.subscribe(event.stream, undefined);
+      /**
+       * let flag = false;
+       *
+       * [...usersProfile].forEach(([key, vale]) => {
+       *   console.log('---- user name ', key, vale);
+       *   if (key === clientData) {
+       *     flag = true;
+       *   }
+       * });
+       *
+       * if (flag) return;
+       * const subscriber = session.subscribe(event.stream, undefined);
+       */
 
       const subscriber = session.subscribe(event.stream, undefined);
 
@@ -282,8 +298,6 @@ export default function SharePage() {
 
     session.on('signal:userLocation', (event: any) => {
       const userLocation = JSON.parse(event.data);
-
-      console.log('userLocation : ', userLocation);
 
       setUserLocations((prevLocations) => [...prevLocations, userLocation]);
       updateUserMarker(userLocation);
@@ -313,15 +327,23 @@ export default function SharePage() {
 
     session.on('signal:voteDone', (e: any) => {
       e.preventDefault();
+      const { userName } = JSON.parse(e.data);
 
+      setUsersProfile((prev) => {
+        const updated = new Map(prev.entries());
+        const user = updated.get(userName);
+        if (user) {
+          updated.set(userName, { ...user, isVoted: true });
+        }
+        return updated;
+      });
       setVoteEndCnt((voteCount) => voteCount + 1);
     });
 
     session.on('signal:userData', async (e: any) => {
       const userDetail = JSON.parse(e.data);
-      console.log('signal userData', userDetail);
-      usersProfile.set(userDetail.username, userDetail);
 
+      usersProfile.set(userDetail.username, userDetail);
       setUsersProfile((prev) => {
         const updated = new Map(prev.entries());
         updated.set(userDetail.username, userDetail);
@@ -349,8 +371,6 @@ export default function SharePage() {
   };
 
   const joinSessionAndPatchAudioTag = async (sessionId: string) => {
-    // console.log('---------- join session ----------', i++);
-
     if (sessionId) {
       await joinSession(sessionId);
 
@@ -566,7 +586,10 @@ export default function SharePage() {
   const broadcastImVoteDoneSIG = () => {
     // if (!session) throw new Error(MSG.NO_SESSION_INSTANCE);
     if (session) {
+      const userName = localStorageApi.getUserName();
+
       session.signal({
+        data: JSON.stringify({ userName }),
         to: [],
         type: 'voteDone',
       });
@@ -599,7 +622,6 @@ export default function SharePage() {
   };
 
   const handleMyVoteDoneClick = () => {
-    voteAllDone();
     broadcastImVoteDoneSIG();
     setDisableButton(true);
   };
@@ -629,23 +651,16 @@ export default function SharePage() {
     setPublisher(() => null);
   };
 
-  useEffect(() => {
-    console.log(isVoteStart);
-  }, [isVoteStart]);
-
   const updateUserMarker = ({ userId: username, lat, lng }: UserLocation) => {
     const markerPosition = new window.kakao.maps.LatLng(lat, lng);
     let overlay = userMarkers.current.get(username);
+    const profileImg = usersProfile.get(username)?.imageUrl;
+    const imageSrc = profileImg || '/profile/profile-default-icon-male.svg';
+    const currentLevel = map.getLevel();
+
     // const name = localStorageApi.getName();
     // const userName = localStorageApi.getUserName();
     // console.log('name : ', name);
-    console.log('userNAme : ', username);
-    const profileImg = usersProfile.get(username)?.imageUrl;
-    console.log(profileImg);
-    console.log(usersProfile);
-
-    const imageSrc = profileImg || '/profile/profile-default-icon-male.svg';
-    const currentLevel = map.getLevel();
 
     const content = document.createElement('div');
     content.style.width = '40px';
@@ -678,22 +693,18 @@ export default function SharePage() {
       const { lat, lng, level } = target.dataset;
       const movePosition = new window.kakao.maps.LatLng(lat, lng);
 
-      // console.log('e.target : ', e.target);
-      // console.log('e.target.lat:', lat, 'e.target.lng:', lng);
       // map.setLevel(level, {
       //   anchor: movePosition,
       //   animate: { duration: 1000 },
       // });
-
       // map.setCenter(movePostion);
-
-      // const movePosition = new window.kakao.maps.LatLng(lat, lng);
-      map.panTo(movePosition);
       // map.setLevel(level);
       // map.setLevel(4, {
       //   anchor: movePosition,
       //   animate: { duration: 1000 },
       // });
+      // const movePosition = new window.kakao.maps.LatLng(lat, lng);
+      map.panTo(movePosition);
     };
 
     if (overlay) {
@@ -713,7 +724,6 @@ export default function SharePage() {
   // 내 프로필을 SIG으로 subscriber에게 보냄
   const sendUserData = ({ imageUrl, username, name }: UserProfile) => {
     // if (!session) throw new Error(MSG.NO_SESSION_INSTANCE);
-    console.log(imageUrl);
 
     if (session) {
       console.log('세션있음');
@@ -781,41 +791,72 @@ export default function SharePage() {
     const fetchLiveStores = async (selectedStoreId: number) => {
       const streamers =
         await apiService.fetchLiveOnStreamersOfStore(selectedStoreId);
-      console.log('streamers : ', streamers);
+
       setStreamerFromStores(() => streamers);
     };
 
     fetchLiveStores(selectedStoreId);
   }, [selectedStoreId]);
 
-  useEffect(() => {
-    console.log('------ win store', voteWinStores);
-  }, [voteWinStores]);
-
   // [ing 투표]
   if (isVoteStart) {
     return (
-      <div className={s.startVoteContainer}>
-        {/* 하위 태그 생성시 map이 안사라짐 */}
-        <div className={s.startVoteWrapper}>
-          <VotableCards
-            stores={votedStores}
-            handleAddVote={handleVoteStoreClick}
-            handleDeleteVote={handleCancelVote}
-          />
-          <div className={s.navUpperBtnContainer}>
-            <button
-              className={s.myVoteDoneBtn}
-              type="button"
-              onClick={handleMyVoteDoneClick}
-              // ✅ TODO: 주석을 해제해야합니다.
-              // disabled={disable}
-            >
-              나의 투표 종료
-            </button>
+      <>
+        <ShareHeader />
+        <div className={s.startVoteContainer}>
+          <div className={s.userContainer}>
+            {[...usersProfile].map(
+              ([username, { imageUrl, name, isVoted }]) => {
+                return (
+                  <div key={username} className={s.votingUsers}>
+                    {isVoted && (
+                      <Image
+                        src="/newDesign/vote/vote_done.svg"
+                        alt="vote-done"
+                        width={54}
+                        height={25}
+                      />
+                    )}
+                    <UserIconWithText
+                      shape="circle"
+                      size="large"
+                      fontSize="medium"
+                      color="black"
+                      imgSrc={
+                        !!imageUrl
+                          ? imageUrl
+                          : '/profile/profile-default-icon-female.svg'
+                      }
+                      alt="profile-icon"
+                    >
+                      {name}
+                    </UserIconWithText>
+                  </div>
+                );
+              },
+            )}
+          </div>
+
+          <div className={s.startVoteWrapper}>
+            <VotableCards
+              stores={votedStores}
+              handleAddVote={handleVoteStoreClick}
+              handleDeleteVote={handleCancelVote}
+            />
+            <div className={s.navUpperBtnContainer}>
+              <button
+                className={s.myVoteDoneBtn}
+                type="button"
+                onClick={handleMyVoteDoneClick}
+                // ✅ TODO: 주석을 해제해야합니다.
+                // disabled={disable}
+              >
+                나의 투표 종료
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </>
     );
   } else if (isVoteEnd) {
     /* [end 개표] 결과 발표 */
@@ -831,7 +872,7 @@ export default function SharePage() {
                 color="white"
                 fontSize="24px"
                 fontWeight="medium"
-                title={`${voteWinStores[0].storeName}이 우승했어요 !`}
+                title={`${voteWinStores[0]?.storeName}이 우승했어요 !`}
               />
             </div>
           </div>
@@ -1025,6 +1066,54 @@ function ResultHeader() {
             height={24}
           />
         </Link>
+      </div>
+    </header>
+  );
+}
+
+function ShareHeader() {
+  return (
+    <header className={s.sharePageHeaderContainer}>
+      <div>
+        <Link href="/">
+          <p className={s.logoTitle}>WAGU BOOK</p>
+        </Link>
+      </div>
+      <div className={s.navBtnArea}>
+        <Link href="/search">
+          <Image
+            src="/newDesign/nav/search_glass_gray.svg"
+            alt="search-btn"
+            width={24}
+            height={24}
+          />
+        </Link>
+
+        <div className={s.profileContainer}>
+          <Image
+            className={s.profileIcon}
+            src="/newDesign/nav/profile_gray.svg"
+            alt="profile-btn"
+            width={24}
+            height={24}
+          />
+          <div className={s.dropdownMenu}>
+            <Link className={s.myPage} href="/profile">
+              마이페이지
+            </Link>
+            <div className={s.logout}>
+              <button type="button" className={s.logoutBtn}>
+                <p className={s.text}>로그아웃</p>
+              </button>
+              <Image
+                src="/newDesign/sign_out.svg"
+                alt="arrow-down"
+                width={20}
+                height={20}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </header>
   );
