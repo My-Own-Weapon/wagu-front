@@ -5,10 +5,12 @@ import Image from 'next/image';
 import { MouseEventHandler } from 'react';
 
 import { UserIcon } from '@/components/UserIcon';
+import { apiService } from '@/services/apiService';
 
 import s from './LiveHeader.module.scss';
 
 interface Props {
+  sessionId: string;
   isLiveOn: boolean;
   streamerName: string;
   streamerProfileImage: string;
@@ -18,6 +20,7 @@ interface Props {
 }
 
 export default function LiveHeader({
+  sessionId,
   isLiveOn,
   streamerName,
   streamerProfileImage,
@@ -39,15 +42,9 @@ export default function LiveHeader({
         <p className={s.streamerName}>{streamerName}</p>
       </div>
       <div className={s.buttonsWrapper}>
-        {isStreamer && (
-          <StreamerButtons
-            onLeaveSession={onLeaveSession}
-            onSwitchCamera={onSwitchCamera}
-          />
-        )}
         {isLiveOn && (
           <div className={s.liveFlagBox}>
-            <p className={s.liveFlagText}>Live!</p>
+            <p className={s.liveFlagText}>Live !</p>
           </div>
         )}
         <div className={s.viewerCountArea}>
@@ -74,26 +71,32 @@ export default function LiveHeader({
             />
           </button>
         )}
+        {isStreamer && (
+          <StreamerButtons
+            sessionId={sessionId}
+            onLeaveSession={onLeaveSession}
+            onSwitchCamera={onSwitchCamera}
+          />
+        )}
       </div>
     </header>
   );
 }
 
 interface StreamerButtonsProps {
+  sessionId: string;
   onLeaveSession: () => void;
   onSwitchCamera: MouseEventHandler<HTMLButtonElement>;
 }
 
 function StreamerButtons({
+  sessionId,
   onLeaveSession,
   onSwitchCamera,
 }: StreamerButtonsProps) {
   return (
     // <div className={s.streamrButtons}>
     <>
-      <button className={s.liveEndBtn} type="button" onClick={onLeaveSession}>
-        방송 종료
-      </button>
       <button
         className={s.switchCameraBtn}
         type="button"
@@ -106,7 +109,16 @@ function StreamerButtons({
           height={16}
         />
       </button>
+      <button
+        className={s.liveEndBtn}
+        type="button"
+        onClick={async () => {
+          await apiService.removeLiveSession(sessionId);
+          onLeaveSession();
+        }}
+      >
+        방송 종료
+      </button>
     </>
-    // </div>
   );
 }
