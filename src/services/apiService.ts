@@ -23,6 +23,17 @@ interface AIAutoReviewResponse {
   menuContent: string;
 }
 
+interface VotedStoreResponse {
+  storeId: number;
+  storeName: string;
+  menuImage: {
+    id: number;
+    url: string;
+  };
+  postCount: number;
+  menuName: string;
+}
+
 type SuccessMessageResponse = Promise<string>;
 
 class ApiService {
@@ -510,7 +521,9 @@ class ApiService {
     return res.text();
   }
 
-  async fetchStoresInVoteList(sessionId: string) {
+  async fetchStoresInVoteList(
+    sessionId: string,
+  ): Promise<VotedStoreResponse[]> {
     const res = await fetch(`${this.baseUrl}/share/${sessionId}/vote/list`, {
       method: 'GET',
       credentials: 'include',

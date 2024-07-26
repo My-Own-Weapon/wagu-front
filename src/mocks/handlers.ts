@@ -118,6 +118,7 @@ function getStoresIncludeA(): Store[] {
         url: '/images/mock-food.png',
       },
       postCount: 1,
+      menuName: '김치찜',
     },
     {
       storeId: 2,
@@ -127,6 +128,7 @@ function getStoresIncludeA(): Store[] {
         url: '/images/mock-food.png',
       },
       postCount: 1,
+      menuName: '김치찜',
     },
     {
       storeId: 3,
@@ -136,6 +138,7 @@ function getStoresIncludeA(): Store[] {
         url: '/images/mock-food.png',
       },
       postCount: 1,
+      menuName: '김치찜',
     },
     {
       storeId: 4,
@@ -145,6 +148,7 @@ function getStoresIncludeA(): Store[] {
         url: '/images/mock-food.png',
       },
       postCount: 1,
+      menuName: '김치찜',
     },
     {
       storeId: 5,
@@ -154,6 +158,7 @@ function getStoresIncludeA(): Store[] {
         url: '/images/mock-food.png',
       },
       postCount: 1,
+      menuName: '김치찜',
     },
   ];
 }
@@ -168,6 +173,7 @@ function getStoresNotIncludeA(): Store[] {
         url: '/images/mock-food.png',
       },
       postCount: 1,
+      menuName: '김치찜',
     },
     {
       storeId: 2,
@@ -177,6 +183,7 @@ function getStoresNotIncludeA(): Store[] {
         url: '/images/mock-food.png',
       },
       postCount: 1,
+      menuName: '김치찜',
     },
     {
       storeId: 3,
@@ -186,6 +193,7 @@ function getStoresNotIncludeA(): Store[] {
         url: '/images/mock-food.png',
       },
       postCount: 1,
+      menuName: '김치찜',
     },
     {
       storeId: 4,
@@ -195,6 +203,7 @@ function getStoresNotIncludeA(): Store[] {
         url: '/images/mock-food.png',
       },
       postCount: 1,
+      menuName: '김치찜',
     },
     {
       storeId: 5,
@@ -204,6 +213,7 @@ function getStoresNotIncludeA(): Store[] {
         url: '/images/mock-food.png',
       },
       postCount: 1,
+      menuName: '김치찜',
     },
   ];
 }
