@@ -61,6 +61,7 @@ export default function CategorySelect({
                 as="h3"
                 fontSize="20px"
                 fontWeight="medium"
+                color="black"
                 title="카테고리를 선택하세요"
               />
               <button

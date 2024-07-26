@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 'use client';
 
 import Link from 'next/link';
-import { useState, MouseEvent } from 'react';
+import { MouseEvent, MouseEventHandler, useState } from 'react';
 
+import { UserIcon } from '@/components/UserIcon';
 import ImageFill from '@/components/ui/ImageFill';
 
 import s from './StoreCard.module.scss';
@@ -15,6 +18,8 @@ export interface Store {
     url: string;
   };
   postCount: number;
+  // eslint-disable-next-line react/no-unused-prop-types
+  menuName: string;
 }
 
 export default function StoreCards({ stores }: { stores: Store[] }) {
@@ -26,7 +31,7 @@ export default function StoreCards({ stores }: { stores: Store[] }) {
   );
 }
 
-export interface StoreVoteCardProps {
+export interface VotedStoreCardProps {
   storeId: number;
   storeName: string;
   menuImage: {
@@ -72,67 +77,142 @@ export function StoreCard({ storeId, storeName, menuImage, postCount }: Store) {
   );
 }
 
-export function StoreVoteCard({
+export function VotedStoreCards({ stores }: { stores: VotedStoreCardProps[] }) {
+  console.log('in voted stores :', stores);
+
+  return (
+    <ul className={s.votedStoresContainer}>
+      {stores.map((store) => (
+        <VotedStoreCard key={store.storeId} {...store} />
+      ))}
+    </ul>
+  );
+}
+
+export function VotedStoreCard({
   storeId,
   storeName,
   menuImage,
   nobutton,
   handleAddVote,
   handleDeleteVote,
-}: StoreVoteCardProps) {
-  const [isVoted, setIsVoted] = useState<boolean>(false);
+}: VotedStoreCardProps) {
   // const [isVoteDone, setIsVoteDone] = useState<boolean>(false);
-  const { url } = menuImage;
+  // const { url } = menuImage;
 
   return (
-    <li className={s.vcontainer}>
-      <div>
-        <div>
+    <li className={s.votedStoreCardWrapper}>
+      <p className={s.storeName}>{storeName}</p>
+      <UserIcon
+        size="small"
+        shape="circle"
+        imgSrc="/profile/profile-default-icon-male.svg"
+        alt="profile-img"
+      />
+
+      {/* {!nobutton && (
           <div>
-            {/* <div className={s.vlinkArea}> */}
-            {/* <div className={s.vwrapper}> */}
-            {/* <div className={s.vstoreInfoArea}> */}
-            <ImageFill
-              src={url ?? '/profile/profile-default-icon-female.svg'}
-              alt="profile-img"
-              fill
-              height="70px"
-              borderRadius="8px"
-              backgroundColor="#aeaeae"
-            />
-            <p className={s.vstoreName}>{storeName}</p>
+            {isVoted ? (
+              <button
+                className={s.deleteVoteBtn}
+                data-store-id={storeId}
+                type="button"
+                onClick={(e) => {
+                  handleDeleteVote(e);
+                  setIsVoted(false);
+                }}
+              >
+                투표 삭제
+              </button>
+            ) : (
+              <button
+                className={s.addVoteBtn}
+                type="button"
+                data-store-id={storeId}
+                onClick={(e) => {
+                  handleAddVote(e);
+                  setIsVoted(true);
+                }}
+              >
+                투표 추가
+              </button>
+            )}
           </div>
-          {!nobutton && (
-            <div>
-              {isVoted ? (
-                <button
-                  className={s.deleteVoteBtn}
-                  data-store-id={storeId}
-                  type="button"
-                  onClick={(e) => {
-                    handleDeleteVote(e);
-                    setIsVoted(false);
-                  }}
-                >
-                  투표 삭제
-                </button>
-              ) : (
-                <button
-                  className={s.addVoteBtn}
-                  type="button"
-                  data-store-id={storeId}
-                  onClick={(e) => {
-                    handleAddVote(e);
-                    setIsVoted(true);
-                  }}
-                >
-                  투표 추가
-                </button>
-              )}
-            </div>
-          )}
+        )} */}
+    </li>
+  );
+}
+
+export function VotableCards({
+  stores,
+  handleAddVote,
+  handleDeleteVote,
+}: {
+  stores: Store[];
+  handleAddVote: MouseEventHandler;
+  handleDeleteVote: MouseEventHandler;
+}) {
+  return (
+    <ul className={s.votableCardsContainer}>
+      {stores.map((store) => (
+        <VotableCard
+          key={store.storeId}
+          store={store}
+          handleAddVote={handleAddVote}
+          handleDeleteVote={handleDeleteVote}
+        />
+      ))}
+    </ul>
+  );
+}
+
+export function VotableCard({
+  store,
+  handleAddVote,
+  handleDeleteVote,
+}: {
+  store: Store;
+  handleAddVote: (e: MouseEvent) => void;
+  handleDeleteVote: (e: MouseEvent) => void;
+}) {
+  const [isVoted, setIsVoted] = useState<boolean>(false);
+  const { storeId } = store;
+
+  return (
+    <li
+      className={s.votableStoreCardContainer}
+      style={{
+        opacity: isVoted ? 1 : 0.6,
+      }}
+    >
+      <button
+        className={s.voteWrapperBtn}
+        type="button"
+        data-store-id={storeId}
+        onClick={
+          isVoted
+            ? (e) => {
+                handleDeleteVote(e);
+                setIsVoted(!isVoted);
+              }
+            : (e) => {
+                handleAddVote(e);
+                setIsVoted(!isVoted);
+              }
+        }
+      >
+        <ImageFill
+          src={store.menuImage.url}
+          alt="store-img"
+          fill
+          height="140px"
+          borderRadius="8px"
+        />
+        <div className={s.storeInfoArea}>
+          <p className={s.storeName}>{store.storeName}</p>
+          <p className={s.menuName}>{store.menuName}</p>
         </div>
-      </div>
+      </button>
     </li>
   );
 }

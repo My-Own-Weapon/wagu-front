@@ -1,6 +1,7 @@
 @import '@styles/variables/colors.scss';
 @import '@styles/variables/textSize.scss';
 @import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/zIndex.scss';
 @import '@styles/variables/radius.scss';
 
 @media (min-width: 375px) {
@@ -16,9 +17,10 @@
   bottom: 0;
   left: 0;
   right: 0;
-  box-sizing: border-box;
+  z-index: $footer;
 
   height: 60px;
+  box-sizing: border-box;
 
   padding: 0 24px;
 

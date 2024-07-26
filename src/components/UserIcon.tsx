@@ -63,8 +63,6 @@ export function WithText<T extends WithTextProps>(
   Component: React.ComponentType<T>,
 ) {
   return ({ children, fontSize = 'small', color = 'white', ...rest }: T) => {
-    console.log(fontSize);
-
     const className = classNames({
       [s.smallName]: fontSize === 'small',
       [s.mediumName]: fontSize === 'medium',

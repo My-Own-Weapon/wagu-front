@@ -16,15 +16,22 @@
 'use client';
 
 import React, { useEffect, useState, useRef, MouseEventHandler } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { OpenVidu, Subscriber } from 'openvidu-browser';
 
-import { Post } from '@/components/Post';
-import { StoreCard, StoreVoteCard } from '@/components/StoreCard';
+import {
+  StoreCard,
+  VotableCards,
+  VotedStoreCard,
+  VotedStoreCards,
+} from '@/components/StoreCard';
 import LiveFriends from '@/components/LiveFriendsList';
 import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
 import { localStorageApi } from '@/services/localStorageApi';
 import { apiService } from '@/services/apiService';
+import { StoreResponse } from '@/types';
+import PostsOfMap from '@/app/map/_components/PostsOfMap';
+import Heading from '@/components/ui/Heading';
 
 import s from './page.module.scss';
 
@@ -32,14 +39,6 @@ declare global {
   interface Window {
     kakao: any;
   }
-}
-
-interface StoreData {
-  name: string;
-  address: string;
-  storeId: number;
-  posx: number;
-  posy: number;
 }
 
 interface UserProfile {
@@ -53,9 +52,10 @@ interface UserLocation {
   lng: number;
 }
 
-interface Stores {
+export interface VoteStoreInfo {
   storeId: number;
   storeName: string;
+  menuName: string;
   menuImage: {
     id: number;
     url: string;
@@ -88,6 +88,10 @@ export default function SharePage() {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
 
   const [usersProfile, setUsersProfile] = useState(new Map());
+  //
+  const [selectedStore, setSelectedStore] = useState<StoreResponse | null>();
+  const [posts, setPosts] = useState<any[]>([]);
+  //
 
   const [votedStores, setVotedStores] = useState<any[]>([]);
   const [selectedStoreId, setSelectedStoreId] = useState<any>();
@@ -96,7 +100,7 @@ export default function SharePage() {
   const [isVoteStart, setIsVoteStart] = useState<boolean>(false);
   const [isVoteEnd, setIsVoteEnd] = useState<boolean>(false);
   const [voteEndCnt, setVoteEndCnt] = useState<number>(0);
-  const [voteWinStores, setVoteWinStores] = useState<Stores[]>([]);
+  const [voteWinStores, setVoteWinStores] = useState<VoteStoreInfo[]>([]);
   const [disableButton, setDisableButton] = useState<boolean>(false);
   const [streamerFromStores, setStreamerFromStores] = useState<any[]>([]);
 
@@ -239,14 +243,6 @@ export default function SharePage() {
     };
   }, []);
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     updateCenterLocation();
-  //   }, SEND_LOCATION_INTERVAL);
-
-  //   return () => clearInterval(interval);
-  // }, [markers]);
-
   useEffect(() => {
     if (voteEndCnt == subscribers.length + 1) {
       voteAllDone();
@@ -381,19 +377,15 @@ export default function SharePage() {
   };
 
   /* 좌표를 맵에 추가하는 함수 */
-  const addMarkers = (mapInstance: any, storeData: StoreData[]) => {
+  const addMarkers = (mapInstance: any, storeData: StoreResponse[]) => {
     removeMarkers();
-
-    console.log('addmarker stores', storeData);
-
-    if (!Array.isArray(storeData)) {
-      console.error('storeData가 배열이 아닙니다:', storeData);
-      return;
-    }
 
     const newMarkers = storeData.map((store) => {
       const { kakao } = window;
-      const imageSrc = '/images/map/ping_orange.svg';
+      const { liveStore } = store;
+      const imageSrc = liveStore
+        ? '/newDesign/map/pin_book_live.svg'
+        : '/newDesign/map/pin_book.svg';
       const imageSize = new kakao.maps.Size(32, 32);
       const imageOption = { offset: new kakao.maps.Point(16, 32) };
       const markerImage = new kakao.maps.MarkerImage(
@@ -414,6 +406,7 @@ export default function SharePage() {
       kakao.maps.event.addListener(marker, 'click', () => {
         setSelectedStoreId(store.storeId);
         fetchPostsAndSet(store.storeId);
+        setSelectedStore(store);
       });
 
       return marker;
@@ -518,7 +511,8 @@ export default function SharePage() {
   // [BEFORE 투표] 투표가 ⛔️시작되기전⛔️에 가게 카드에서 투표버튼 ⭐️ 핸들러
   const deleteStoreFromVoteList = async (url: string, storeId: string) => {
     if (!sessionId || !storeId) {
-      throw new Error('세션 ID 또는 store id가 없습니다.');
+      alert('세션 ID 또는 store id가 없습니다.');
+      return;
     }
 
     try {
@@ -527,7 +521,7 @@ export default function SharePage() {
         storeId,
       );
       setVotedStores(
-        votedStores.filter(({ curStoreId }) => curStoreId != storeId),
+        votedStores.filter(({ storeId: curStoreId }) => curStoreId != storeId),
       );
       broadcastUpdateVoteListSIG();
       alert(succMsg);
@@ -626,6 +620,10 @@ export default function SharePage() {
     setSubscribers(() => []);
     setPublisher(() => null);
   };
+
+  useEffect(() => {
+    console.log(isVoteStart);
+  }, [isVoteStart]);
 
   const updateUserMarker = ({ userId: username, lat, lng }: UserLocation) => {
     const markerPosition = new window.kakao.maps.LatLng(lat, lng);
@@ -769,44 +767,67 @@ export default function SharePage() {
     fetchLiveStores();
   }, [voteWinStores]);
 
+  useEffect(() => {
+    if (!selectedStoreId) return;
+
+    const fetchLiveStores = async (selectedStoreId: number) => {
+      const streamers =
+        await apiService.fetchLiveOnStreamersOfStore(selectedStoreId);
+      console.log('streamers : ', streamers);
+      setStreamerFromStores(() => streamers);
+    };
+
+    fetchLiveStores(selectedStoreId);
+  }, [selectedStoreId]);
+
   // 투표가 시작되었습니다.
   if (isVoteStart) {
     return (
       <main className={s.container}>
-        <div className={s.voteCardsContainer}>
-          {votedStores.map((store) => {
+        {/* 하위 태그 생성시 map이 안사라짐 */}
+        {/* <div className={s.afterVoteContainer}> */}
+        <div className={s.votableCardsWrapper}>
+          <VotableCards
+            stores={votedStores}
+            handleAddVote={handleVoteStoreClick}
+            handleDeleteVote={handleCancelVote}
+          />
+          {/* {votedStores.map((store) => {
             return (
-              <StoreVoteCard
+              <VotedStoreCard
                 key={store.storeId}
                 {...store}
                 handleAddVote={handleVoteStoreClick}
                 handleDeleteVote={handleCancelVote}
               />
             );
-          })}
+          })} */}
+          {/* </div> */}
+          <div
+            style={{
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              fontSize: '16px',
+              color: '#212025',
+              fontWeight: 'bold',
+            }}
+          >
+            투표 종료한 사람 수 : {voteEndCnt}
+          </div>
+          <div className={s.urlButtonContainer}>
+            <button
+              className={s.myVoteDoneBtn}
+              type="button"
+              onClick={handleMyVoteDoneClick}
+              // ✅ TODO: 주석을 해제해야합니다.
+              // disabled={disable}
+            >
+              나의 투표 종료
+            </button>
+          </div>
         </div>
-        <div
-          style={{
-            width: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            fontSize: '16px',
-            color: '#212025',
-            fontWeight: 'bold',
-          }}
-        >
-          투표 종료한 사람 수 : {voteEndCnt}
-        </div>
-        <button
-          className={s.myVoteDone}
-          type="button"
-          onClick={handleMyVoteDoneClick}
-          // ✅ TODO: 주석을 해제해야합니다.
-          // disabled={disable}
-        >
-          나의 투표 종료
-        </button>
       </main>
     );
   } else if (isVoteEnd) {
@@ -826,137 +847,143 @@ export default function SharePage() {
         ) : ( */}
         <LiveFriends liveFriends={streamerFromStores} />
         {/* )} */}
-        {voteWinStores.map(({ storeId, storeName, menuImage, postCount }) => {
-          return (
-            <StoreCard
-              key={storeId}
-              storeId={storeId}
-              storeName={storeName}
-              menuImage={menuImage}
-              postCount={postCount}
-            />
-          );
-        })}
+        {voteWinStores.map(
+          ({ storeId, storeName, menuImage, postCount, menuName }) => {
+            return (
+              <StoreCard
+                key={storeId}
+                storeId={storeId}
+                storeName={storeName}
+                menuImage={menuImage}
+                menuName={menuName}
+                postCount={postCount}
+              />
+            );
+          },
+        )}
       </div>
     );
   } else {
     return (
       <main className={s.container}>
-        <div className={s.userContainer}>
-          {[...usersProfile].map(([username, { imageUrl, name }]) => {
-            return (
-              <UserIconWithText
-                key={username}
-                shape="circle"
-                size="small"
-                imgSrc={
-                  !!imageUrl
-                    ? imageUrl
-                    : '/profile/profile-default-icon-female.svg'
-                }
-                alt="profile-icon"
-              >
-                {name}
-              </UserIconWithText>
-            );
-          })}
-        </div>
-        <div className={s.mapContainer}>
+        <div className={s.top}>
           <div id="map" className={s.map} />
+          <div className={s.userContainer}>
+            {[...usersProfile].map(([username, { imageUrl, name }]) => {
+              return (
+                <UserIconWithText
+                  key={username}
+                  shape="circle"
+                  size="small"
+                  color="black"
+                  imgSrc={
+                    !!imageUrl
+                      ? imageUrl
+                      : '/profile/profile-default-icon-female.svg'
+                  }
+                  alt="profile-icon"
+                >
+                  {name}
+                </UserIconWithText>
+              );
+            })}
+          </div>
         </div>
-        <div className={s.postContainer}>
-          <Post.Wrapper>
-            <Post>
-              {postsOfStore.length === 0 ? (
-                <Post.Title title="현재 선택된 post가 없어요! Post를 선택해보세요!" />
-              ) : (
-                <Post.Title title={`${postsOfStore[0].storeName}  Posts`} />
-              )}
-              {postsOfStore.length > 0 && (
-                <Post.PostCards posts={postsOfStore} />
-              )}
-            </Post>
-          </Post.Wrapper>
-        </div>
-        {votedStores.length > 0 && (
-          <p
-            style={{
-              fontSize: '14px',
-              color: '#212025999',
-            }}
-          >
-            투표에 추가된 가게
-          </p>
-        )}
-        <div className={s.voteListContainer}>
-          {votedStores.map((store) => {
-            return (
-              <StoreVoteCard
-                key={store.storeId}
-                {...store}
-                nobutton
-                handleAddVote={handleVoteStoreClick}
-                handleDeleteVote={handleCancelVote}
+        <div className={s.bottom}>
+          {selectedStore?.liveStore && selectedStore?.storeName && (
+            <>
+              <Heading
+                as="h3"
+                fontSize="16px"
+                fontWeight="bold"
+                color="black"
+                title={`${selectedStore.storeName}에서 방송중이에요 !`}
               />
-            );
-          })}
-        </div>
-        <div className={s.voteContainer}>
-          <button
-            className={s.voteAddButton}
-            type="button"
-            onClick={() => {
-              if (!sessionId) return;
-              handleAddStoreToVoteListClick(sessionId, selectedStoreId);
-            }}
-          >
-            투표 추가
-          </button>
-          <button
-            className={s.voteRemoveButton}
-            type="button"
-            onClick={() => {
-              if (!sessionId) return;
-
-              deleteStoreFromVoteList(sessionId, selectedStoreId);
-            }}
-          >
-            투표 삭제
-          </button>
-        </div>
-        <div className={s.voteStartContainer}>
-          <button
-            className={s.voteStartButton}
-            type="button"
-            onClick={() => {
-              setIsVoteStart(true);
-              broadcastWantVoteStartSIG();
-            }}
-          >
-            투표 시작
-          </button>
-        </div>
-        {/* <video
-          id="publisherVideo"
-          autoPlay
-          ref={(video) => {
-            if (video && publisher) {
-              video.srcObject = publisher.stream.getMediaStream();
-            }
-          }}
-        /> */}
-        {subscribers.map((subscriber, index) => (
-          <video
-            key={index}
-            id={`subscriberVideo${index}`}
-            autoPlay
-            ref={(video) => {
-              if (video) {
-                video.srcObject = subscriber.stream.getMediaStream();
-              }
-            }}
+              <LiveFriends liveFriends={streamerFromStores} />
+            </>
+          )}
+          <PostsOfMap
+            selectedStoreName={selectedStore?.storeName}
+            selectedStoreId={selectedStore?.storeId}
+            posts={postsOfStore}
           />
-        ))}
+          <div className={s.urlButtonContainer}>
+            <button
+              className={s.addVoteListBtn}
+              type="button"
+              onClick={() => {
+                if (!sessionId) return;
+                handleAddStoreToVoteListClick(sessionId, selectedStoreId);
+              }}
+            >
+              투표 추가
+            </button>
+            <button
+              className={s.startVoteBtn}
+              type="button"
+              onClick={() => {
+                setIsVoteStart(true);
+                broadcastWantVoteStartSIG();
+              }}
+            >
+              개표 신청
+            </button>
+          </div>
+          {/* </div> */}
+          {votedStores.length > 0 && (
+            <div className={s.votedStoresWrapper}>
+              <Heading
+                as="h3"
+                fontSize="16px"
+                fontWeight="bold"
+                color="black"
+                title="투표에 추가된 STORE"
+              />
+              <VotedStoreCards stores={votedStores} />
+              {/* <div className={s.voteListContainer}>
+                {votedStores.map((store) => {
+                  return (
+                    <VotedStoreCard
+                      key={store.storeId}
+                      {...store}
+                      nobutton
+                      handleAddVote={handleVoteStoreClick}
+                      handleDeleteVote={handleCancelVote}
+                    />
+                  );
+                })}
+              </div> */}
+            </div>
+          )}
+
+          {/* <div className={s.voteContainer}>
+            <button
+              className={s.voteRemoveButton}
+              type="button"
+              onClick={() => {
+                if (!sessionId) return;
+
+                deleteStoreFromVoteList(sessionId, selectedStoreId);
+              }}
+            >
+              투표 삭제
+            </button>
+          </div> */}
+
+          {subscribers.map((subscriber, index) => (
+            <video
+              style={{ display: 'none' }}
+              key={index}
+              id={`subscriberVideo${index}`}
+              autoPlay
+              ref={(video) => {
+                if (video) {
+                  video.srcObject = subscriber.stream.getMediaStream();
+                }
+              }}
+            />
+          ))}
+        </div>
       </main>
     );
   }

@@ -255,6 +255,7 @@ export default function BoardPage() {
             <Heading
               title="식당 정보"
               as="h3"
+              color="black"
               fontWeight="semiBold"
               fontSize="16px"
             />
@@ -274,8 +275,9 @@ export default function BoardPage() {
           </Wrapper>
           <Wrapper gap="16px">
             <Heading
-              title="카테고리 선택"
               as="h3"
+              title="카테고리 선택"
+              color="black"
               fontWeight="semiBold"
               fontSize="16px"
             />

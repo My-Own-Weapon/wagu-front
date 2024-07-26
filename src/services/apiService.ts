@@ -23,6 +23,17 @@ interface AIAutoReviewResponse {
   menuContent: string;
 }
 
+interface VotedStoreResponse {
+  storeId: number;
+  storeName: string;
+  menuImage: {
+    id: number;
+    url: string;
+  };
+  postCount: number;
+  menuName: string;
+}
+
 type SuccessMessageResponse = Promise<string>;
 
 class ApiService {
@@ -373,6 +384,21 @@ class ApiService {
     return data;
   }
 
+  async removeLiveSession(sessionId: string) {
+    const res = await fetch(`${this.baseUrl}/api/sessions/${sessionId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
+
+    return res.text();
+  }
+
   async checkIsStreamerUserOfSession(sessionId: string) {
     const res = await fetch(
       `${this.baseUrl}/api/sessions/${sessionId}/creator`,
@@ -495,7 +521,9 @@ class ApiService {
     return res.text();
   }
 
-  async fetchStoresInVoteList(sessionId: string) {
+  async fetchStoresInVoteList(
+    sessionId: string,
+  ): Promise<VotedStoreResponse[]> {
     const res = await fetch(`${this.baseUrl}/share/${sessionId}/vote/list`, {
       method: 'GET',
       credentials: 'include',
@@ -602,6 +630,7 @@ class ApiService {
     return res.json();
   }
 
+  /* AI auto review */
   async fetchAIAutoReview({
     category,
     menuName,

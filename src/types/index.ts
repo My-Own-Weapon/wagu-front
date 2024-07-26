@@ -33,12 +33,14 @@ export interface AddPostProps {
   auto: true;
 }
 
-export interface PostCardProps {
-  postId: string;
+export interface PostOfStoreResponse {
   storeName: string;
+  postId: number;
   postMainMenu: string;
+  category: CategoriesEN;
   menuImage: PostImage;
-  menuPrice: string;
+  menuPrice: number;
+  memberUsername: string;
   createdDate: string;
 }
 
@@ -76,3 +78,12 @@ export type CategoriesKR = (typeof categoryMap)[keyof typeof categoryMap];
 export type CategoriesEN = keyof typeof categoryMap;
 export type CategoriesWithAllEN = CategoriesEN | 'ALL';
 export type CategoriesWithAllKR = CategoriesKR | '전부';
+
+export interface StoreResponse {
+  storeId: number;
+  storeName: string;
+  address: string;
+  posx: number;
+  posy: number;
+  liveStore: boolean;
+}

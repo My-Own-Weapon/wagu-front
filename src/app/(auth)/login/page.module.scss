@@ -12,7 +12,7 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  background-color: $bgColor;
+  background-color: $bgWhite;
   padding: 0;
 }
 
@@ -91,7 +91,7 @@
       height: 56px;
       border: 1px solid #e5e5ec;
       border-radius: 12px;
-      background-color: $bgColor;
+      background-color: $bgWhite;
       display: flex;
       align-items: center;
       justify-content: center;
