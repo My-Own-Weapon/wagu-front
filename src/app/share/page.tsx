@@ -803,18 +803,6 @@ export default function SharePage() {
             handleAddVote={handleVoteStoreClick}
             handleDeleteVote={handleCancelVote}
           />
-
-          {/* {votedStores.map((store) => {
-
-            return (
-              <VotedStoreCard
-                key={store.storeId}
-                {...store}
-                handleAddVote={handleVoteStoreClick}
-                handleDeleteVote={handleCancelVote}
-              />
-            );
-          })} */}
           <div className={s.navUpperBtnContainer}>
             <button
               className={s.myVoteDoneBtn}
@@ -836,7 +824,6 @@ export default function SharePage() {
         <ResultHeader />
         <div className={s.endVoteContainer}>
           <div className={s.top}>
-            <LiveFriends liveFriends={streamerFromStores} />
             <div className={s.winningMsgArea}>
               <KingSVG />
               <Heading
@@ -965,21 +952,6 @@ export default function SharePage() {
               </div> */}
             </div>
           )}
-
-          {/* <div className={s.voteContainer}>
-            <button
-              className={s.voteRemoveButton}
-              type="button"
-              onClick={() => {
-                if (!sessionId) return;
-
-                deleteStoreFromVoteList(sessionId, selectedStoreId);
-              }}
-            >
-              투표 삭제
-            </button>
-          </div> */}
-
           {subscribers.map((subscriber, index) => (
             <video
               style={{ display: 'none' }}
@@ -1009,20 +981,22 @@ function WinStoreCard({
   const { url } = menuImage;
 
   return (
-    <div className={s.winStoreCardContainer}>
-      <ImageFill
-        src={url}
-        id={String(storeId)}
-        alt="vote-win-store-img"
-        height="280px"
-        fill
-        borderRadius="24px"
-      />
-      <div className={s.titleArea}>
-        <p className={s.storeName}>{storeName}</p>
-        <p className={s.menuName}>{menuName}</p>
+    <Link className={s.winStoreCardAnchor} href={`/store/${storeId}`}>
+      <div className={s.winStoreCardContainer}>
+        <ImageFill
+          src={url}
+          id={String(storeId)}
+          alt="vote-win-store-img"
+          height="280px"
+          fill
+          borderRadius="24px"
+        />
+        <div className={s.titleArea}>
+          <p className={s.storeName}>{storeName}</p>
+          <p className={s.menuName}>{menuName}</p>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }
 

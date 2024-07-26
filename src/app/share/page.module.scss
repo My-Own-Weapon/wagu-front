@@ -119,6 +119,11 @@
 }
 
 /* 투표 종료 (우승 가게 페이지) */
+
+.winStoreCardAnchor {
+  width: 100%;
+}
+
 .endVoteContainer {
   display: flex;
   flex-direction: column;
@@ -129,6 +134,8 @@
   .top {
     height: 200px;
     background-color: $bgBrown;
+
+    @include flexCenter;
 
     .winningMsgArea {
       @include flexCenter;

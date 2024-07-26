@@ -125,7 +125,14 @@ export default function PostPage({ params: { postId } }: Props) {
                 </p>
               </div>
             </div>
-            <div className={s.review}>{menu?.menuContent}</div>
+            <div
+              className={s.review}
+              dangerouslySetInnerHTML={{
+                __html: menu?.menuContent
+                  ? menu.menuContent.replace(/\n/g, '<br>')
+                  : '',
+              }}
+            />
             {postDetails.menus.length > 1 &&
               currentMenuIndex < postDetails.menus.length - 1 && (
                 <button type="button" onClick={goToNextMenu}>
