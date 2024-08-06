@@ -339,7 +339,7 @@ export default function BoardPage() {
               }}
             >
               <InputBox
-                height="30px"
+                height="48px"
                 label="대표 메뉴"
                 name="menuName"
                 placeholder="대표 메뉴를 입력해주세요"
@@ -349,7 +349,7 @@ export default function BoardPage() {
               />
               {/* ✅ TODO: 세자리수마다 , 붙이기 */}
               <InputBox
-                height="30px"
+                height="48px"
                 label="가격"
                 name="menuPrice"
                 placeholder="메뉴 가격을 입력해주세요"

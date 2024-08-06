@@ -6,9 +6,9 @@ import classNames from 'classnames';
 import s from './InputBox.module.scss';
 
 type InputBoxProps = {
+  className?: string;
   width?: string;
   height?: string;
-  className?: string;
   label?: string;
   placeholder?: string;
   type?: 'text' | 'number' | 'password' | 'tel' | 'textarea' | 'file';
@@ -22,9 +22,9 @@ type InputBoxProps = {
 
 /* ✅ TODO: Input과 textarea 컴포넌트 분리 */
 export default function InputBox({
+  className = '',
   width = '100%',
   height = '56px',
-  className = '',
   label = '',
   placeholder = '',
   type = 'text',
