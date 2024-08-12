@@ -23,6 +23,7 @@ export default function RQProvider({ children }: Props) {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
+      {/* ✅ TODO: playwright react query devtools가 안돌도록 env설정 변경해야함 */}
       {/* <ReactQueryDevtools
         initialIsOpen={process.env.NEXT_PUBLIC_MODE === 'local'}
       /> */}
