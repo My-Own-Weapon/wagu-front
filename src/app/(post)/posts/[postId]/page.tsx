@@ -11,7 +11,7 @@ import { CategoriesEN, ProfileWithoutFollowResponse } from '@/types';
 import { formatNumberToKRW } from '@/utils';
 import { UserIcon, WithText } from '@/components/UserIcon';
 import { PROFILE_IMG } from '@/constants/path';
-import PostHeader from './_components/PostHeader';
+import PostHeader from '../_components/PostHeader';
 
 import s from './page.module.scss';
 

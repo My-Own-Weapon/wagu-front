@@ -1,5 +1,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import BoxButton from '@/components/ui/BoxButton';
+import Heading from '@/components/ui/Heading';
+
 import s from './page.module.scss';
 
 export default function EntryPage() {
@@ -16,15 +19,35 @@ export default function EntryPage() {
               priority
             />
             <h1 className={s.title}>WAGU BOOK</h1>
+            <Heading
+              as="h2"
+              fontSize="18px"
+              fontWeight="bold"
+              color="black"
+              title="너와 나의 맛집 기록"
+            />
           </div>
-          <h2 className={s.subTitle}>너와 나의 맛집 기록</h2>
         </div>
         <div className={s.btnArea}>
-          <Link className={s.signupBtn} href="/signup">
-            회원가입
+          <Link
+            style={{
+              width: '100%',
+            }}
+            href="/signup"
+          >
+            <BoxButton width="100%" height="56px" variant="fill">
+              회원가입
+            </BoxButton>
           </Link>
-          <Link className={s.loginBtn} href="/login">
-            로그인
+          <Link
+            style={{
+              width: '100%',
+            }}
+            href="/login"
+          >
+            <BoxButton width="100%" height="56px" variant="outline">
+              로그인
+            </BoxButton>
           </Link>
         </div>
       </div>

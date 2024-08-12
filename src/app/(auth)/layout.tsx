@@ -1,12 +1,13 @@
-import BackHeader from '@/components/BackHeader';
 import { ReactNode } from 'react';
+
+import AuthHeader from '@/app/(auth)/_components/AuthHeader';
 
 export default function layout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   return (
     <div>
-      <BackHeader />
+      <AuthHeader />
       {children}
     </div>
   );

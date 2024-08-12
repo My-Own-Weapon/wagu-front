@@ -1,0 +1,12 @@
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/textSize.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/radius.scss';
+
+.button {
+  border-radius: $radiusMedium;
+
+  font-size: $textLarge;
+  font-weight: $semiBold;
+  letter-spacing: -0.025em;
+}
