@@ -1,4 +1,5 @@
 import { COLORS } from '@/constants/colors';
+
 import s from './Heading.module.scss';
 
 interface Props {
@@ -14,7 +15,7 @@ interface Props {
     | 'bold'
     | 'extraBold'
     | 'black';
-  color?: 'white' | 'black';
+  color?: 'white' | 'black' | 'primary';
   title: string;
 }
 
@@ -30,10 +31,10 @@ export default function Heading({
       className={s.heading}
       style={{
         fontSize,
-        fontWeight: getFontWeight(fontWeight),
+        fontWeight: FONT_WEIGHTS[fontWeight],
         lineHeight: '150%',
         letterSpacing: '-0.05em',
-        color: color === 'white' ? COLORS.FONT.WHITE : COLORS.FONT.BLACK,
+        color: COLORS.FONT[color],
       }}
     >
       {title}
@@ -41,18 +42,30 @@ export default function Heading({
   );
 }
 
-function getFontWeight(fontWeight: string) {
-  const fontWeights: { [key: string]: number } = {
-    thin: 100,
-    extraLight: 200,
-    light: 300,
-    regular: 400,
-    medium: 500,
-    semiBold: 600,
-    bold: 700,
-    extraBold: 800,
-    black: 900,
-  };
+const FONT_WEIGHTS: { [key: string]: number } = {
+  thin: 100,
+  extraLight: 200,
+  light: 300,
+  regular: 400,
+  medium: 500,
+  semiBold: 600,
+  bold: 700,
+  extraBold: 800,
+  black: 900,
+};
 
-  return fontWeights[fontWeight];
-}
+// function getFontWeight(fontWeight: string) {
+//   const fontWeights: { [key: string]: number } = {
+//     thin: 100,
+//     extraLight: 200,
+//     light: 300,
+//     regular: 400,
+//     medium: 500,
+//     semiBold: 600,
+//     bold: 700,
+//     extraBold: 800,
+//     black: 900,
+//   };
+
+//   return fontWeights[fontWeight];
+// }
