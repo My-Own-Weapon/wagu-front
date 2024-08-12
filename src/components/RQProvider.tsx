@@ -2,7 +2,7 @@
 
 import { ReactNode, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+// import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 interface Props {
   children: ReactNode;
@@ -23,9 +23,9 @@ export default function RQProvider({ children }: Props) {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      <ReactQueryDevtools
+      {/* <ReactQueryDevtools
         initialIsOpen={process.env.NEXT_PUBLIC_MODE === 'local'}
-      />
+      /> */}
     </QueryClientProvider>
   );
 }
