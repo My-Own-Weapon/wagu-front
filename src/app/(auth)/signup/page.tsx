@@ -28,6 +28,7 @@ export default function SignupPage() {
       <form className={s.form} action={formAction}>
         <InputBox
           className={s.inputBox}
+          height="56px"
           label="아이디"
           name="username"
           type="text"
@@ -35,6 +36,7 @@ export default function SignupPage() {
         />
         <InputBox
           className={s.inputBox}
+          height="56px"
           label="비밀번호"
           name="password"
           type="password"
@@ -42,6 +44,7 @@ export default function SignupPage() {
         />
         <InputBox
           className={s.inputBox}
+          height="56px"
           label="비밀번호 확인"
           name="passwordConfirm"
           type="password"
@@ -49,17 +52,19 @@ export default function SignupPage() {
         />
         <InputBox
           className={s.inputBox}
+          height="56px"
           label="이름"
           name="name"
           type="text"
-          placeholder="이름을 입력해 주세요"
+          placeholder="실명을 입력해 주세요"
         />
         <InputBox
           className={s.inputBox}
+          height="56px"
           label="휴대폰 번호"
           name="phoneNumber"
           type="text"
-          placeholder="휴대폰 번호를 입력해 주세요"
+          placeholder="000-0000-0000"
         />
         {!signupState.succ && (
           <p className={s.message}>{signupState.message}</p>

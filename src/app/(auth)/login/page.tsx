@@ -47,6 +47,7 @@ export default function LoginPage() {
       <form className={s.form} onSubmit={handleSubmit}>
         <InputBox
           className={s.inputBox}
+          height="56px"
           label="아이디"
           name="username"
           placeholder="아이디를 입력해 주세요"
@@ -55,6 +56,7 @@ export default function LoginPage() {
         />
         <InputBox
           className={s.inputBox}
+          height="56px"
           label="비밀번호"
           name="password"
           placeholder="비밀번호를를 입력해 주세요"

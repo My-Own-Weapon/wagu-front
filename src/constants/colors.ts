@@ -4,7 +4,8 @@ export const COLORS = {
   ICON_FILL: '#C0C4CE',
 
   FONT: {
-    WHITE: '#ffffff',
-    BLACK: '#2E2E2E',
+    white: '#ffffff',
+    black: '#2E2E2E',
+    primary: '#ff6b00',
   },
-};
+} as const;
