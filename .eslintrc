@@ -69,6 +69,7 @@
     "@typescript-eslint/semi": "off",
     "react/jsx-filename-extension": ["warn", { "extensions": [".ts", ".tsx"] }],
     "no-useless-catch": "off",
+    "import/no-anonymous-default-export": "off",
     "import/no-extraneous-dependencies": "off" /* msw를 제대로 인식하지 못함 */,
     /* about label, input connection with htmlfor */
     "jsx-a11y/label-has-associated-control": [
