@@ -1,0 +1,47 @@
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/radius.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/textSize.scss';
+@import '@styles/mixins/index.scss';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .reviewInput {
+    width: 100%;
+    height: auto;
+    min-height: 120px;
+
+    padding: 16px 0;
+
+    background-color: transparent;
+
+    color: $inputTextColor;
+    font-size: $textMedium;
+    font-weight: $medium;
+    letter-spacing: -0.025em;
+
+    border: none;
+    resize: none;
+    overflow: hidden;
+
+    &::placeholder {
+      color: $placeholderColor;
+      font-size: $placeholderSize;
+      font-weight: $medium;
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+.label {
+  color: $inputTextColor;
+  font-size: $textMedium;
+  font-weight: $medium;
+  letter-spacing: -0.025em;
+}
