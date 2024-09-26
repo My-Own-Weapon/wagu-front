@@ -1,0 +1,47 @@
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/radius.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/textSize.scss';
+
+.form {
+  width: 88%;
+
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-sizing: border-box;
+
+  .label {
+    font-size: $textMedium;
+    font-weight: 500;
+    color: $gray800;
+    margin-bottom: 8px;
+  }
+
+  .input {
+    width: 100%;
+    height: 56px;
+    padding: 0 24px;
+    border: 1px solid $primaryOrange;
+    border-radius: 8px;
+    background-color: #ece6d9;
+    font-size: $textMedium;
+    font-weight: 500;
+    color: #979797;
+    box-sizing: border-box;
+  }
+
+  .signupButton {
+    width: 100%;
+    height: 56px;
+    margin-top: 20px;
+    background-color: $primaryOrange;
+    border: none;
+    border-radius: $radiusMedium;
+    color: #ffffff;
+    font-size: $textLarge;
+    font-weight: 600;
+    cursor: pointer;
+    box-sizing: border-box;
+  }
+}
