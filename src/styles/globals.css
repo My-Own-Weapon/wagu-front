@@ -27,15 +27,14 @@ body {
     sans-serif;
 
   width: 100dvw;
-  height: 100dvh;
+  min-height: 100dvh;
   background-color: var(--bgColor);
 }
 
 @media (min-width: 375px) {
   html {
+    /* pc환경에서 중앙정렬을 위해 */
     max-width: 410px;
-    height: 100dvh;
-
     margin: 0 auto;
 
     background-color: rgba(63, 63, 63);
@@ -43,7 +42,6 @@ body {
 
   body {
     max-width: 410px;
-    height: 100dvh;
 
     margin: 0 auto;
 
