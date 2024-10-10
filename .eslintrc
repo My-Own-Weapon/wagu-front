@@ -40,6 +40,9 @@
     "import/extensions": "off",
     "react-hooks/exhaustive-deps": ["warn"],
     // airbnb style guide
+    /*eslint camelcase: ["error", {allow: ["^UNSAFE_"]}]*/
+
+    "camelcase": ["error", { "allow": ["^[a-zA-Z]+__[a-zA-Z]+$"] }],
     "template-curly-spacing": ["error", "never"],
     "default-param-last": ["error"],
     "no-param-reassign": ["error"],
@@ -81,7 +84,9 @@
       { "required": { "some": ["nesting", "id"] } }
     ],
     /* about default parameter */
+    "no-dupe-class-members": "off",
     "react/require-default-props": [2, { "functions": "defaultArguments" }],
+    "func-names": ["error", "as-needed"],
     "no-shadow": [
       "error",
       {
