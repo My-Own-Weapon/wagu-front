@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { categoryMap } from '../constants/categoty';
 
 export interface LoginUserInputs {
@@ -97,4 +99,40 @@ export interface VotedStoreResponse {
   };
   postCount: number;
   menuName: string;
+}
+
+export interface LoginFormInputs {
+  username: string;
+  password: string;
+}
+
+export interface Category {
+  id: string;
+  name: CategoriesWithAllEN;
+  IconSVG: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+}
+
+export interface ReviewFormValues {
+  menuReviews: {
+    menuName: string;
+    menuPrice: string;
+    menuContent: string;
+    image?: File | null;
+  }[];
+}
+
+export interface MenuReviewInfo {
+  menuName: string;
+  menuPrice: string;
+  menuContent: string;
+}
+
+export interface ReviewRequestSchema {
+  postCategory: string;
+  storeName: string;
+  storeLocation: Omit<AddressSearchDetails, 'storeName'>;
+  menus: MenuReviewInfo[];
+  postMainMenu: string;
+  permission: 'PRIVATE' | 'PUBLIC';
+  auto: boolean;
 }
