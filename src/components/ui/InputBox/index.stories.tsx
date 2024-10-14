@@ -1,9 +1,11 @@
 import { InputBox } from '@/components/ui';
 import { Args, Meta, StoryObj } from '@storybook/react';
-import { ChangeEventHandler, ComponentType } from 'react';
+import { ChangeEventHandler, ComponentProps, ComponentType } from 'react';
 import { useArgs } from 'storybook/internal/preview-api';
 
-const meta = {
+const meta: Meta<
+  ComponentProps<typeof InputBox> & ComponentProps<typeof InputBox.Input>
+> = {
   title: 'ui/InputBox',
   component: InputBox,
   tags: ['autodocs'],
@@ -30,7 +32,7 @@ const meta = {
       );
     },
   ],
-} satisfies Meta<typeof InputBox & ComponentType>;
+};
 export default meta;
 
 type Story = StoryObj<typeof meta>;

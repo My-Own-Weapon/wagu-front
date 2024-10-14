@@ -1,13 +1,16 @@
-import { ChangeEventHandler } from 'react';
+import { ChangeEventHandler, ComponentProps } from 'react';
 
 import type { Args, Meta, StoryObj } from '@storybook/react';
 import { useArgs } from '@storybook/preview-api';
 
 import TextareaBox from './index';
 
-const meta = {
+const meta: Meta<
+  ComponentProps<typeof TextareaBox> &
+    ComponentProps<typeof TextareaBox.Textarea>
+> = {
   title: 'Components/TextareaBox',
-  component: TextareaBox.Textarea,
+  component: TextareaBox,
   tags: ['autodocs'],
   argTypes: {
     placeholder: { control: 'text' },
@@ -34,7 +37,7 @@ const meta = {
       );
     },
   ],
-} satisfies Meta<typeof TextareaBox.Textarea>;
+};
 export default meta;
 
 type Story = StoryObj<typeof meta>;
