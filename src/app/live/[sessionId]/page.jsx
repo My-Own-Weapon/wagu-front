@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-shadow */
@@ -48,7 +47,7 @@ export default function StreamingPage({ params }) {
 
     checkStreamer();
     joinSession();
-  }, []);
+  }, [joinSession, sessionId]);
 
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -60,7 +59,7 @@ export default function StreamingPage({ params }) {
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, []);
+  }, [handleLeaveSessionClick]);
 
   const handleChatMessageChange = (e) => {
     setMessage(e.target.value);

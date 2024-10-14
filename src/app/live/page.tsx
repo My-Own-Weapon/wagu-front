@@ -44,7 +44,7 @@ export default function PrepareStreamingPage() {
           marginTop: '100px',
         }}
       >
-        <div className={s.entryPageHeaderWrapper} id="join-dialog">
+        <div className={s.entryPageHeaderWrapper}>
           <h1 className={s.title}> 스트리밍 방 참가 페이지 </h1>
           <AddressInput
             title="가게 이름"
