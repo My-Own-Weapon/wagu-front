@@ -26,10 +26,36 @@ export const formatNumberToKRW = (price: number) => {
   return `${formattedPrice}원`;
 };
 
-export const consoleArt = () => {
-  console.log(`
-    　(　 .∧_∧
-    　 )　(｡・ω・)
-    　旦 ι''o,,_）～ 너와 나의 맛집 공유 !
-    `);
+export const formatDate = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+
+    // 날짜가 유효한지 확인
+    if (Number.isNaN(date.getTime())) {
+      throw new Error('Invalid date format');
+    }
+
+    return new Intl.DateTimeFormat('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(date);
+  } catch (error) {
+    return '알 수 없는 작성일';
+  }
+};
+
+export interface ResultProps<T, E> {
+  (Ok: () => T, Err: (e: Error) => E): T | E;
+}
+
+export const Result: ResultProps<void, void> = async (Ok, Err) => {
+  try {
+    return await Ok();
+  } catch (e) {
+    if (e instanceof Error) {
+      return Err(e);
+    }
+    return new Error('An unknown error occurred');
+  }
 };
