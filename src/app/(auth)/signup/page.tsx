@@ -9,7 +9,9 @@ export default function SignupPage() {
   return (
     <>
       <Spacing size={32} />
+
       <SignupForm />
+
       <Spacing size={24} />
       <Flex justifyContent="center">
         <Text as="span" fontSize="medium" fontWeight="regular" color="#2e2e2e">
