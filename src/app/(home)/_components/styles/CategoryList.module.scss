@@ -1,0 +1,47 @@
+@import '@styles/mixins/index.scss';
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/radius.scss';
+@import '@styles/variables/textSize.scss';
+@import '@styles/variables/fontWeight.scss';
+
+.categoriesWrapper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  column-gap: 8px;
+  row-gap: 4px;
+}
+
+.categoryBtn {
+  padding: 4px;
+
+  background-color: $white;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+
+  border-radius: $radiusMedium;
+
+  position: relative;
+
+  flex-grow: 1;
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background-color: transparent; // 기본 상태에서는 투명
+    transition: background-color 0.3s ease; // transition 적용
+  }
+
+  &:hover::after {
+    background-color: rgba(0, 0, 0, 0.03); // hover 시에 색상 변경
+  }
+}
