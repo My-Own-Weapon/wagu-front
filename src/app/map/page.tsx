@@ -40,7 +40,7 @@ export default function MapPage() {
   const [selectedStore, setSelectedStore] = useState<StoreResponse | null>(
     null,
   );
-  const [voteUrl, setVoteUrl] = useState('');
+  const [voteUrl, setVoteUrl] = useState<string>('');
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -170,18 +170,14 @@ export default function MapPage() {
   return (
     <main className={s.container}>
       <div className={s.top}>
-        <div id="map" className={s.map} />
+        <div htmlFor="map" className={s.map} />
       </div>
       <div className={s.bottom}>
         {selectedStore?.liveStore && selectedStore?.storeName && (
           <>
-            <Heading
-              as="h3"
-              fontSize="16px"
-              fontWeight="bold"
-              color="black"
-              title={`${selectedStore.storeName}에서 방송중이에요 !`}
-            />
+            <Heading as="h3" fontSize="16px" fontWeight="bold" color="black">
+              {selectedStore.storeName}에서 방송중이에요 !
+            </Heading>
             <LiveFriends liveFriends={streamers} />
           </>
         )}
