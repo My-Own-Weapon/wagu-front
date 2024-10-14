@@ -1,4 +1,3 @@
-import Spinner from '@/app/(home)/_components/Spinner';
 import InputBoxWrapper from '@/app/(post)/write/_components/InputBoxWrapper';
 import WritePageHeader from '@/app/(post)/write/_components/WritePageHeader';
 
@@ -7,6 +6,7 @@ import CategorySelectSection from '@/app/(post)/write/_components/CategorySelect
 import ReviewPageNavigation from '@/app/(post)/write/_components/ReviewPageNavigation';
 import ImageInputSection from '@/app/(post)/write/_components/ImageInputSection';
 import ReviewInputsSection from '@/app/(post)/write/_components/ReviewInputsSection';
+import Spinner from '@/app/(post)/write/_components/Spinnner';
 
 export {
   Spinner,
