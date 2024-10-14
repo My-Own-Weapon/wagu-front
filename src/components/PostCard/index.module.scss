@@ -1,0 +1,12 @@
+.cardContainer {
+  width: 100%;
+
+  display: flex;
+  flex-direction: row;
+
+  border-radius: 4px;
+
+  .cardWrapper {
+    flex-grow: 1;
+  }
+}
