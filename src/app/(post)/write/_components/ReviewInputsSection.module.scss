@@ -1,0 +1,33 @@
+@import '@styles/mixins/index.scss';
+@import '@styles/variables/radius.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/textSize.scss';
+
+.AIBtn {
+  @include flexCenter;
+  position: absolute;
+  top: calc(16px + 24px + 16px + 48px + 40px + 40px + 16px + 40px + 32px);
+  right: 16px;
+
+  padding: 4px 12px;
+
+  background-color: $bgWhite;
+
+  background-color: $bgBrown;
+  color: $white;
+
+  border-radius: $radiusMedium;
+
+  font-size: $textSmall;
+  font-weight: $medium;
+
+  cursor: pointer;
+
+  &:hover {
+    background-color: $primaryOrange;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}
