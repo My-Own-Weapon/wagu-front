@@ -11,11 +11,22 @@ interface Props {
 }
 
 function OpenViduVideoComponent({ streamManager }: Props) {
-  const videoRef = useRef(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     if (streamManager && videoRef.current) {
       streamManager.addVideoElement(videoRef.current);
+    }
+  }, [streamManager]);
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    const userAgent = navigator.userAgent;
+    if (userAgent.indexOf('Mobile') > -1) {
+      videoRef.current.style.left = '-40px';
+    } else {
+      videoRef.current.style.left = '-410px';
     }
   }, [streamManager]);
 
