@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { MouseEvent, MouseEventHandler, useState } from 'react';
 
 import { UserIcon } from '@/components/UserIcon';
-import ImageFill from '@/components/ui/ImageFill';
+import { NextImageWithCover } from '@/components/ui';
 import { VotedStoreResponse } from '@/types';
 
 import s from './StoreCard.module.scss';
@@ -53,10 +53,9 @@ export function StoreCard({ storeId, storeName, menuImage, postCount }: Store) {
       <Link className={s.linkArea} href={`/store/${storeId}`}>
         <div className={s.wrapper}>
           <div className={s.storeInfoArea}>
-            <ImageFill
+            <NextImageWithCover
               src={url ?? '/profile/profile-default-icon-female.svg'}
               alt="profile-img"
-              fill
               height="80px"
               borderRadius="8px"
               backgroundColor="#aeaeae"
@@ -178,10 +177,9 @@ export function VotableCard({
               }
         }
       >
-        <ImageFill
+        <NextImageWithCover
           src={store.menuImage.url}
           alt="store-img"
-          fill
           height="140px"
           borderRadius="8px"
         />

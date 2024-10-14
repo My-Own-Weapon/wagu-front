@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 
 import { KakaoLogoSVG, XSVG } from '@public/newDesign';
 import Heading from '@/components/ui/Heading';
-import ImageFill from '@/components/ui/ImageFill';
+import { NextImageWithCover } from '@/components/ui';
 
 import s from './VoteUrlModal.module.scss';
 
@@ -65,7 +65,7 @@ export default function VoteUrlModal({
           >
             {voteUrl}
           </div>
-          <ImageFill
+          <NextImageWithCover
             src="/newDesign/share_url_hand.svg"
             width="220px"
             height="220px"
