@@ -3,27 +3,35 @@ import { Store } from '@/components/StoreCard';
 import { User } from '@/components/UserCard';
 import { http, HttpResponse } from 'msw';
 
+import fixtures from './fixtures';
+
 export const handlers = [
-  http.post('/login', () => {
-    console.log('mock Api : login sucess !!');
+  /* 로그인 */
+  http.post('/login', async ({ request }) => {
+    console.log('[POST] /login');
 
-    return HttpResponse.json({
-      headers: { 'Set-Cookie': 'JSESSIONID=helloworld' },
-      status: 200,
-      ok: true,
-    });
+    const requestBody = await request.json();
+    const { username, password } = requestBody as Record<string, string>;
 
-    /* unauthorization */
-    // return HttpResponse.json({
-    //     headers: {
-    //       status: 401,
-    //       ok: false,
-    //     },
-    //   });
+    if (username === 'test' && password === 'test') {
+      return HttpResponse.text('login 성공', {
+        status: 200,
+      });
+    }
+
+    return HttpResponse.json(
+      {
+        error: 'Not Authorized',
+        message: '아이디와 비밀번호가 일치하지 않습니다.',
+        status: 401,
+      },
+      { status: 401 },
+    );
   }),
 
+  /* 로그아웃 */
   http.post('/logout', () => {
-    console.log('mock Api : 로그아웃 !!');
+    console.log('[POST] /logout');
 
     return new HttpResponse(null, {
       headers: {
@@ -32,45 +40,177 @@ export const handlers = [
     });
   }),
 
-  http.post('/join', async () => {
-    console.log('mock Api : 회원가입 !!');
-    /* 중복된 유저 */
-    // return HttpResponse.text(JSON.stringify('Already exists user'), {
-    //   status: 403,
-    // });
+  /* 회원가입 */
+  http.post('/join', async ({ request }) => {
+    console.log('[POST] /join');
 
-    /* 성공 */
-    return HttpResponse.json({
-      message: '성공',
-      succ: true,
-    });
+    const requestBody = await request.json();
+    const { username, password, passwordConfirm, name, phoneNumber } =
+      requestBody as Record<string, string>;
+
+    if (username === 'conflict' && password === 'conflict') {
+      return HttpResponse.json(
+        {
+          message: '이미 회원가입된 아이디입니다.',
+        },
+        {
+          status: 409,
+        },
+      );
+    }
+
+    if (password !== passwordConfirm) {
+      return HttpResponse.json(
+        {
+          message: '비밀번호가 일치하지 않습니다.',
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    if (!name.match(/^[가-힣]+$/g)) {
+      return HttpResponse.json(
+        {
+          message: '이름은 한글만 입력 가능합니다.',
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    if (!phoneNumber.match(/^[0-9]{3}-[0-9]{4}-[0-9]{4}$/)) {
+      return HttpResponse.json(
+        {
+          message: '휴대폰 번호는 000-0000-0000 형식으로 입력해주세요.',
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    if (username === 'test' && password === 'test') {
+      return HttpResponse.text('회원가입 성공', {
+        status: 200,
+      });
+    }
+
+    return HttpResponse.json(
+      {
+        message: '정상적인 방법을 통해 회원가입을 진행하세요.',
+      },
+      {
+        status: 401,
+      },
+    );
   }),
 
-  http.get('/posts', () => {
-    console.log('fetch all post !!');
+  http.get('/session', () => {
+    console.log('[GET] /session');
 
-    return HttpResponse.json(getMockPosts());
+    return HttpResponse.text('succ');
   }),
 
+  http.get('rooms/followings', () => {
+    console.log('[GET] /rooms/followings');
+
+    return HttpResponse.json([
+      {
+        profileImage: '/profile/profile-default-icon-female.svg',
+        sessionId: '1',
+        userName: '임꺽정',
+        address: 'string',
+        storeName: 'string',
+      },
+    ]);
+  }),
+
+  /**
+   * @description 로그인한 user가 작성한 모든 post 조회
+   */
+  http.get('/posts', async ({ request }) => {
+    console.log('[GET] /posts');
+
+    const url = new URL(request.url);
+    const page = Number(url.searchParams.get('page'));
+    const count = Number(url.searchParams.get('size'));
+
+    return HttpResponse.json(fixtures.posts.slice(page, count));
+  }),
+
+  /**
+   * @description post 작성
+   * @see ApiService().addPost()
+   */
+  http.post('/posts', async ({ request }) => {
+    console.log('[POST] /posts');
+
+    /**
+     * @description request.formData()로 formdata를 받아와야 했지만 msw 내부적으로 formData 파싱이 안되는
+     * 이슈가 있어서 content-type을 확인해서 multipart/form-data인 경우에만 성공으로 처리
+     */
+    if (request.headers.get('content-type')?.includes('multipart/form-data')) {
+      return HttpResponse.text('success');
+    }
+
+    return HttpResponse.json(
+      {
+        message: '리뷰 입력란을 모두 채워주세요.',
+      },
+      {
+        status: 400,
+      },
+    );
+  }),
+
+  /**
+   * @description 단일 post 조회
+   */
   http.get('/posts/:postId', ({ request }) => {
-    console.log('fetch post !!');
+    console.log('[GET] /posts/:postId');
 
     const splitedUrl = request.url.split('/');
     const path = Number(splitedUrl[splitedUrl.length - 1]);
 
-    if (path % 2 === 0) return HttpResponse.json(getMockPostPossiblePatch());
+    if (path % 2 === 0) return HttpResponse.json(fixtures.modifiablePost);
 
-    return HttpResponse.json(getMockPostNotPossiblePatch());
+    return HttpResponse.json(fixtures.notModifiablePost);
+  }),
+
+  /**
+   * @description ai가 완성한 리뷰를 fetch한다.
+   */
+  http.post('/posts/auto', async ({ request }) => {
+    console.log('[GET] /posts/auto');
+
+    const body = (await request.json()) as {
+      menuName: string;
+      category: string;
+    } | null;
+    if (!body) {
+      return HttpResponse.json(
+        { error: 'Request body is missing' },
+        { status: 400 },
+      );
+    }
+
+    const { menuName } = body;
+    return HttpResponse.json({
+      menuContent: `나는로보트인데 ${menuName} 진짜 맛있음`,
+    });
   }),
 
   http.get('/followings', () => {
-    console.log('fetch live friends !!');
+    console.log('[GET] /followings');
 
     return HttpResponse.json(getFollowings());
   }),
 
   http.get('/members', ({ request }) => {
-    console.log('fetch members !!');
+    console.log('[GET] /members');
 
     const url = new URL(request.url);
     const query = url.searchParams.get('username');
@@ -86,8 +226,28 @@ export const handlers = [
     return HttpResponse.json(getUserNotIncludeA());
   }),
 
+  /**
+   * @description user의 profile 정보를 조회한다.
+   */
+  http.get('/member/:userName/profile', ({ request }) => {
+    console.log('[GET] /member/:userName/profile');
+
+    const splitedUrl = request.url.split('/');
+    const userName = splitedUrl[splitedUrl.length - 2];
+
+    return HttpResponse.json({
+      memberId: 1,
+      imageUrl: '/profile/profile-default-icon-male.svg',
+      username: userName,
+      name: 'id',
+    });
+  }),
+
+  /**
+   * @description search page에서 가게 검색
+   */
   http.get('/stores', ({ request }) => {
-    console.log('fetch members !!');
+    console.log('[GET] /stores');
 
     const url = new URL(request.url);
     const query = url.searchParams.get('keyword');
@@ -104,6 +264,8 @@ export const handlers = [
   }),
 
   http.get('/map/posts', () => {
+    console.log('[GET] /map/posts');
+
     return HttpResponse.json(getMockPostsOfStroe());
   }),
 ];
@@ -336,157 +498,6 @@ function getUserNotIncludeA(): User[] {
       each: false,
     },
   ];
-}
-
-function getMockPosts() {
-  return [
-    {
-      postId: 1,
-      menuPrice: '12000',
-      storeName: '울엄 김치찜ㅇㄴㅁㅇㅁㄴㅇㅁ',
-      category: 'KOREAN',
-      postMainMenu: '김치찜',
-      postImage: { id: 23, url: '/images/mock-food.png' },
-      postContent: 'string',
-      createDate: '2024-07-08',
-      updateDate: '2024-07-08',
-      auto: true,
-    },
-    {
-      postId: 2,
-      menuPrice: '12000',
-      storeName: '울엄 김치찜',
-      category: 'KOREAN',
-      postMainMenu: '김치찜',
-      postImage: { id: 23, url: '/images/mock-food.png' },
-      postContent: 'string',
-      createDate: '2024-07-08',
-      updateDate: '2024-07-08',
-      auto: true,
-    },
-    {
-      postId: 11123,
-      menuPrice: '12000',
-      storeName: '울엄 김치찜',
-      category: 'KOREAN',
-      postMainMenu: '김치찜',
-      postImage: { id: 23, url: '/images/mock-food.png' },
-      postContent: 'string',
-      createDate: '2024-07-08',
-      updateDate: '2024-07-08',
-      auto: true,
-    },
-    {
-      postId: 1111,
-      menuPrice: '12000',
-      storeName: '울엄 김치찜',
-      category: 'KOREAN',
-      postMainMenu: '김치찜',
-      postImage: { id: 23, url: '/images/mock-food.png' },
-      postContent: 'string',
-      createDate: '2024-07-08',
-      updateDate: '2024-07-08',
-      auto: true,
-    },
-    {
-      postId: 2222,
-      menuPrice: '12000',
-      storeName: '울엄 김치찜',
-      category: 'JAPANESE',
-      postMainMenu: '김치찜',
-      postImage: { id: 23, url: '/images/mock-food.png' },
-      postContent: 'string',
-      createDate: '2024-07-08',
-      updateDate: '2024-07-08',
-      auto: true,
-    },
-    {
-      postId: 2223,
-      menuPrice: '12000',
-      storeName: '울엄 김치찜',
-      category: 'JAPANESE',
-      postMainMenu: '김치찜',
-      postImage: { id: 23, url: '/images/mock-food.png' },
-      postContent: 'string',
-      createDate: '2024-07-08',
-      updateDate: '2024-07-08',
-      auto: true,
-    },
-    {
-      postId: 2225,
-      menuPrice: '12000',
-      storeName: '울엄 김치찜',
-      category: 'JAPANESE',
-      postMainMenu: '김치찜',
-      postImage: { id: 23, url: '/images/mock-food.png' },
-      postContent: 'string',
-      createDate: '2024-07-08',
-      updateDate: '2024-07-08',
-      auto: true,
-    },
-    {
-      postId: 33312,
-      menuPrice: '12000',
-      storeName: '울엄 김치찜',
-      category: 'CHINESE',
-      postMainMenu: '김치찜',
-      postImage: { id: 23, url: '/images/mock-food.png' },
-      postContent: 'string',
-      createDate: '2024-07-08',
-      updateDate: '2024-07-08',
-      auto: true,
-    },
-    {
-      postId: 33313,
-      menuPrice: '12000',
-      storeName: '울엄 김치찜',
-      category: 'WESTERN',
-      postMainMenu: '김치찜',
-      postImage: { id: 23, url: '/images/mock-food.png' },
-      postContent: 'string',
-      createDate: '2024-07-08',
-      updateDate: '2024-07-08',
-      auto: true,
-    },
-    {
-      postId: 3331,
-      menuPrice: '12000',
-      storeName: '울엄 김치찜',
-      category: 'WESTERN',
-      postMainMenu: '김치찜',
-      postImage: { id: 23, url: '/images/mock-food.png' },
-      postContent: 'string',
-      createDate: '2024-07-08',
-      updateDate: '2024-07-08',
-      auto: true,
-    },
-  ];
-}
-
-function getMockPostPossiblePatch() {
-  return {
-    id: 111,
-    writer: 'zxc',
-    postMainMenu: 'string',
-    postImage: 'string',
-    postContent: '호박고구마'.repeat(150),
-    createDate: '2024-07-08',
-    updateDate: '2024-07-08',
-    auto: true,
-  };
-}
-
-function getMockPostNotPossiblePatch() {
-  return {
-    id: 111,
-    writer: 'other',
-    postMainMenu: 'string',
-    postImage: 'string',
-    postContent: '호박고구마'.repeat(150),
-    createDate: '2024-07-08',
-    updateDate: '2024-07-08',
-    auto: true,
-  };
 }
 
 function getFollowings() {
