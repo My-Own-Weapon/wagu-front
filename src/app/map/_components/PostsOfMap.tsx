@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 import { PostOfStoreResponse } from '@/types';
-import ImageFill from '@/components/ui/ImageFill';
+import { NextImageWithCover } from '@/components/ui';
 import Heading from '@/components/ui/Heading';
 import useDragScroll from '@/hooks/useDragScroll';
 
@@ -22,20 +22,14 @@ export default function PostsOfMap({
   return (
     <div className={s.container}>
       <div className={s.titleWrapper}>
-        <Heading
-          as="h3"
-          fontSize="16px"
-          fontWeight="bold"
-          color="black"
-          title={
-            isNotSelectStore({
-              selectedStoreId,
-              selectedStoreName,
-            })
-              ? '지도의 가게를 클릭해보세요 !'
-              : `${selectedStoreName} POST`
-          }
-        />
+        <Heading as="h3" fontSize="16px" fontWeight="bold" color="black">
+          {isNotSelectStore({
+            selectedStoreId,
+            selectedStoreName,
+          })
+            ? '지도의 가게를 클릭해보세요 !'
+            : `${selectedStoreName} POST`}
+        </Heading>
         {isNoPost({
           posts,
           selectedStoreId,
@@ -46,7 +40,6 @@ export default function PostsOfMap({
           </Link>
         )}
       </div>
-
       <ul className={s.postsWrapper} ref={ref}>
         {!isNoPost({
           posts,
@@ -69,11 +62,10 @@ function PostCard({ imgUrl, postId }: { imgUrl: string; postId: number }) {
   return (
     <li>
       <Link href={`/posts/${postId}`}>
-        <ImageFill
+        <NextImageWithCover
           src={imgUrl}
           width="120px"
           height="120px"
-          fill
           alt="post-img"
           borderRadius="4px"
         />

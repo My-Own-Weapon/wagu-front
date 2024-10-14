@@ -30,7 +30,7 @@
     // "max-lines-per-function": ["error", 15],
     "array-callback-return": "error", // 4.7
     "prefer-destructuring": [
-      "error",
+      "warn",
       { "array": true, "object": true },
       { "enforceForRenamedProperties": false }
     ],
@@ -40,6 +40,9 @@
     "import/extensions": "off",
     "react-hooks/exhaustive-deps": ["warn"],
     // airbnb style guide
+    /*eslint camelcase: ["error", {allow: ["^UNSAFE_"]}]*/
+
+    "camelcase": ["error", { "allow": ["^[a-zA-Z]+__[a-zA-Z]+$"] }],
     "template-curly-spacing": ["error", "never"],
     "default-param-last": ["error"],
     "no-param-reassign": ["error"],
@@ -69,6 +72,7 @@
     "@typescript-eslint/semi": "off",
     "react/jsx-filename-extension": ["warn", { "extensions": [".ts", ".tsx"] }],
     "no-useless-catch": "off",
+    "import/no-anonymous-default-export": "off",
     "import/no-extraneous-dependencies": "off" /* msw를 제대로 인식하지 못함 */,
     /* about label, input connection with htmlfor */
     "jsx-a11y/label-has-associated-control": [
@@ -80,13 +84,15 @@
       { "required": { "some": ["nesting", "id"] } }
     ],
     /* about default parameter */
+    "no-dupe-class-members": "off",
     "react/require-default-props": [2, { "functions": "defaultArguments" }],
+    "func-names": ["error", "as-needed"],
     "no-shadow": [
       "error",
       {
-        "allow": ["query", "x", "y", "e", "from"],
-        "hoist": "never",
-        "ignoreOnInitialization": true
+        "hoist": "functions",
+        "ignoreOnInitialization": true,
+        "allow": ["resolve", "reject", "done", "next", "err", "error", "query"]
       }
     ],
     /* ✅ TODO : remove */

@@ -1,0 +1,60 @@
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/radius.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/textSize.scss';
+
+// .container {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 8px;
+
+.reviewInput {
+  width: 100%;
+  height: auto;
+  min-height: 120px;
+
+  padding: 16px 0;
+
+  background-color: transparent;
+
+  color: $inputTextColor;
+  font-size: $textMedium;
+  font-weight: $medium;
+  letter-spacing: -0.025em;
+
+  border: 1.5px solid transparent;
+  resize: none;
+  overflow: hidden;
+
+  transition: border 0.1s;
+
+  &::placeholder {
+    color: $placeholderColor;
+    font-size: $placeholderSize;
+    font-weight: $medium;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:hover {
+    border: 1.5px solid rgba(255, 111, 0, 0.3);
+
+    border-radius: $radiusSmall;
+  }
+
+  &:focus {
+    border: 1.5px solid $primaryOrange;
+
+    border-radius: $radiusSmall;
+  }
+}
+// }
+
+.label {
+  color: $inputTextColor;
+  font-size: $textMedium;
+  font-weight: $medium;
+  letter-spacing: -0.025em;
+}

@@ -31,7 +31,7 @@ import { apiService } from '@/services/apiService';
 import { StoreResponse } from '@/types';
 import PostsOfMap from '@/app/map/_components/PostsOfMap';
 import Heading from '@/components/ui/Heading';
-import ImageFill from '@/components/ui/ImageFill';
+import { NextImageWithCover } from '@/components/ui';
 import { KingSVG } from '@public/newDesign/vote';
 import { usePostsOfStore, useSelectedStore, useVotedStore } from '@/stores';
 
@@ -881,8 +881,9 @@ export default function SharePage() {
                 color="white"
                 fontSize="24px"
                 fontWeight="medium"
-                title={`${voteWinStores[0]?.storeName}이 우승했어요 !`}
-              />
+              >
+                {`${voteWinStores[0]?.storeName}이 우승했어요 !`}
+              </Heading>
             </div>
           </div>
           <div className={s.bottom}>
@@ -911,7 +912,7 @@ export default function SharePage() {
     return (
       <div className={s.addVoteContainer}>
         <div className={s.top}>
-          <div id="map" className={s.map} />
+          <div htmlFor="map" className={s.map} />
           <div className={s.userContainer}>
             {[...usersProfile].map(([username, { imageUrl, name }]) => {
               return (
@@ -936,13 +937,9 @@ export default function SharePage() {
         <div className={s.bottom}>
           {selectedStore?.liveStore && selectedStore?.storeName && (
             <>
-              <Heading
-                as="h3"
-                fontSize="16px"
-                fontWeight="bold"
-                color="black"
-                title={`${selectedStore.storeName}에서 방송중이에요 !`}
-              />
+              <Heading as="h3" fontSize="16px" fontWeight="bold" color="black">
+                {`${selectedStore.storeName}에서 방송중이에요 !`}
+              </Heading>
               <LiveFriends liveFriends={streamerFromStores} />
             </>
           )}
@@ -976,13 +973,9 @@ export default function SharePage() {
           {/* </div> */}
           {votedStores.length > 0 && (
             <div className={s.votedStoresWrapper}>
-              <Heading
-                as="h3"
-                fontSize="16px"
-                fontWeight="bold"
-                color="black"
-                title="투표에 추가된 STORE"
-              />
+              <Heading as="h3" fontSize="16px" fontWeight="bold" color="black">
+                투표에 추가된 STORE
+              </Heading>
               <VotedStoreCards
                 stores={votedStores}
                 handleRemoveVotedStore={deleteStoreFromVoteList}
@@ -1006,7 +999,7 @@ export default function SharePage() {
             <video
               style={{ display: 'none' }}
               key={index}
-              id={`subscriberVideo${index}`}
+              htmlFor={`subscriberVideo${index}`}
               autoPlay
               ref={(video) => {
                 if (video) {
@@ -1033,12 +1026,11 @@ function WinStoreCard({
   return (
     <Link className={s.winStoreCardAnchor} href={`/store/${storeId}`}>
       <div className={s.winStoreCardContainer}>
-        <ImageFill
+        <NextImageWithCover
           src={url}
           id={String(storeId)}
           alt="vote-win-store-img"
           height="280px"
-          fill
           borderRadius="24px"
         />
         <div className={s.titleArea}>

@@ -1,0 +1,55 @@
+@import '@/styles/variables/radius.scss';
+@import '@/styles/variables/colors.scss';
+@import '@/styles/variables/textSize.scss';
+
+.socialLogin {
+  width: 100%;
+
+  margin-top: 40px;
+  text-align: center;
+
+  .divider {
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #e5e5ec;
+    }
+
+    span {
+      font-size: $textMedium;
+      font-weight: 500;
+      color: #767676;
+    }
+  }
+
+  .socialButtons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 25px;
+
+    .socialButton {
+      width: 93px;
+      height: 56px;
+      border: 1px solid #e5e5ec;
+      border-radius: 12px;
+      background-color: $bgWhite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+
+      img {
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+}
