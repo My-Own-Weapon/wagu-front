@@ -31,7 +31,7 @@ interface KAKAOSearchAddressResponse {
 }
 
 export default function AddressInput({
-  title = undefined,
+  title = '',
   value,
   onSelect,
 }: AddressInputProps) {
@@ -104,10 +104,10 @@ export default function AddressInput({
   return (
     <div className={`${s.container} ${isFocused ? s.blur : ''}`}>
       {!isFocused && (
-        <div>
-          <InputBox
-            height="30px"
-            label={title}
+        <InputBox>
+          <InputBox.Label>{title}</InputBox.Label>
+          <InputBox.Input
+            height={48}
             placeholder="주소를 검색하면 식당 정보가 자동으로 입력됩니다."
             name="address"
             type="text"
@@ -116,7 +116,7 @@ export default function AddressInput({
             onFocus={() => setIsFocused(true)}
             readOnly={!isFocused}
           />
-        </div>
+        </InputBox>
       )}
       {isFocused && (
         <div ref={inputRef}>
@@ -137,7 +137,6 @@ export default function AddressInput({
                 onKeyDown={handleKeyDown}
                 readOnly={!isFocused}
               />
-              {/* <Button text="검색" type="button" onClick={handleButtonClick} /> */}
               <button
                 className={s.searchBtn}
                 type="button"
@@ -151,9 +150,13 @@ export default function AddressInput({
                 />
               </button>
             </div>
-            <ul className={s.results} onWheel={(e) => e.stopPropagation()}>
-              {results.length > 0 && !!results ? (
-                results.map(({ id, address_name, place_name, x, y }) => (
+            {results.length > 0 && !!results ? (
+              <ul
+                className={s.results}
+                data-testid="address-search-results"
+                onWheel={(e) => e.stopPropagation()}
+              >
+                {results.map(({ id, address_name, place_name, x, y }) => (
                   <li
                     key={id}
                     onClick={() => {
@@ -173,11 +176,11 @@ export default function AddressInput({
                       </div>
                     </div>
                   </li>
-                ))
-              ) : (
-                <p className={s.resultText}>검색결과가 없습니다.</p>
-              )}
-            </ul>
+                ))}
+              </ul>
+            ) : (
+              <p className={s.resultText}>검색결과가 없습니다.</p>
+            )}
           </div>
         </div>
       )}
