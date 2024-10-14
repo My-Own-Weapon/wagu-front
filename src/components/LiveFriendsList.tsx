@@ -1,8 +1,10 @@
+'use client';
+
 import Link from 'next/link';
 
+import { COLORS } from '@/components/ui/_contants';
 import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
 import { usePathname } from 'next/navigation';
-import { COLORS } from '@/constants/colors';
 
 import s from './LiveFriendsList.module.scss';
 
