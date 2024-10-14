@@ -29,12 +29,13 @@ type SuccessMessageResponse = Promise<string>;
 class ApiService {
   private mswBaseUrl = 'http://localhost:9090';
 
-  private baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  private baseUrl =
+    process.env.NODE_ENV === 'production'
+      ? process.env.NEXT_PUBLIC_BASE_URL
+      : this.mswBaseUrl;
 
   private kakaoBaseUrl =
     'https://dapi.kakao.com/v2/local/search/keyword.json?page=1&size=15&sort=accuracy&query=';
-
-  private sessionId = '';
 
   /* Auth */
   async login({ username, password }: LoginUserInputs) {
@@ -48,14 +49,13 @@ class ApiService {
     });
 
     if (!res.ok) {
-      const { status, message, error } = await res.json();
+      const data = await res.json();
+      const { status, message, error } = data;
 
       throw new Error(`[${status}, ${error}] ${message}`);
     }
 
-    const data = await res.text();
-
-    return data;
+    return res.text();
   }
 
   async logout() {
@@ -93,6 +93,13 @@ class ApiService {
         phoneNumber,
       }),
     });
+
+    if (!res.ok) {
+      const data = await res.json();
+      const { status, message, error } = data;
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
 
     return res.text();
   }
@@ -207,11 +214,20 @@ class ApiService {
   }
 
   /* about Post */
-  async fetchPosts() {
-    const res = await fetch(`${this.baseUrl}/posts`, {
-      method: 'GET',
-      credentials: 'include',
-    });
+  async fetchPosts({
+    page = 0,
+    count = 12,
+  }: {
+    page?: number;
+    count?: number;
+  }) {
+    const res = await fetch(
+      `${this.baseUrl}/posts?page=${page}&size=${count}`,
+      {
+        method: 'GET',
+        credentials: 'include',
+      },
+    );
 
     return res.json();
   }
@@ -424,7 +440,7 @@ class ApiService {
     return data;
   }
 
-  async fetchLiveFriends() {
+  async fetchLiveFollowings() {
     const res = await fetch(`${this.baseUrl}/rooms/followings`, {
       method: 'GET',
       credentials: 'include',
