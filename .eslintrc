@@ -30,7 +30,7 @@
     // "max-lines-per-function": ["error", 15],
     "array-callback-return": "error", // 4.7
     "prefer-destructuring": [
-      "error",
+      "warn",
       { "array": true, "object": true },
       { "enforceForRenamedProperties": false }
     ],
