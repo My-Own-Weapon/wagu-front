@@ -1,3 +1,5 @@
+'use client';
+
 import { apiService } from '@/services/apiService';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
