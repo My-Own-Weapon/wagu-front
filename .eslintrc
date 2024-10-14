@@ -90,8 +90,7 @@
     "no-shadow": [
       "error",
       {
-        "allow": ["query", "x", "y", "e", "from"],
-        "hoist": "never",
+        "hoist": "functions",
         "ignoreOnInitialization": true
       }
     ],
