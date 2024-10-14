@@ -26,6 +26,7 @@ export default function SignupPage() {
           </Link>
         </Text>
       </Flex>
+      <Spacing size={40} />
     </>
   );
 }
