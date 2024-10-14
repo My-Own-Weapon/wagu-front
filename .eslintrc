@@ -91,7 +91,8 @@
       "error",
       {
         "hoist": "functions",
-        "ignoreOnInitialization": true
+        "ignoreOnInitialization": true,
+        "allow": ["resolve", "reject", "done", "next", "err", "error", "query"]
       }
     ],
     /* ✅ TODO : remove */
