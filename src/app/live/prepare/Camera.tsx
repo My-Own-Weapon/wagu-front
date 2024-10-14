@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { BoxButton } from '@/components/ui';
+import { useEffect, useReducer, useRef } from 'react';
 
 /**
  * ⛔️ mobile device에서 카메라 접근은 확인했습니다.
@@ -13,7 +14,7 @@ import { useEffect, useRef, useState } from 'react';
  */
 export default function Camera() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isCameraOn, toggleCameraOn] = useState<boolean>(false);
+  const [isCameraOn, toggleCamera] = useReducer((state) => !state, false);
 
   useEffect(() => {
     const initCamera = async () => {
@@ -25,7 +26,6 @@ export default function Camera() {
 
         videoRef.current.srcObject = isCameraOn ? stream : null;
       } catch (error) {
-        // eslint-disable-next-line no-alert
         alert(`Error accessing camera (reason : ${error})`);
       }
     };
@@ -42,16 +42,44 @@ export default function Camera() {
     };
   }, [isCameraOn]);
 
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    const userAgent = navigator.userAgent;
+    if (userAgent.indexOf('Mobile') > -1) {
+      videoRef.current.style.left = '-40px';
+    } else {
+      videoRef.current.style.left = '-410px';
+    }
+  }, [isCameraOn]);
+
   const handleClickCameraOnOff = () => {
-    toggleCameraOn((prevState) => !prevState);
+    toggleCamera();
   };
 
   return (
-    <div>
-      <video ref={videoRef} autoPlay muted />
-      <button type="button" onClick={handleClickCameraOnOff}>
-        {isCameraOn ? 'Turn off camera' : 'Turn on camera'}
-      </button>
+    <div
+      style={{
+        position: 'relative',
+        width: '100%',
+      }}
+    >
+      {isCameraOn ? (
+        <video
+          style={{
+            position: 'absolute',
+            left: '-410px',
+            height: '100dvh',
+          }}
+          ref={videoRef}
+          autoPlay
+          muted
+        />
+      ) : null}
+
+      <BoxButton onClick={handleClickCameraOnOff} styleType="outline">
+        {isCameraOn ? '카메라 테스트 종료' : '카메라 테스트 시작'}
+      </BoxButton>
     </div>
   );
 }
