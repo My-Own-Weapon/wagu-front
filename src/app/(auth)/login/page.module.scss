@@ -3,9 +3,3 @@
 .container {
   @include mainStyle;
 }
-
-.error {
-  color: red;
-  font-weight: 500;
-  margin-top: 8px;
-}

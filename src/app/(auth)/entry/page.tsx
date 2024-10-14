@@ -19,13 +19,9 @@ export default function EntryPage() {
               priority
             />
             <h1 className={s.title}>WAGU BOOK</h1>
-            <Heading
-              as="h2"
-              fontSize="18px"
-              fontWeight="bold"
-              color="black"
-              title="너와 나의 맛집 기록"
-            />
+            <Heading as="h2" fontSize="18px" fontWeight="bold" color="black">
+              너와 나의 맛집 기록
+            </Heading>
           </div>
         </div>
         <div className={s.btnArea}>
@@ -35,7 +31,7 @@ export default function EntryPage() {
             }}
             href="/signup"
           >
-            <BoxButton width="100%" height="56px" variant="fill">
+            <BoxButton width="100%" height="56px" styleType="fill">
               회원가입
             </BoxButton>
           </Link>
@@ -45,7 +41,7 @@ export default function EntryPage() {
             }}
             href="/login"
           >
-            <BoxButton width="100%" height="56px" variant="outline">
+            <BoxButton width="100%" height="56px" styleType="outline">
               로그인
             </BoxButton>
           </Link>
