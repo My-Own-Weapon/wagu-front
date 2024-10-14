@@ -2,7 +2,7 @@ import { useState } from 'react';
 import classNames from 'classnames';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import ImageFill from '@/components/ui/ImageFill';
+import { NextImageWithCover } from '@/components/ui';
 import { apiService } from '@/services/apiService';
 
 import s from './UserCard.module.scss';
@@ -43,10 +43,9 @@ function UserCard({
     <li className={s.container}>
       <div className={s.wrapper}>
         <div className={s.profileInfoArea}>
-          <ImageFill
+          <NextImageWithCover
             src={url ?? '/profile/profile-default-icon-female.svg'}
             alt="profile-img"
-            fill
             height="80px"
             borderRadius="8px"
             backgroundColor="#aeaeae"
