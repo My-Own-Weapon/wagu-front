@@ -46,3 +46,7 @@ next-env.d.ts
 /blob-report/
 /playwright/.cache/
 /tests-examples/
+*storybook.log
+
+# storybook example
+stories
