@@ -29,10 +29,11 @@ type SuccessMessageResponse = Promise<string>;
 class ApiService {
   private mswBaseUrl = 'http://localhost:9090';
 
-  private baseUrl =
-    process.env.NODE_ENV === 'production'
-      ? process.env.NEXT_PUBLIC_BASE_URL
-      : this.mswBaseUrl;
+  // private baseUrl =
+  //   process.env.NODE_ENV === 'production'
+  //     ? process.env.NEXT_PUBLIC_BASE_URL
+  //     : this.mswBaseUrl;
+  private baseUrl = 'https://api.wagubook.shop:8080';
 
   private kakaoBaseUrl =
     'https://dapi.kakao.com/v2/local/search/keyword.json?page=1&size=15&sort=accuracy&query=';

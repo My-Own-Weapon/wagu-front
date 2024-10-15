@@ -1,10 +1,10 @@
 @import 'https://fonts.cdnfonts.com/css/nats';
-@import '@styles/variables/colors';
-@import '@styles/variables/radius';
-@import '@styles/variables/textSize';
-@import '@styles/variables/fontWeight';
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/radius.scss';
+@import '@styles/variables/textSize.scss';
+@import '@styles/variables/fontWeight.scss';
 @import '@styles/variables/zIndex';
-@import '@styles/mixins/index';
+@import '@styles/mixins/index.scss';
 
 .container {
   position: sticky;

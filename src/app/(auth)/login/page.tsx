@@ -3,11 +3,7 @@
 import { useState } from 'react';
 
 import { Spacing } from '@/components/ui';
-import {
-  LoginForm,
-  SocialLoginArea,
-  NotYetSignupText,
-} from './_components/index';
+import { LoginForm, NotYetSignupText } from './_components/index';
 import { ErrorMessage } from '../_components';
 
 import s from './page.module.scss';
@@ -24,7 +20,6 @@ export default function LoginPage() {
           <ErrorMessage align="center">{errorMsg}</ErrorMessage>
         </>
       )}
-      <SocialLoginArea />
       <NotYetSignupText goto="signup" />
     </main>
   );

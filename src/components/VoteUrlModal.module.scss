@@ -1,9 +1,9 @@
-@import '@styles/mixins/index';
+@import '@styles/mixins/index.scss';
 @import '@styles/variables/zIndex';
-@import '@styles/variables/colors';
-@import '@styles/variables/fontWeight';
-@import '@styles/variables/textSize';
-@import '@styles/variables/radius';
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/textSize.scss';
+@import '@styles/variables/radius.scss';
 
 .overlay {
   position: fixed;
