@@ -6,16 +6,15 @@ test.describe('Main Page (HomePage)', () => {
   });
 
   test('메인 페이지가 정상적으로 렌더링되는지 확인', async ({ page }) => {
-    const liveFriendsHeading = page.locator('text=방송중인 친구가 있어요 !');
+    const liveFriendsHeading = page.getByText(/방송중인 친구가/);
     const myPostHeading = page.locator('text=My Post');
     const categoryList = page.getByTestId('category-list');
     const postCards = page.getByTestId('post-cards');
 
-    [liveFriendsHeading, myPostHeading, categoryList, postCards].forEach(
-      async (element) => {
-        await expect(element).toBeVisible();
-      },
-    );
+    await expect(liveFriendsHeading).toBeVisible();
+    await expect(myPostHeading).toBeVisible();
+    await expect(categoryList).toBeVisible();
+    await expect(postCards).toBeVisible();
   });
 
   test('카테고리 클릭 시 포스트가 필터링되는지 확인', async ({ page }) => {
@@ -33,12 +32,12 @@ test.describe('Main Page (HomePage)', () => {
   test('방송중인 친구가 있을 때 또는 없을 때 올바른 메시지가 표시되는지 확인', async ({
     page,
   }) => {
-    const liveFriendsMessage = page.locator('text=방송중인 친구가 있어요');
-    const noLiveFriendsMessage = page.locator('text=방송중인 친구가 없어요');
+    const liveFriendsMessage = page.getByText(/방송중인 친구가 있어요/);
+    const noLiveFriendsMessage = page.getByText(/방송중인 친구가 없어요/);
 
     const isLiveFriendsVisible = await liveFriendsMessage.isVisible();
     const isNoLiveFriendsVisible = await noLiveFriendsMessage.isVisible();
 
-    await expect(isLiveFriendsVisible || isNoLiveFriendsVisible).toBe(true);
+    expect(isLiveFriendsVisible || isNoLiveFriendsVisible).toBe(true);
   });
 });
