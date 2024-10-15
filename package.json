@@ -10,7 +10,8 @@
     "mock": "npx tsx watch ./src/mocks/http.ts",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test": "jest"
+    "test": "jest",
+    "lint:css": "stylelint 'src/**/*.{css,scss}' --fix"
   },
   "type": "module",
   "dependencies": {
