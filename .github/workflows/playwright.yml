@@ -24,9 +24,6 @@ jobs:
       - name: Wait for server to be ready
         run: npx wait-on http://localhost:3000
 
-      - name: Wait for msw server to be ready
-        run: npx wait-on http://localhost:9090
-
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
