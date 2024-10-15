@@ -170,7 +170,7 @@ export default function MapPage() {
   return (
     <main className={s.container}>
       <div className={s.top}>
-        <div htmlFor="map" className={s.map} />
+        <div id="map" className={s.map} />
       </div>
       <div className={s.bottom}>
         {selectedStore?.liveStore && selectedStore?.storeName && (

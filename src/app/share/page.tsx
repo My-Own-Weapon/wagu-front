@@ -912,7 +912,7 @@ export default function SharePage() {
     return (
       <div className={s.addVoteContainer}>
         <div className={s.top}>
-          <div htmlFor="map" className={s.map} />
+          <div id="map" className={s.map} />
           <div className={s.userContainer}>
             {[...usersProfile].map(([username, { imageUrl, name }]) => {
               return (
@@ -999,7 +999,7 @@ export default function SharePage() {
             <video
               style={{ display: 'none' }}
               key={index}
-              htmlFor={`subscriberVideo${index}`}
+              id={`subscriberVideo${index}`}
               autoPlay
               ref={(video) => {
                 if (video) {
