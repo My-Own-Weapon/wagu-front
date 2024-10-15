@@ -1,7 +1,7 @@
-@import '@styles/mixins/index';
-@import '@styles/variables/radius';
-@import '@styles/variables/fontWeight';
-@import '@styles/variables/textSize';
+@import '@styles/mixins/index.scss';
+@import '@styles/variables/radius.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/textSize.scss';
 
 .AIBtn {
   @include flexCenter;

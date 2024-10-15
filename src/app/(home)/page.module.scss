@@ -1,6 +1,6 @@
-@import '@/styles/mixins/index';
-@import '@/styles/variables/radius';
-@import '@/styles/variables/colors';
+@import '@/styles/mixins/index.scss';
+@import '@/styles/variables/radius.scss';
+@import '@/styles/variables/colors.scss';
 
 .container {
   background-color: $bgBrown;

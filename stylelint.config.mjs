@@ -14,5 +14,7 @@ export default {
       emptyLineBefore: 'always',
       noEmptyLineBetween: true,
     })),
+
+    'import-notation': 'string',
   },
 };
