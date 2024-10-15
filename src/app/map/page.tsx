@@ -163,7 +163,7 @@ export default function MapPage() {
     const sessionId = await apiService.createShareMapRandomSessionId();
     apiService.publishShareMapSession(sessionId);
 
-    setVoteUrl(`${BASE_URL}/share?sessionId=${sessionId}`);
+    setVoteUrl(`${BASE_URL}/vote?sessionId=${sessionId}`);
     setModalIsOpen(true);
   };
 
