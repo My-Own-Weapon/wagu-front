@@ -1,0 +1,49 @@
+@import '@styles/variables/colors';
+@import '@styles/variables/radius';
+@import '@styles/variables/fontWeight';
+@import '@styles/variables/textSize';
+@import '@styles/mixins/index';
+
+.container {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.inputBox {
+  box-sizing: border-box;
+
+  width: 100%;
+  padding: 16px 0;
+
+  font-size: $textMedium;
+  font-weight: $medium;
+  color: $inputTextColor;
+  letter-spacing: -0.025em;
+
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid $inputBorderColor;
+
+  &::placeholder {
+    font-size: $placeholderSize;
+    font-weight: $medium;
+    color: $placeholderColor;
+  }
+}
+
+.label {
+  font-size: $textMedium;
+  font-weight: $medium;
+  color: $inputTextColor;
+  letter-spacing: -0.025em;
+}
+
+.errorMessage {
+  font-size: $textSmall;
+  font-weight: $medium;
+  color: $red600;
+  letter-spacing: -0.025em;
+}

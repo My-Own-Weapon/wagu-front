@@ -1,68 +1,72 @@
-@import '@styles/variables/colors.scss';
-@import '@styles/variables/textSize.scss';
-@import '@styles/variables/fontWeight.scss';
-@import '@styles/variables/zIndex.scss';
-@import '@styles/variables/radius.scss';
+@import '@styles/variables/colors';
+@import '@styles/variables/textSize';
+@import '@styles/variables/fontWeight';
+@import '@styles/variables/zIndex';
+@import '@styles/variables/radius';
 
-@media (min-width: 375px) {
+@media (width >= 375px) {
   .container {
     max-width: 410px;
-
     margin: 0 auto;
   }
 }
 
 .container {
   position: fixed;
+  right: 0;
   bottom: 0;
   left: 0;
-  right: 0;
   z-index: $footer;
 
-  height: 60px;
   box-sizing: border-box;
-
-  padding: 0 24px;
-
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+
   gap: 24px;
 
-  background-color: $white;
+  align-items: center;
+  justify-content: space-between;
 
+  height: 60px;
+  padding: 0 24px;
+
+  background-color: $white;
   border: 0.5px solid #e6e6ea;
-  box-shadow: 2px 0px 6px rgba(51, 61, 75, 0.15);
+  box-shadow: 2px 0 6px rgb(51 61 75 / 15%);
 
   .wrapper {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
     width: 52px;
     height: 52px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
 
     &:nth-child(3) {
       min-width: 52px;
       min-height: 52px;
-      border-radius: $circle;
+
       background-color: $primaryOrange;
+      border-radius: $circle;
     }
 
     .iconArea {
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 4px;
+
+      align-items: center;
+      justify-content: center;
+
       width: 100%;
       height: 100%;
 
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 4px;
-
       .text {
-        color: $iconTextColor;
         font-size: $textXSmall;
         font-weight: $regular;
+        color: $iconTextColor;
       }
     }
   }

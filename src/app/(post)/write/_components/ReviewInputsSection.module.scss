@@ -1,0 +1,32 @@
+@import '@styles/mixins/index';
+@import '@styles/variables/radius';
+@import '@styles/variables/fontWeight';
+@import '@styles/variables/textSize';
+
+.AIBtn {
+  @include flexCenter;
+
+  position: absolute;
+  top: calc(16px + 24px + 16px + 48px + 40px + 40px + 16px + 40px + 32px);
+  right: 16px;
+
+  padding: 4px 12px;
+
+  font-size: $textSmall;
+  font-weight: $medium;
+  color: $white;
+
+  cursor: pointer;
+
+  background-color: $bgWhite;
+  background-color: $bgBrown;
+  border-radius: $radiusMedium;
+
+  &:hover {
+    background-color: $primaryOrange;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}

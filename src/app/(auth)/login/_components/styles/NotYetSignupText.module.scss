@@ -1,0 +1,20 @@
+@import '@/styles/variables/colors';
+@import '@/styles/variables/textSize';
+
+.footer {
+  margin-top: 40px;
+
+  font-size: $textMedium;
+  font-weight: 500;
+  color: $gray800;
+  text-align: center;
+
+  .signupLink {
+    color: $primaryOrange;
+    text-decoration: none;
+  }
+
+  .signupLink:disabled {
+    color: #e5e5ec;
+  }
+}

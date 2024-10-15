@@ -1,11 +1,9 @@
-/* eslint-disable no-shadow */
-
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import ImageFill from '@/components/ui/ImageFill';
+import { NextImageWithCover } from '@/components/ui';
 import { apiService } from '@/services/apiService';
 import { CategoriesEN, ProfileWithoutFollowResponse } from '@/types';
 import { formatNumberToKRW } from '@/utils';
@@ -21,7 +19,7 @@ interface Props {
   };
 }
 
-interface PostDetailsResponse {
+export interface PostDetailsResponse {
   postId: number;
   memberUsername: string;
   storeName: string;
@@ -51,6 +49,7 @@ interface MenuResponse {
 
 const UserIconWithText = WithText(UserIcon);
 
+/* ✅ TODO: 수정하기 구현 */
 export default function PostPage({ params: { postId } }: Props) {
   const [postDetails, setPostDetails] = useState<PostDetailsResponse | null>(
     null,
@@ -58,17 +57,19 @@ export default function PostPage({ params: { postId } }: Props) {
   const [profile, setProfile] = useState<ProfileWithoutFollowResponse | null>(
     null,
   );
-  const [currentMenuIndex, setCurrentMenuIndex] = useState(0); // 추가된 상태
+  const [currentMenuIndex, setCurrentMenuIndex] = useState<number>(0);
   const router = useRouter();
 
   useEffect(() => {
     const fetchPostDetails = async () => {
       try {
-        const postDetails = await apiService.fetchPost(postId);
-        setPostDetails(postDetails);
-        const { memberUsername: writer } = postDetails;
-        const profile = await apiService.fetchProfileWithoutFollow(writer);
-        setProfile(profile);
+        const fetchedPostDetails = await apiService.fetchPost(postId);
+        const { memberUsername: writer } = fetchedPostDetails;
+        const fetchedProfile =
+          await apiService.fetchProfileWithoutFollow(writer);
+
+        setPostDetails(fetchedPostDetails);
+        setProfile(fetchedProfile);
       } catch (e) {
         if (e instanceof Error) {
           alert(e.message);
@@ -78,7 +79,7 @@ export default function PostPage({ params: { postId } }: Props) {
     };
 
     fetchPostDetails();
-  }, []);
+  }, [postId, router]);
 
   const goToNextMenu = () => {
     if (postDetails && postDetails.menus.length > currentMenuIndex + 1) {
@@ -91,15 +92,13 @@ export default function PostPage({ params: { postId } }: Props) {
 
   return (
     <>
-      {/* ✅ TODO: 수정하기 구현 */}
       <PostHeader modable={false} />
       {postDetails && (
         <div className={s.container} data-id={postDetails?.postId}>
-          <ImageFill
-            src={menu?.menuImage.url || '/images/mock-food.png'}
-            alt={menu?.menuName || 'food-image'}
-            fill
-            height="360px"
+          <NextImageWithCover
+            src={menu?.menuImage?.url || ''}
+            alt="menu-image"
+            height={360}
           />
           <div className={s.contentWrapper}>
             <div className={s.postInfoArea}>

@@ -8,7 +8,7 @@ import {
 } from 'next/navigation';
 
 import * as Icon from '@public/newDesign/nav/index';
-import { COLORS } from '@/constants/colors';
+import { COLORS } from '@/components/ui/_contants';
 
 import s from './Footer.module.scss';
 

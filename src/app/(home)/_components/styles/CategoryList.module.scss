@@ -1,0 +1,54 @@
+@import '@styles/mixins/index.scss';
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/radius.scss';
+@import '@styles/variables/textSize.scss';
+@import '@styles/variables/fontWeight.scss';
+
+.categoriesWrapper {
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  row-gap: 4px;
+  column-gap: 8px;
+}
+
+.categoryBtn {
+  position: relative;
+
+  display: flex;
+
+  flex-grow: 1;
+  flex-direction: column;
+
+  gap: 4px;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 4px;
+
+  background-color: $white;
+  border-radius: $radiusMedium;
+
+  &::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    width: 50px;
+    height: 50px;
+
+    content: '';
+
+    background-color: transparent;
+    border-radius: 50%;
+
+    transition: background-color 0.3s ease;
+    transform: translate(-50%, -50%);
+  }
+
+  &:hover::after {
+    background-color: rgba(0, 0, 0, 0.03);
+  }
+}

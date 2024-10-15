@@ -1,0 +1,26 @@
+@import '@/styles/mixins/index';
+@import '@/styles/variables/radius';
+@import '@/styles/variables/colors';
+
+.container {
+  background-color: $bgBrown;
+
+  .top {
+    background-color: $bgBrown;
+  }
+
+  .bottom {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 20px;
+
+    justify-content: flex-start;
+
+    padding: 24px 24px 80px;
+
+    background-color: $white;
+    border-radius: 32px 32px 0 0;
+  }
+}

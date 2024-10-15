@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-shadow */
@@ -38,33 +37,6 @@ export default function StreamingPage({ params }) {
 
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
-
-  useEffect(() => {
-    const checkStreamer = async () => {
-      const { isCreator: isStreamer } =
-        await apiService.checkIsStreamerUserOfSession(sessionId);
-      setIsStreamer(isStreamer);
-    };
-
-    checkStreamer();
-    joinSession();
-  }, []);
-
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      handleLeaveSessionClick();
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, []);
-
-  const handleChatMessageChange = (e) => {
-    setMessage(e.target.value);
-  };
 
   const joinSession = useCallback(async () => {
     if (!sessionId) {
@@ -157,6 +129,10 @@ export default function StreamingPage({ params }) {
     });
   }, []);
 
+  const handleChatMessageChange = (e) => {
+    setMessage(e.target.value);
+  };
+
   const handleLeaveSessionClick = useCallback(() => {
     if (session) {
       session.disconnect();
@@ -216,6 +192,29 @@ export default function StreamingPage({ params }) {
       setMessage('');
     }
   };
+
+  useEffect(() => {
+    const checkStreamer = async () => {
+      const { isCreator: isStreamer } =
+        await apiService.checkIsStreamerUserOfSession(sessionId);
+      setIsStreamer(isStreamer);
+    };
+
+    checkStreamer();
+    joinSession();
+  }, [joinSession, sessionId]);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      handleLeaveSessionClick();
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [handleLeaveSessionClick]);
 
   return (
     <>
