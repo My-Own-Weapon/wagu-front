@@ -1,4 +1,4 @@
-import { ComponentProps, ElementType } from 'react';
+import { ComponentProps, CSSProperties, ElementType } from 'react';
 
 import { FONT_SIZE, FONT_WEIGHTS } from '@/components/ui/_contants';
 import { PropsWithNotUndefinedChildren } from '@/components/ui/_types';
@@ -9,6 +9,7 @@ export interface Props extends ComponentProps<'p'> {
   fontWeight: keyof typeof FONT_WEIGHTS;
   color: string;
   role?: 'alert' | 'status';
+  style?: CSSProperties;
 }
 
 export default function Text({
@@ -16,6 +17,7 @@ export default function Text({
   fontSize,
   fontWeight,
   color,
+  style = {},
   role = undefined,
   children,
   ...rest
@@ -26,6 +28,7 @@ export default function Text({
         fontSize: FONT_SIZE[fontSize],
         fontWeight: FONT_WEIGHTS[fontWeight],
         color,
+        ...style,
       }}
       role={role}
       {...rest}
