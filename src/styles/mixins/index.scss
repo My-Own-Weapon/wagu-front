@@ -1,4 +1,4 @@
-@import '@styles/variables/colors.scss';
+@import '@styles/variables/colors';
 
 @mixin mainStyle {
   width: 100%;
@@ -9,33 +9,37 @@
 
 @mixin flexCenter {
   display: flex;
-  justify-content: center;
+
   align-items: center;
+  justify-content: center;
 }
 
 @mixin flexRowStart {
   display: flex;
-  justify-content: flex-start;
+
   align-items: center;
+  justify-content: flex-start;
 }
 
 @mixin flexColumnCenter {
   display: flex;
+
   flex-direction: column;
-  justify-content: center;
+
   align-items: center;
+  justify-content: center;
 }
 
 @mixin flexColumnStart {
   display: flex;
+
   flex-direction: column;
-  justify-content: center;
+
   align-items: flex-start;
+  justify-content: center;
 }
 
 @mixin BorderRainbow {
-  border: 1.5px solid transparent;
-  border-radius: $radiusMedium;
   background-image: linear-gradient($white, $white),
     linear-gradient(
       to bottom right,
@@ -47,13 +51,17 @@
       indigo,
       violet
     );
-  background-origin: border-box;
   background-clip: padding-box, border-box;
+  background-origin: border-box;
+  border: 1.5px solid transparent;
+  border-radius: $radiusMedium;
 }
 
 @mixin Scroll {
   overflow-x: auto;
+
   white-space: nowrap;
+
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* Internet Explorer 10+ */
 
@@ -64,31 +72,31 @@
 
 @mixin ItemTopRightCirclePoint {
   &::after {
-    content: '';
-
     position: absolute;
+    top: 2px;
+    right: 2px;
 
     width: 12px;
     height: 12px;
 
-    top: 2px;
-    right: 2px;
+    content: '';
 
-    border-radius: 50%;
     background-color: $primaryOrange;
+    border-radius: 50%;
   }
 }
 
 @mixin ellipseOneLine {
-  white-space: nowrap;
   overflow: hidden;
+
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 // 🔵 chrome과 safari의 경우 상위 Wrapper element에 다음 속성을 추가해야합니다.
 //
 // {selector}::-webkit-scrollbar {
-//   display: none; /* Chrome, Safari, Opera*/
+//   display: none;displaydisplaydisplaydisplaydisplaydisplaydisplaydisplay /* Chrome, Safari, Opera*/
 // }
 @mixin removeScrollBar {
   scrollbar-width: none; /* Firefox */
@@ -97,27 +105,34 @@
 
 @keyframes colorChange {
   0% {
-    color: #ff0000;
+    color: #f00;
   }
+
   14% {
     color: #ff7f00;
   }
+
   28% {
-    color: #ffff00;
+    color: #ff0;
   }
+
   42% {
-    color: #00ff00;
+    color: #0f0;
   }
+
   57% {
-    color: #0000ff;
+    color: #00f;
   }
+
   71% {
     color: #4b0082;
   }
+
   85% {
     color: #9400d3;
   }
+
   100% {
-    color: #ff0000;
+    color: #f00;
   }
 }

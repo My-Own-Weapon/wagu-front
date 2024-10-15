@@ -1,22 +1,23 @@
-@import '@styles/variables/textSize.scss';
-@import '@styles/variables/fontWeight.scss';
-@import '@styles/variables/radius.scss';
+@import '@styles/variables/textSize';
+@import '@styles/variables/fontWeight';
+@import '@styles/variables/radius';
 
 $button-transition:
   transform 0.1s ease,
   box-shadow 0.1s ease;
 
 .button {
-  border-radius: $radiusMedium;
-
   font-size: $textLarge;
   font-weight: $semiBold;
   letter-spacing: -0.025em;
 
+  border-radius: $radiusMedium;
+
   transition: $button-transition;
 
   &:active {
+    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+
     transform: translateY(2px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 }

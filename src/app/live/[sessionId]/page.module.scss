@@ -1,20 +1,23 @@
-@import '@styles/variables/textSize.scss';
-@import '@styles/variables/fontWeight.scss';
-@import '@styles/variables/colors.scss';
-@import '@styles/variables/radius.scss';
-@import '@styles/mixins/index.scss';
+@import '@styles/variables/textSize';
+@import '@styles/variables/fontWeight';
+@import '@styles/variables/colors';
+@import '@styles/variables/radius';
+@import '@styles/mixins/index';
 
 .container {
   position: relative;
 
   display: flex;
+
   flex-direction: column;
-  justify-content: center;
+
   align-items: center;
-  background-color: #f5f5f5;
+  justify-content: center;
 
   width: 100%;
   height: 100dvh;
+
+  background-color: #f5f5f5;
 
   .streamerVideoWrapper {
     width: 100%;
@@ -24,49 +27,53 @@
 
   .chatBoxContianer {
     position: absolute;
-    bottom: 0;
     right: 0;
+    bottom: 0;
     left: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: flex-end;
 
     height: 30%;
 
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-
     background: linear-gradient(
       to top,
-      rgba(0, 0, 0, 0.5) 0%,
+      rgb(0 0 0 / 50%) 0%,
       transparent 100%
     );
     backdrop-filter: blur(3px);
-
     border-top: 1px solid #e0e0e0;
 
     -webkit-mask-image: linear-gradient(
       to bottom,
-      rgba(0, 0, 0, 0) 0%,
-      rgba(0, 0, 0, 1) 30%
+      rgb(0 0 0 / 0%) 0%,
+      rgb(0 0 0 / 100%) 30%
     );
     mask-image: linear-gradient(
       to bottom,
-      rgba(0, 0, 0, 0) 0%,
-      rgba(0, 0, 0, 1) 30%
+      rgb(0 0 0 / 0%) 0%,
+      rgb(0 0 0 / 100%) 30%
     );
 
     .chatBoxWrapper {
       @include flexColumnStart;
-      padding: 0 24px;
 
       gap: 10px;
 
+      padding: 0 24px;
       overflow: auto;
 
       .chatArea {
         position: relative;
-        width: 100%;
-        @include flexRowStart;
+
         gap: 10px;
+
+        width: 100%;
+
+        @include flexRowStart;
 
         .userImg {
           position: absolute;
@@ -74,22 +81,23 @@
           left: 3px;
 
           line-height: 0;
-          border-radius: 50%;
-          border: 1px solid $white;
+
           background-color: pink;
+          border: 1px solid $white;
+          border-radius: 50%;
         }
 
         .msgArea {
           @include flexColumnStart;
 
-          margin-left: 40px;
-
           gap: 4px;
+
+          margin-left: 40px;
           overflow-y: auto;
 
           .userName {
-            font-weight: $medium;
             font-size: $textMedium;
+            font-weight: $medium;
             color: $white;
           }
 
@@ -101,9 +109,11 @@
       }
     }
   }
+
   .chatInputContainer {
+    padding: 12px 24px 16px;
+
     background-color: transparent;
-    padding: 12px 24px 16px 24px;
 
     .chatInputWrapper {
       @include flexCenter;
@@ -116,26 +126,26 @@
         padding: 10px;
 
         color: $white;
-        background-color: rgba(0, 0, 0, 0.3);
 
+        background-color: rgb(0 0 0 / 30%);
         border: 1px solid #f0f0f0be;
         border-radius: 5px;
-        box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0 5px 0 rgb(0 0 0 / 10%);
 
         &::placeholder {
-          color: #f0f0f0be;
-          font-weight: $medium;
           font-size: $textMedium;
+          font-weight: $medium;
+          color: #f0f0f0be;
         }
       }
 
       .msgSendBtn {
         width: 40px;
-        background-color: transparent;
-
-        border: none;
 
         cursor: pointer;
+
+        background-color: transparent;
+        border: none;
       }
     }
   }
@@ -144,19 +154,19 @@
 // /* Frame 114 */
 
 // /* Auto layout */
-// display: flex;
-// flex-direction: row;
-// align-items: flex-start;
-// padding: 7.26486px;
-// gap: 7.26px;
+// display: flex;displaydisplaydisplaydisplaydisplaydisplaydisplaydisplay
+// flex-direction: row;flex-directionflex-directionflex-directionflex-directionflex-directionflex-directionflex-directionflex-direction
+// align-items: flex-start;align-itemsalign-itemsalign-itemsalign-itemsalign-itemsalign-itemsalign-itemsalign-items
+// padding: 7.26486px;paddingpaddingpaddingpaddingpaddingpaddingpaddingpadding
+// gap: 7.26px;gapgapgapgapgapgapgapgap
 
-// width: 37.78px;
-// height: 26.88px;
+// width: 37.78px;widthwidthwidthwidthwidthwidthwidthwidth
+// height: 26.88px;heightheightheightheightheightheightheightheight
 
-// background: linear-gradient(90deg, #EF5F00 -0.53%, #E8A700 100.06%);
-// border-radius: 3.84px;
+// background: linear-gradient(90deg, #EF5F00 -0.53%, #E8A700 100.06%);backgroundbackgroundbackgroundbackgroundbackgroundbackgroundbackgroundbackground
+// border-radius: 3.84px;border-radiusborder-radiusborder-radiusborder-radiusborder-radiusborder-radiusborder-radiusborder-radius
 
 // /* Inside auto layout */
-// flex: none;
-// order: 0;
-// flex-grow: 0;
+// flex: none;flexflexflexflexflexflexflexflex
+// order: 0;orderorderorderorderorderorderorderorder
+// flex-grow: 0;flex-growflex-growflex-growflex-growflex-growflex-growflex-growflex-grow

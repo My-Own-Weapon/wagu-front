@@ -1,9 +1,10 @@
-@import '@/styles/variables/colors.scss';
+@import '@/styles/variables/colors';
 
 .container {
   display: flex;
-  justify-content: center;
+
   align-items: center;
+  justify-content: center;
 
   background-color: inherit;
 
