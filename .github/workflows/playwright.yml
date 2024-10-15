@@ -17,12 +17,15 @@ jobs:
         run: npm ci
 
       - name: Start the server
-        run: npm run dev &
+        run: npm run dev & npm run mock
         env:
           CI: true
 
       - name: Wait for server to be ready
         run: npx wait-on http://localhost:3000
+
+      - name: Wait for msw server to be ready
+        run: npx wait-on http://localhost:9090
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
