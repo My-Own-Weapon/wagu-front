@@ -1,78 +1,87 @@
-@import url('https://cdn.jsdelivr.net/gh/toss/tossface/dist/tossface.css');
-@import '@styles/mixins/index.scss';
-@import '@styles/variables/colors.scss';
-@import '@styles/variables/fontWeight.scss';
-@import '@styles/variables/textSize.scss';
+@import 'https://cdn.jsdelivr.net/gh/toss/tossface/dist/tossface.css';
+@import '@styles/mixins/index';
+@import '@styles/variables/colors';
+@import '@styles/variables/fontWeight';
+@import '@styles/variables/textSize';
 
 .container {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
 
-  background-color: $bgWhite;
+  flex-direction: column;
+
+  justify-content: center;
 
   padding-bottom: 80px;
 
+  background-color: $bgWhite;
+
   .contentWrapper {
+    gap: 40px;
+
     padding: 24px;
 
     @include flexColumnStart;
-    gap: 40px;
 
     .postInfoArea {
+      gap: 12px;
+
       width: 100%;
 
       @include flexColumnStart;
-      gap: 12px;
 
       .postHeader {
-        width: 100%;
-
         display: flex;
-        justify-content: space-between;
+
         align-items: center;
+        justify-content: space-between;
+
+        width: 100%;
 
         .storeInfo {
           @include flexColumnStart;
+
           gap: 6px;
 
           .storeName {
-            color: $textTitleGray;
             font-size: 24px;
             font-weight: $bold;
+            color: $textTitleGray;
           }
+
           .address {
-            color: $textSub-content;
             font-size: $textMedium;
             font-weight: $regular;
+            color: $textSub-content;
             letter-spacing: 0.025em;
           }
         }
       }
+
       .menuInfoArea {
         @include flexColumnStart;
+
         gap: 8px;
 
         .menuName {
-          color: $textTitleGray;
           font-size: $textLarge;
           font-weight: $semiBold;
+          color: $textTitleGray;
         }
 
         .price {
-          color: $textSub-content;
           font-size: $textMedium;
           font-weight: $medium;
+          color: $textSub-content;
           letter-spacing: 0.025em;
         }
       }
     }
 
     .review {
-      color: $textContent;
       font-size: $textLarge;
       font-weight: $medium;
       line-height: 140%;
+      color: $textContent;
       letter-spacing: 0.025em;
     }
   }

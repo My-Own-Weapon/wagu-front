@@ -1,73 +1,75 @@
-@import '@styles/variables/colors.scss';
-@import '@styles/variables/radius.scss';
-@import '@styles/variables/fontWeight.scss';
-@import '@styles/variables/textSize.scss';
-@import '@styles/mixins/index.scss';
+@import '@styles/variables/colors';
+@import '@styles/variables/radius';
+@import '@styles/variables/fontWeight';
+@import '@styles/variables/textSize';
+@import '@styles/mixins/index';
 
 .container {
   display: flex;
+
   flex-direction: column;
+
   gap: 8px;
 
   .inputBoxs {
-    width: 100%;
-
     box-sizing: border-box;
 
+    width: 100%;
     padding: 16px 0;
 
-    background-color: transparent;
-
-    color: $inputTextColor;
     font-size: $textMedium;
     font-weight: $medium;
+    color: $inputTextColor;
     letter-spacing: -0.025em;
 
+    background-color: transparent;
     border: none;
     border-bottom: 1px solid $inputBorderColor;
 
     &::placeholder {
-      color: $placeholderColor;
       font-size: $placeholderSize;
       font-weight: $medium;
+      color: $placeholderColor;
     }
   }
+
   .label {
-    color: $inputTextColor;
     font-size: $textMedium;
     font-weight: $medium;
+    color: $inputTextColor;
     letter-spacing: -0.025em;
   }
 
   .fileInputBox {
     display: none;
   }
+
   .fileLabel {
     position: relative;
 
-    @include flexColumnCenter;
+    box-sizing: border-box;
+
     gap: 4px;
 
     width: 80px;
     height: 80px;
 
-    box-sizing: border-box;
-
-    background-color: transparent;
-    color: $placeholderColor;
-
     font-size: $placeholderSize;
-
-    border: 1px solid $inputBorderColor;
-    border-radius: $radiusMedium;
+    color: $placeholderColor;
 
     cursor: pointer;
 
+    background-color: transparent;
+    border: 1px solid $inputBorderColor;
+    border-radius: $radiusMedium;
+
+    @include flexColumnCenter;
+
     .labelText {
-      color: $placeholderColor;
       font-size: $textSmall;
       font-weight: $medium;
       line-height: 150%;
+      color: $placeholderColor;
     }
   }
 
@@ -75,24 +77,23 @@
     width: 100%;
     height: auto;
     min-height: 120px;
-
     padding: 16px 0;
-
-    background-color: transparent;
-
-    color: $inputTextColor;
-    font-size: $textMedium;
-    font-weight: $medium;
-    letter-spacing: -0.025em;
-
-    border: none;
-    resize: none;
     overflow: hidden;
 
+    font-size: $textMedium;
+    font-weight: $medium;
+    color: $inputTextColor;
+    letter-spacing: -0.025em;
+
+    resize: none;
+
+    background-color: transparent;
+    border: none;
+
     &::placeholder {
-      color: $placeholderColor;
       font-size: $placeholderSize;
       font-weight: $medium;
+      color: $placeholderColor;
     }
 
     &:focus {

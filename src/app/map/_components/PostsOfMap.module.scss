@@ -1,18 +1,20 @@
-@import '@styles/mixins/index.scss';
-@import '@styles/variables/textSize.scss';
+@import '@styles/mixins/index';
+@import '@styles/variables/textSize';
 
 .container {
+  gap: 16px;
+
   width: 100%;
 
   @include flexColumnStart;
-  gap: 16px;
 
   .titleWrapper {
-    width: 100%;
-
     display: flex;
-    justify-content: space-between;
+
     align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
 
     .allPostsAnchor {
       font-size: $textSmall;
@@ -21,11 +23,11 @@
   }
 
   .postsWrapper {
-    width: 100%;
-
     display: flex;
 
     gap: 12px;
+
+    width: 100%;
 
     @include Scroll;
 

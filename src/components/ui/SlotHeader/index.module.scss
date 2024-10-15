@@ -1,22 +1,23 @@
-@import '@/styles/variables/colors.scss';
-@import '@/styles/variables/textSize.scss';
-@import '@/styles/variables/fontWeight.scss';
-@import '@/styles/variables/zIndex.scss';
+@import '@/styles/variables/colors';
+@import '@/styles/variables/textSize';
+@import '@/styles/variables/fontWeight';
+@import '@/styles/variables/zIndex';
 
 .container {
   position: sticky;
-  z-index: $header;
   top: 0;
-  left: 0;
   right: 0;
-
-  padding: 0 24px;
-  height: 60px;
-  margin: 0;
+  left: 0;
+  z-index: $header;
 
   display: flex;
+
   align-items: center;
   justify-content: center;
+
+  height: 60px;
+  padding: 0 24px;
+  margin: 0;
 
   background-color: $bgWhite;
 }
@@ -31,11 +32,12 @@
 }
 
 .center {
-  width: 100%;
-
   display: flex;
-  justify-content: center;
+
   align-items: center;
+  justify-content: center;
+
+  width: 100%;
 }
 
 .right {

@@ -1,22 +1,25 @@
-@import '@styles/variables/colors.scss';
-@import '@styles/variables/radius.scss';
-@import '@styles/variables/textSize.scss';
-@import '@styles/variables/fontWeight.scss';
-@import '@styles/variables/zIndex.scss';
-@import '@styles/mixins/index.scss';
+@import '@styles/variables/colors';
+@import '@styles/variables/radius';
+@import '@styles/variables/textSize';
+@import '@styles/variables/fontWeight';
+@import '@styles/variables/zIndex';
+@import '@styles/mixins/index';
 
 .addVoteContainer {
   position: relative;
-  width: 100%;
-  height: 100%;
 
   display: flex;
+
   flex-direction: column;
+
+  width: 100%;
+  height: 100%;
 
   background: $bgWhite;
 
   .top {
     position: relative;
+
     width: 100%;
 
     .map {
@@ -28,81 +31,86 @@
 
     .userContainer {
       position: absolute;
-      z-index: 1;
       bottom: 64px;
       left: 24px;
+      z-index: 1;
+
+      gap: 16px;
 
       width: auto;
 
       @include flexCenter;
-      gap: 16px;
     }
   }
 
   .bottom {
     position: absolute;
-    z-index: 1;
     top: 424px;
-    left: 0;
     right: 0;
+    left: 0;
+    z-index: 1;
 
-    padding: 24px 24px 152px 24px;
-
-    @include flexColumnStart;
     gap: 24px;
 
-    background-color: $white;
+    padding: 24px 24px 152px;
 
+    background-color: $white;
     border-radius: 24px 24px 0;
+
+    @include flexColumnStart;
 
     .navUpperBtnContainer {
       position: fixed;
-      z-index: $footer;
+      right: 0;
       bottom: 0;
       left: 0;
-      right: 0;
+      z-index: $footer;
+
+      display: flex;
+
+      gap: 20px;
+
+      justify-content: space-between;
 
       max-width: calc(410px - 48px);
       height: 60px;
-
+      padding: 16px 24px 0;
       margin: 0 auto 60px;
-      padding: 16px 24px 0 24px;
-
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
 
       background-color: $white;
 
       .startVoteBtn {
         width: 100%;
         height: 48px;
+
+        font-size: $textLarge;
+        font-weight: $semiBold;
+        color: $white;
+        letter-spacing: -0.025em;
+
         background: $primaryOrange;
         border: none;
         border-radius: 8px;
-
-        color: $white;
-        font-size: $textLarge;
-        font-weight: $semiBold;
-        letter-spacing: -0.025em;
       }
 
       .addVoteListBtn {
         width: 100%;
         height: 48px;
+
+        font-size: $textLarge;
+        font-weight: $semiBold;
+        color: $primaryOrange;
+        letter-spacing: -0.025em;
+
         background: $white;
         border: 1px solid $primaryOrange;
         border-radius: 8px;
-
-        color: $primaryOrange;
-        font-size: $textLarge;
-        font-weight: $semiBold;
-        letter-spacing: -0.025em;
       }
     }
 
     .votedStoresWrapper {
       @include flexColumnStart;
+
       gap: 16px;
 
       width: 100%;
@@ -112,34 +120,38 @@
 
 /* [befroe 개표] */
 .startVoteContainer {
+  gap: 24px;
+
   background-color: $white;
 
   @include flexColumnStart;
-  gap: 24px;
 
   .userContainer {
-    width: auto;
-
-    padding: 0 24px;
-    @include flexRowStart;
     gap: 8px;
 
+    width: auto;
+    padding: 0 24px;
+
+    @include flexRowStart;
+
     .votingUsers {
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 4px;
+
+      align-items: center;
+      justify-content: flex-end;
+
       width: 60px;
       height: 106px;
-
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 4px;
     }
   }
 
   .startVoteWrapper {
     width: calc(100% - 48px);
-
-    padding: 0 24px 140px 24px;
+    padding: 0 24px 140px;
   }
 }
 
@@ -151,68 +163,85 @@
 
 .endVoteContainer {
   display: flex;
+
   flex-direction: column;
+
   gap: 20px;
 
   background-color: $bgBrown;
 
   .top {
     height: 200px;
+
     background-color: $bgBrown;
 
     @include flexCenter;
 
     .winningMsgArea {
       @include flexCenter;
+
       gap: 8px;
     }
   }
 
   .bottom {
     display: flex;
+
     flex-direction: column;
-    justify-content: flex-start;
+
     gap: 20px;
 
-    padding: 24px 24px 80px 24px;
+    justify-content: flex-start;
+
+    padding: 24px 24px 80px;
 
     background-color: $white;
-
     border-radius: 32px 32px 0 0;
 
     .endVoteWrapper {
       @include flexColumnCenter;
+
       gap: 4px;
 
       // padding: 24px 24px 0 24px;
 
-      border-radius: 24px 24px 0;
+paddingpadding
+
+paddingpadding
+
+paddingpadding
+
+paddingpadding
+
+      border-radius: 24px 24px 0;paddingpaddingpaddingpaddingpaddingpaddingborder-radiuspaddingpaddingpaddingpaddingborder-radiuspaddingpaddingpaddingpaddingborder-radiuspaddingpaddingborder-radiuspaddingpaddingborder-radiusborder-radiusborder-radius
     }
   }
 }
 
 .winStoreCardContainer {
+  gap: 12px;
+
   width: 100%;
 
   @include flexColumnStart;
-  gap: 12px;
 
   .titleArea {
     @include flexColumnStart;
+
     gap: 8px;
 
     .storeName {
-      color: $textTitleColor;
       font-size: $textTitle;
       font-weight: $bold;
       line-height: 150%;
+      color: $textTitleColor;
     }
 
     .menuName {
-      color: $textTitleGray;
       font-size: $textLarge;
       font-weight: $medium;
       line-height: 150%;
+      color: $textTitleGray;
     }
   }
 }
@@ -220,86 +249,92 @@
 /* nav bar 위의 button */
 .navUpperBtnContainer {
   position: fixed;
-  z-index: $footer;
+  right: 0;
   bottom: 0;
   left: 0;
-  right: 0;
+  z-index: $footer;
+
+  display: flex;
+
+  gap: 20px;
+
+  justify-content: space-between;
 
   max-width: calc(410px - 48px);
   height: 60px;
-
+  padding: 16px 24px 0;
   margin: 0 auto 60px;
-  padding: 16px 24px 0 24px;
-
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
 
   background-color: $white;
 
   .myVoteDoneBtn {
     width: 100%;
     height: 48px;
+
+    font-size: $textLarge;
+    font-weight: $semiBold;
+    color: $white;
+    letter-spacing: -0.025em;
+
     background: $primaryOrange;
     border: none;
     border-radius: 8px;
-
-    color: $white;
-    font-size: $textLarge;
-    font-weight: $semiBold;
-    letter-spacing: -0.025em;
   }
 }
 
 .resultHeaderContainer {
   position: sticky;
 
-  padding: 0 24px;
-  height: 60px;
-
   display: flex;
-  justify-content: space-between;
+
   align-items: center;
+  justify-content: space-between;
+
+  height: 60px;
+  padding: 0 24px;
 
   background-color: $bgBrown;
 
   .logoTitle {
-    color: $primaryOrange;
-    font-family: 'NATS', sans-serif;
+    font-family: NATS, sans-serif;
     font-size: $textTitle;
     font-weight: $regular;
+    color: $primaryOrange;
   }
 
   .navBtnArea {
     @include flexCenter;
+
     gap: 16px;
   }
 }
 
-@import url('https://fonts.cdnfonts.com/css/nats');
+@import 'https://fonts.cdnfonts.com/css/nats';
 
 .sharePageHeaderContainer {
   position: sticky;
   z-index: $header;
 
-  padding: 0 24px;
-  height: 60px;
-
   display: flex;
-  justify-content: space-between;
+
   align-items: center;
+  justify-content: space-between;
+
+  height: 60px;
+  padding: 0 24px;
 
   background-color: $bgWhite;
 
   .logoTitle {
-    color: $primaryOrange;
-    font-family: 'NATS', sans-serif;
+    font-family: NATS, sans-serif;
     font-size: $textTitle;
     font-weight: $regular;
+    color: $primaryOrange;
   }
 
   .navBtnArea {
     @include flexCenter;
+
     gap: 16px;
 
     .profileContainer {
@@ -310,22 +345,22 @@
       }
 
       .dropdownMenu {
-        display: none;
-
         position: absolute;
-        z-index: $dropDown;
         right: 0;
+        z-index: $dropDown;
+
+        display: none;
 
         width: 140px;
 
         background-color: $white;
-
         border: 1px solid $gray300;
         border-radius: $radiusSmall;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
 
         .myPage {
           display: inline-block;
+
           height: 40px;
 
           @include flexCenter;
@@ -343,15 +378,16 @@
           width: 100%;
           height: 40px;
 
-          @include flexCenter;
+          cursor: pointer;
 
           background-color: transparent;
 
-          cursor: pointer;
+          @include flexCenter;
 
           .logoutBtn {
             background-color: transparent;
           }
+
           .text {
             font-size: $textMedium;
             font-weight: $medium;

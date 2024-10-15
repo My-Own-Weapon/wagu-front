@@ -6,42 +6,49 @@
 
 .categoriesWrapper {
   display: grid;
+
   grid-template-columns: repeat(4, 1fr);
-  column-gap: 8px;
+
   row-gap: 4px;
+  column-gap: 8px;
 }
 
 .categoryBtn {
+  position: relative;
+
+  display: flex;
+
+  flex-grow: 1;
+  flex-direction: column;
+
+  gap: 4px;
+
+  align-items: center;
+  justify-content: center;
+
   padding: 4px;
 
   background-color: $white;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-
   border-radius: $radiusMedium;
 
-  position: relative;
-
-  flex-grow: 1;
-
   &::after {
-    content: '';
     position: absolute;
-    width: 50px;
-    height: 50px;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+
+    width: 50px;
+    height: 50px;
+
+    content: '';
+
+    background-color: transparent;
     border-radius: 50%;
-    background-color: transparent; // 기본 상태에서는 투명
-    transition: background-color 0.3s ease; // transition 적용
+
+    transition: background-color 0.3s ease;
+    transform: translate(-50%, -50%);
   }
 
   &:hover::after {
-    background-color: rgba(0, 0, 0, 0.03); // hover 시에 색상 변경
+    background-color: rgba(0, 0, 0, 0.03);
   }
 }

@@ -1,24 +1,29 @@
-@import '@/styles/variables/radius.scss';
-@import '@/styles/variables/colors.scss';
-@import '@/styles/variables/textSize.scss';
+@import '@/styles/variables/radius';
+@import '@/styles/variables/colors';
+@import '@/styles/variables/textSize';
 
 .socialLogin {
   width: 100%;
-
   margin-top: 40px;
+
   text-align: center;
 
   .divider {
-    padding: 0 24px;
     display: flex;
+
+    gap: 16px;
+
     align-items: center;
     justify-content: center;
-    gap: 16px;
+
+    padding: 0 24px;
 
     &::before,
     &::after {
-      content: '';
       flex: 1;
+
+      content: '';
+
       border-bottom: 1px solid #e5e5ec;
     }
 
@@ -31,20 +36,27 @@
 
   .socialButtons {
     display: flex;
-    justify-content: center;
+
     gap: 20px;
+
+    justify-content: center;
+
     margin-top: 25px;
 
     .socialButton {
-      width: 93px;
-      height: 56px;
-      border: 1px solid #e5e5ec;
-      border-radius: 12px;
-      background-color: $bgWhite;
       display: flex;
+
       align-items: center;
       justify-content: center;
+
+      width: 93px;
+      height: 56px;
+
       cursor: pointer;
+
+      background-color: $bgWhite;
+      border: 1px solid #e5e5ec;
+      border-radius: 12px;
 
       img {
         width: 24px;

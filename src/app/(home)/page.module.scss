@@ -1,6 +1,6 @@
-@import '@/styles/mixins/index.scss';
-@import '@/styles/variables/radius.scss';
-@import '@/styles/variables/colors.scss';
+@import '@/styles/mixins/index';
+@import '@/styles/variables/radius';
+@import '@/styles/variables/colors';
 
 .container {
   background-color: $bgBrown;
@@ -11,14 +11,16 @@
 
   .bottom {
     display: flex;
+
     flex-direction: column;
-    justify-content: flex-start;
+
     gap: 20px;
 
-    padding: 24px 24px 80px 24px;
+    justify-content: flex-start;
+
+    padding: 24px 24px 80px;
 
     background-color: $white;
-
     border-radius: 32px 32px 0 0;
   }
 }

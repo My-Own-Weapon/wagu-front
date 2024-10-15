@@ -1,28 +1,27 @@
-@import '@styles/mixins/index.scss';
-@import '@styles/variables/zIndex.scss';
-@import '@styles/variables/colors.scss';
+@import '@styles/mixins/index';
+@import '@styles/variables/zIndex';
+@import '@styles/variables/colors';
 
 .writeNavBar {
   position: fixed;
-  left: 0;
-  bottom: 0;
   right: 0;
+  bottom: 0;
+  left: 0;
   z-index: $footer;
 
-  height: 60px;
+  gap: 20px;
 
+  height: 60px;
   padding: 16px 24px;
 
   background-color: $bgWhite;
 
   @include flexCenter;
-  gap: 20px;
 }
 
-@media (min-width: 375px) {
+@media (width >= 375px) {
   .writeNavBar {
     max-width: calc(410px - 48px);
-
     margin: 0 auto;
   }
 }

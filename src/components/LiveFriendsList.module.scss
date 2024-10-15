@@ -1,54 +1,65 @@
-@import '@styles/variables/colors.scss';
-@import '@styles/variables/radius.scss';
-@import '@styles/variables/fontWeight.scss';
-@import '@styles/variables/textSize.scss';
-@import '@styles/mixins/index.scss';
+@import '@styles/variables/colors';
+@import '@styles/variables/radius';
+@import '@styles/variables/fontWeight';
+@import '@styles/variables/textSize';
+@import '@styles/mixins/index';
 
 .container {
   display: flex;
+
   flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
+
   gap: 16px;
+
+  align-items: flex-start;
+  justify-content: center;
 
   overflow: hidden;
 
   .friendsWrapper {
     display: flex;
+
     gap: 12px;
   }
 }
 
 @keyframes colorChange {
   0% {
-    color: #ff0000;
+    color: #f00;
   }
+
   14% {
     color: #ff7f00;
   }
+
   28% {
-    color: #ffff00;
+    color: #ff0;
   }
+
   42% {
-    color: #00ff00;
+    color: #0f0;
   }
+
   57% {
-    color: #0000ff;
+    color: #00f;
   }
+
   71% {
     color: #4b0082;
   }
+
   85% {
     color: #9400d3;
   }
+
   100% {
-    color: #ff0000;
+    color: #f00;
   }
 }
 
 .catAnimation {
-  font-weight: $bold;
   font-size: $textSmall;
+  font-weight: $bold;
 
   animation: colorChange 4s infinite;
 }

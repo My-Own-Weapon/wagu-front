@@ -4,21 +4,18 @@
 @import '@styles/variables/radius.scss';
 
 .circleIcon {
-  // width: 56px;
-  // height: 56px;
-
-  background-color: transparent;
-
   display: flex;
-  justify-content: center;
+
   align-items: center;
+  justify-content: center;
 
   padding: 3px;
 
+  cursor: pointer;
+
+  background-color: transparent;
   border: 1.5px solid $primaryOrange;
   border-radius: 50%;
-
-  cursor: pointer;
 
   img {
     background-color: pink;
@@ -27,41 +24,43 @@
 }
 
 .squareIcon {
-  background-color: transparent;
-
-  border: 1px solid $primaryOrange;
-  border-radius: $radiusMedium;
-
   display: flex;
-  justify-content: center;
+
   align-items: center;
+  justify-content: center;
 
   cursor: pointer;
+
+  background-color: transparent;
+  border: 1px solid $primaryOrange;
+  border-radius: $radiusMedium;
 }
 
 .withtextIconContainer {
   display: flex;
+
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
 
   gap: 4px;
 
+  align-items: center;
+  justify-content: center;
+
   .smallName {
-    color: $white;
     font-size: $textSmall;
     font-weight: $medium;
+    color: $white;
   }
 
   .mediumName {
-    color: $white;
     font-size: $textMedium;
     font-weight: $medium;
+    color: $white;
   }
 
   .largeName {
-    color: $white;
     font-size: $textMedium;
     font-weight: $medium;
+    color: $white;
   }
 }

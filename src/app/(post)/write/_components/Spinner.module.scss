@@ -1,12 +1,16 @@
-@import '@styles/variables/colors.scss';
+@import '@styles/variables/colors';
 
 .container {
   position: relative;
-  padding: 0 24px;
-  height: 100vh;
+
   display: flex;
-  justify-content: center;
+
   align-items: center;
+  justify-content: center;
+
+  height: 100vh;
+  padding: 0 24px;
+
   background-color: $bgBrown;
 
   &.blurred {
@@ -18,21 +22,27 @@
   position: fixed;
   top: 0;
   left: 0;
+  z-index: 9999;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
+
+  background-color: rgb(0 0 0 / 50%);
 }
 
 .spinner {
+  width: 120px;
+  height: 120px;
+
   border: 16px solid #f3f3f3;
   border-top: 16px solid $primaryOrange;
   border-radius: 50%;
-  width: 120px;
-  height: 120px;
+
   animation: spin 2s linear infinite;
 }
 
@@ -40,6 +50,7 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
