@@ -53,8 +53,10 @@ export default function VoteUrlModal({
               fontSize="20px"
               fontWeight="semiBold"
               color="black"
-              title="투표 링크가 생성되었어요 !"
-            />
+            >
+              투표 링크가 생성되었어요 !
+            </Heading>
+
             <p className={s.subTitle}>
               아래의 Box를 클릭하면 자동으로 복사됩니다
             </p>
