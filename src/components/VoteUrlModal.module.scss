@@ -1,41 +1,42 @@
-@import '@styles/mixins/index.scss';
-@import '@styles/variables/zIndex.scss';
-@import '@styles/variables/colors.scss';
-@import '@styles/variables/fontWeight.scss';
-@import '@styles/variables/textSize.scss';
-@import '@styles/variables/radius.scss';
+@import '@styles/mixins/index';
+@import '@styles/variables/zIndex';
+@import '@styles/variables/colors';
+@import '@styles/variables/fontWeight';
+@import '@styles/variables/textSize';
+@import '@styles/variables/radius';
 
 .overlay {
   position: fixed;
   top: 0;
-  left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(3px);
+  left: 0;
   z-index: $modal;
+
+  background: rgb(0 0 0 / 70%);
+  backdrop-filter: blur(3px);
 }
 
 .modal {
   position: fixed;
-  z-index: $modal;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  z-index: $modal;
 
-  width: 320px;
   box-sizing: border-box;
 
+  width: 320px;
   padding: 24px 24px 64px;
 
   background: linear-gradient(
     180deg,
-    rgba(188, 188, 188, 0.85) 0%,
-    rgba(150, 150, 150, 0.65) 100%
+    rgb(188 188 188 / 85%) 0%,
+    rgb(150 150 150 / 65%) 100%
   );
-
   border: 1px solid $gray300;
   border-radius: $radiusMedium;
+
+  transform: translate(-50%, -50%);
 
   .modalWrapper {
     .closeButton {
@@ -43,21 +44,22 @@
       top: 20px;
       left: 20px;
 
-      background-color: transparent;
-
       cursor: pointer;
+
+      background-color: transparent;
     }
 
     .contentArea {
-      width: 100%;
+      gap: 32px;
 
+      width: 100%;
       margin-top: 40px;
 
       @include flexColumnCenter;
-      gap: 32px;
 
       .titleArea {
         @include flexColumnCenter;
+
         gap: 12px;
 
         .subTitle {
@@ -70,34 +72,32 @@
       .urlBox {
         padding: 12px 24px;
 
-        background-color: $mint;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-        border: 0.5px solid $gray400;
-        border-radius: $radiusMedium;
-
         font-size: $textLarge;
         font-weight: $regular;
         color: $white;
-
         text-align: center;
 
         cursor: pointer;
+
+        background-color: $mint;
+        border: 0.5px solid $gray400;
+        border-radius: $radiusMedium;
+        box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
       }
 
       .shareButton {
         @include flexCenter;
+
         gap: 4px;
 
         width: 100%;
         height: 56px;
 
-        background: #ffe812;
-
-        border-radius: $radiusMedium;
-        border: none;
-
         cursor: pointer;
+
+        background: #ffe812;
+        border: none;
+        border-radius: $radiusMedium;
 
         .shareText {
           font-size: $textSmall;

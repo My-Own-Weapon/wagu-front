@@ -1,37 +1,48 @@
-@import '@styles/variables/colors.scss';
-@import '@styles/variables/radius.scss';
-@import '@styles/variables/fontWeight.scss';
-@import '@styles/variables/textSize.scss';
+@import '@styles/variables/colors';
+@import '@styles/variables/radius';
+@import '@styles/variables/fontWeight';
+@import '@styles/variables/textSize';
 
 // .container {
 //   display: flex;
-//   flex-direction: column;
-//   gap: 8px;
+
+displaydisplay
+
+displaydisplay
+
+displaydisplay
+
+displaydisplay
+//   flex-direction: column;displaydisplaydisplaydisplaydisplaydisplayflex-directiondisplaydisplaydisplaydisplayflex-directiondisplaydisplaydisplaydisplayflex-directiondisplaydisplayflex-direction
+
+displaydisplayflex-directionflex-direction
+
+flex-directionflex-direction
+//   gap: 8px;displaydisplayflex-directionflex-directionflex-directionflex-directiongapdisplaydisplayflex-directionflex-directionflex-directionflex-directiongapdisplaydisplayflex-directionflex-directionflex-directionflex-directiongapflex-directionflex-directiongapflex-directionflex-directiongapgapgapgap
 
 .reviewInput {
   width: 100%;
   height: auto;
   min-height: 120px;
-
   padding: 16px 0;
+  overflow: hidden;
 
-  background-color: transparent;
-
-  color: $inputTextColor;
   font-size: $textMedium;
   font-weight: $medium;
+  color: $inputTextColor;
   letter-spacing: -0.025em;
 
-  border: 1.5px solid transparent;
   resize: none;
-  overflow: hidden;
+
+  background-color: transparent;
+  border: 1.5px solid transparent;
 
   transition: border 0.1s;
 
   &::placeholder {
-    color: $placeholderColor;
     font-size: $placeholderSize;
     font-weight: $medium;
+    color: $placeholderColor;
   }
 
   &:focus {
@@ -39,22 +50,21 @@
   }
 
   &:hover {
-    border: 1.5px solid rgba(255, 111, 0, 0.3);
-
+    border: 1.5px solid rgb(255 111 0 / 30%);
     border-radius: $radiusSmall;
   }
 
   &:focus {
     border: 1.5px solid $primaryOrange;
-
     border-radius: $radiusSmall;
   }
 }
+
 // }
 
 .label {
-  color: $inputTextColor;
   font-size: $textMedium;
   font-weight: $medium;
+  color: $inputTextColor;
   letter-spacing: -0.025em;
 }

@@ -10,40 +10,38 @@ $iconHeight: 20px;
 @media (min-width: 375px) {
   .container {
     max-width: calc(410px - 48px);
-
     margin: 0 auto;
   }
 }
 
 .container {
   position: fixed;
-  z-index: $header;
   top: 0;
-  left: 0;
   right: 0;
-
-  // margin: 0 auto;
-  padding: 12px 24px;
+  left: 0;
+  z-index: $header;
 
   display: flex;
-  justify-content: space-between;
+
   align-items: center;
+  justify-content: space-between;
+
+  padding: 12px 24px;
 
   background-color: transparent;
   backdrop-filter: blur(3px);
 
-  /* 스트리머 이미지 & 이름 */
   .streamerInfoArea {
     @include flexCenter;
     gap: 8px;
 
     .streamerName {
       display: inline-block;
-      white-space: nowrap;
 
       font-size: $textSmall;
       font-weight: $medium;
       color: $white;
+      white-space: nowrap;
     }
   }
 
@@ -51,48 +49,38 @@ $iconHeight: 20px;
     @include flexCenter;
     gap: 8px;
 
-    // .streamrButtons {
-    //   width: 100%;
-
-    //   @include flexCenter;
-    //   gap: 4px;
-
     .liveEndBtn {
       @include flexCenter;
 
-      height: $iconHeight;
-
       box-sizing: content-box;
 
-      background-color: $red600;
-
-      border: none;
-      border-radius: $radiusSmall;
-
+      height: $iconHeight;
       padding: 4px 6px;
 
-      color: $white;
       font-size: $textSmall;
       font-weight: $medium;
+      color: $white;
+
+      background-color: $red600;
+      border: none;
+      border-radius: $radiusSmall;
     }
 
     .switchCameraBtn {
       @include flexCenter;
 
-      height: $iconHeight;
-
       box-sizing: content-box;
 
-      background-color: $blue600;
-      color: $white;
-
-      border: none;
-      border-radius: $radiusSmall;
-
+      height: $iconHeight;
       padding: 4px 6px;
 
       font-size: $textSmall;
       font-weight: $medium;
+      color: $white;
+
+      background-color: $blue600;
+      border: none;
+      border-radius: $radiusSmall;
     }
     // }
 
@@ -102,15 +90,13 @@ $iconHeight: 20px;
 
     .liveFlagBox {
       height: $iconHeight;
-
-      @include flexCenter;
-
-      border: none;
-      border-radius: $radiusSmall;
-
       padding: 4px 6px;
 
       background: linear-gradient(90deg, #d22d2d 0%, #ef5f00 50%, #e8a700 100%);
+      border: none;
+      border-radius: $radiusSmall;
+
+      @include flexCenter;
 
       .liveFlagText {
         font-size: $textSmall;
@@ -122,19 +108,18 @@ $iconHeight: 20px;
 
   /* 시청자 수 Box */
   .viewerCountArea {
-    height: $iconHeight;
-
     display: inline-block;
 
+    gap: 6px;
+
+    height: $iconHeight;
     padding: 4px 6px;
 
     background-color: $gray900;
-
     border: none;
     border-radius: $radiusSmall;
 
     @include flexCenter;
-    gap: 6px;
 
     .viewersCount {
       font-size: $textSmall;
@@ -143,28 +128,3 @@ $iconHeight: 20px;
     }
   }
 }
-
-// /* Frame 114 */
-
-// /* Auto layout */
-// display: flex;
-// flex-direction: row;
-// align-items: flex-start;
-// padding: 7.26486px;
-// gap: 7.26px;
-
-// width: 37.78px;
-// height: 26.88px;
-
-// background: linear-gradient(
-//   90deg,
-//   #d22d2d -0.53%,
-//   #ef5f00 50.77%,
-//   #e8a700 100.06%
-// );
-// border-radius: 3.84px;
-
-// /* Inside auto layout */
-// flex: none;
-// order: 0;
-// flex-grow: 0;

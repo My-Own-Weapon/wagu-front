@@ -1,102 +1,113 @@
-@import '@/styles/variables/colors.scss';
-@import '@/styles/variables/textSize.scss';
-@import '@/styles/variables/fontWeight.scss';
-@import '@/styles/variables/radius.scss';
+@import '@/styles/variables/colors';
+@import '@/styles/variables/textSize';
+@import '@/styles/variables/fontWeight';
+@import '@/styles/variables/radius';
 
 @mixin button-styles($background, $color, $border) {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
   width: 100%;
   height: 56px;
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  background-color: $background;
+  font-size: $textLarge;
   color: $color;
 
+  cursor: pointer;
+
+  background-color: $background;
   border: $border;
   border-radius: $radiusMedium;
-
-  font-size: $textLarge;
-
-  cursor: pointer;
 }
 
 .container {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
   width: 100%;
   height: 100%;
   min-height: 100vh;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
 
   background-color: $bgWhite;
 }
 
 .wrapper {
-  width: 88%;
-
   display: flex;
+
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
 
   gap: 120px;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 88%;
 }
 
 .logoTitleArea {
   display: flex;
+
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
 
   gap: 20px;
+
+  align-items: center;
+  justify-content: center;
 }
 
 .logoWrapper {
   display: flex;
+
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
 
   gap: 8px;
+
+  align-items: center;
+  justify-content: center;
 }
 
 .title {
   margin: 0;
 
-  color: $primaryOrange;
-
   font-size: 36px;
   font-weight: $bold;
+  color: $primaryOrange;
 }
 
 .subTitle {
   margin: 0;
 
-  color: $textTitleColor;
   font-size: $textLarge;
+  color: $textTitleColor;
 }
 
 .btnArea {
-  width: 100%;
-
   display: flex;
+
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+
   gap: 20px;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
 }
 
 .signupBtn {
   width: 100%;
 
   @include button-styles($primaryOrange, $white, none);
+
   font-weight: $semiBold;
 }
 
 .loginBtn {
   @include button-styles($white, $primaryOrange, 1px solid $primaryOrange);
+
   font-weight: $semiBold;
 }
