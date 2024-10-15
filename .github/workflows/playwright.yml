@@ -17,7 +17,9 @@ jobs:
         run: npm ci
 
       - name: Start the server
-        run: npm run dev & npm run mock
+        run: |
+          npm run dev &
+          npm run mock &
         env:
           CI: true
 
