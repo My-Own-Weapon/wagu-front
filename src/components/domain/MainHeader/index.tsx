@@ -4,39 +4,16 @@ import { MouseEventHandler } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
-import {
-  usePathname,
-  useRouter,
-  useSelectedLayoutSegment,
-  useSelectedLayoutSegments,
-} from 'next/navigation';
+import { useRouter, useSelectedLayoutSegment } from 'next/navigation';
 
 import { localStorageApi } from '@/services/localStorageApi';
 import { apiService } from '@/services/apiService';
 
-import s from './Header.module.scss';
+import s from './index.module.scss';
 
-export default function Header() {
+export default function MainHeader() {
   const router = useRouter();
   const segment = useSelectedLayoutSegment();
-  const segments = useSelectedLayoutSegments();
-  const path = usePathname();
-
-  if (
-    segment === '(auth)' ||
-    segment === '(post)' ||
-    segment === 'live' ||
-    path === '/map' ||
-    path === '/share'
-  ) {
-    return null;
-  }
-
-  if (segments.length >= 2) {
-    if (segments[segments.length - 1] === 'board') return null;
-    const [, , postid] = segments;
-    if (!!postid) return null;
-  }
 
   const handleClickLogout: MouseEventHandler<HTMLButtonElement> = async () => {
     try {
