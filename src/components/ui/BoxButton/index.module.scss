@@ -1,6 +1,6 @@
-@import '@styles/variables/textSize';
-@import '@styles/variables/fontWeight';
-@import '@styles/variables/radius';
+@import '@styles/variables/textSize.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/radius.scss';
 
 $button-transition:
   transform 0.1s ease,

@@ -1,9 +1,9 @@
-@import '@styles/variables/colors';
+@import '@styles/variables/colors.scss';
 @import '@styles/variables/zIndex';
-@import '@styles/variables/radius';
-@import '@styles/variables/textSize';
-@import '@styles/variables/fontWeight';
-@import '@styles/mixins/index';
+@import '@styles/variables/radius.scss';
+@import '@styles/variables/textSize.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/mixins/index.scss';
 
 $tabDiff: 32px;
 

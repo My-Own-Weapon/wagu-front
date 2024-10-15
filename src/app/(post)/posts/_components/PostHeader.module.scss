@@ -1,7 +1,7 @@
-@import '@/styles/variables/colors';
-@import '@/styles/variables/textSize';
-@import '@/styles/variables/fontWeight';
-@import '@/styles/variables/zIndex';
+@import '@/styles/variables/colors.scss';
+@import '@/styles/variables/textSize.scss';
+@import '@/styles/variables/fontWeight.scss';
+@import '@/styles/variables/zIndex.scss';
 
 .container {
   position: fixed;

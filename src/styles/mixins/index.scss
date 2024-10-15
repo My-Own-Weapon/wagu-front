@@ -1,4 +1,4 @@
-@import '@styles/variables/colors';
+@import '@styles/variables/colors.scss';
 
 @mixin mainStyle {
   width: 100%;
@@ -96,7 +96,7 @@
 // 🔵 chrome과 safari의 경우 상위 Wrapper element에 다음 속성을 추가해야합니다.
 //
 // {selector}::-webkit-scrollbar {
-//   display: none;displaydisplaydisplaydisplaydisplaydisplaydisplaydisplay /* Chrome, Safari, Opera*/
+//   display: none;displaydisplaydisplaydisplaydisplaydisplaydisplaydisplaydisplaydisplaydisplay /* Chrome, Safari, Opera*/
 // }
 @mixin removeScrollBar {
   scrollbar-width: none; /* Firefox */

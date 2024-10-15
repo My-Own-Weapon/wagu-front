@@ -1,8 +1,8 @@
 @import '@styles/variables/zIndex';
-@import '@styles/variables/colors';
-@import '@styles/variables/radius';
-@import '@styles/variables/fontWeight';
-@import '@styles/variables/textSize';
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/radius.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/textSize.scss';
 
 .container {
   position: relative;

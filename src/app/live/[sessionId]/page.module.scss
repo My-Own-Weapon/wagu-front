@@ -1,8 +1,8 @@
-@import '@styles/variables/textSize';
-@import '@styles/variables/fontWeight';
-@import '@styles/variables/colors';
-@import '@styles/variables/radius';
-@import '@styles/mixins/index';
+@import '@styles/variables/textSize.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/radius.scss';
+@import '@styles/mixins/index.scss';
 
 .container {
   position: relative;
@@ -39,11 +39,7 @@
 
     height: 30%;
 
-    background: linear-gradient(
-      to top,
-      rgb(0 0 0 / 50%) 0%,
-      transparent 100%
-    );
+    background: linear-gradient(to top, rgb(0 0 0 / 50%) 0%, transparent 100%);
     backdrop-filter: blur(3px);
     border-top: 1px solid #e0e0e0;
 
@@ -154,19 +150,19 @@
 // /* Frame 114 */
 
 // /* Auto layout */
-// display: flex;displaydisplaydisplaydisplaydisplaydisplaydisplaydisplay
-// flex-direction: row;flex-directionflex-directionflex-directionflex-directionflex-directionflex-directionflex-directionflex-direction
-// align-items: flex-start;align-itemsalign-itemsalign-itemsalign-itemsalign-itemsalign-itemsalign-itemsalign-items
-// padding: 7.26486px;paddingpaddingpaddingpaddingpaddingpaddingpaddingpadding
-// gap: 7.26px;gapgapgapgapgapgapgapgap
+// display: flex;displaydisplaydisplaydisplaydisplaydisplaydisplaydisplaydisplaydisplaydisplay
+// flex-direction: row;flex-directionflex-directionflex-directionflex-directionflex-directionflex-directionflex-directionflex-directionflex-directionflex-directionflex-direction
+// align-items: flex-start;align-itemsalign-itemsalign-itemsalign-itemsalign-itemsalign-itemsalign-itemsalign-itemsalign-itemsalign-itemsalign-items
+// padding: 7.26486px;paddingpaddingpaddingpaddingpaddingpaddingpaddingpaddingpaddingpaddingpadding
+// gap: 7.26px;gapgapgapgapgapgapgapgapgapgapgap
 
-// width: 37.78px;widthwidthwidthwidthwidthwidthwidthwidth
-// height: 26.88px;heightheightheightheightheightheightheightheight
+// width: 37.78px;widthwidthwidthwidthwidthwidthwidthwidthwidthwidthwidth
+// height: 26.88px;heightheightheightheightheightheightheightheightheightheightheight
 
-// background: linear-gradient(90deg, #EF5F00 -0.53%, #E8A700 100.06%);backgroundbackgroundbackgroundbackgroundbackgroundbackgroundbackgroundbackground
-// border-radius: 3.84px;border-radiusborder-radiusborder-radiusborder-radiusborder-radiusborder-radiusborder-radiusborder-radius
+// background: linear-gradient(90deg, #EF5F00 -0.53%, #E8A700 100.06%);backgroundbackgroundbackgroundbackgroundbackgroundbackgroundbackgroundbackgroundbackgroundbackgroundbackground
+// border-radius: 3.84px;border-radiusborder-radiusborder-radiusborder-radiusborder-radiusborder-radiusborder-radiusborder-radiusborder-radiusborder-radiusborder-radius
 
 // /* Inside auto layout */
-// flex: none;flexflexflexflexflexflexflexflex
-// order: 0;orderorderorderorderorderorderorderorder
-// flex-grow: 0;flex-growflex-growflex-growflex-growflex-growflex-growflex-growflex-grow
+// flex: none;flexflexflexflexflexflexflexflexflexflexflex
+// order: 0;orderorderorderorderorderorderorderorderorderorderorder
+// flex-grow: 0;flex-growflex-growflex-growflex-growflex-growflex-growflex-growflex-growflex-growflex-growflex-grow
