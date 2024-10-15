@@ -8,7 +8,7 @@
 import Modal from 'react-modal';
 import { useRouter } from 'next/navigation';
 
-import { KakaoLogoSVG, XSVG } from '@public/newDesign';
+import { XSVG } from '@public/newDesign';
 import Heading from '@/components/ui/Heading';
 import { NextImageWithCover } from '@/components/ui';
 
@@ -73,10 +73,6 @@ export default function VoteUrlModal({
             height="220px"
             alt="share-url-hand-img"
           />
-          <button className={s.shareButton}>
-            <KakaoLogoSVG />
-            <p className={s.shareText}>카카오톡으로 공유해보세요 !</p>
-          </button>
         </div>
       </div>
     </Modal>

@@ -51,6 +51,6 @@ function getNavMap(): NavItem[] {
     { id: 2, IconComponent: Icon.TropySVG, text: 'Vote', href: '/map' },
     { id: 3, IconComponent: Icon.PlusSVG, text: '', href: '/write' },
     { id: 4, IconComponent: Icon.MapPinSVG, text: 'Map', href: '/map' },
-    { id: 5, IconComponent: Icon.LiveSVG, text: 'Live', href: '/live' },
+    { id: 5, IconComponent: Icon.LiveSVG, text: 'Live', href: '/prepareLive' },
   ] as const;
 }
