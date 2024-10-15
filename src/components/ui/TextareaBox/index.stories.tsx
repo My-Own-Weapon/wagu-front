@@ -9,7 +9,7 @@ const meta: Meta<
   ComponentProps<typeof TextareaBox> &
     ComponentProps<typeof TextareaBox.Textarea>
 > = {
-  title: 'Components/TextareaBox',
+  title: 'ui/TextareaBox',
   component: TextareaBox,
   tags: ['autodocs'],
   argTypes: {
