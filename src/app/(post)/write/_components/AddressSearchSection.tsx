@@ -30,10 +30,9 @@ export default function AddressSearchSection({
             gap: '12px',
           }}
         >
-          {/* <p className={s.storeName}>{addressSearchResult.address}</p> */}
           <Text
             as="p"
-            color="gray"
+            color="#2E2E37"
             fontSize="medium"
             fontWeight="medium"
             style={{
@@ -43,11 +42,10 @@ export default function AddressSearchSection({
           >
             {addressSearchResult.storeName}
           </Text>
-          {/* <p className={s.storeAddress}>{addressSearchResult.storeName}</p> */}
           <Text
             as="p"
-            color="gray"
-            fontSize="medium"
+            color="#2E2E37"
+            fontSize="small"
             fontWeight="medium"
             style={{
               lineHeight: '150%',
