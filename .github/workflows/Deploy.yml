@@ -31,8 +31,20 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      # .env.production 파일 생성.
       - name: create dotenv
         run: echo "NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL }}" >> .env.production
+
+      # ******************************************************************
+      # *  TODO: "//" 와 같은 주석이 있는경우 에러가 발생하므로 이를 수정하고 주석을 제거해준다.
+      # ******************************************************************
+      # stylelint formatting 실행
+      # - name: stylelint
+      #   run: npm run lint:css
+
+      # theme.ts 생성.
+      - name: create theme.ts
+        run: npm run generate:theme
 
       # 프로젝트 빌드.
       - name: Build next app

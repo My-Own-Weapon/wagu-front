@@ -11,9 +11,9 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test": "jest",
-    "lint:css": "stylelint 'src/**/*.{css,scss}' --fix"
+    "lint:css": "stylelint 'src/**/*.{css,scss}' --fix",
+    "generate:theme": "node ./generateColors.cjs"
   },
-  "type": "module",
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.7",
     "@tanstack/react-query": "^5.49.2",
@@ -56,7 +56,7 @@
     "@svgr/webpack": "^8.1.0",
     "@swc/core": "^1.7.26",
     "@swc/jest": "^0.2.36",
-    "@tanstack/react-query-devtools": "^5.51.3",
+    "@tanstack/react-query-devtools": "^5.59.15",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",
@@ -102,7 +102,7 @@
     "stylelint-order": "^6.0.4",
     "stylelint-prettier": "^5.0.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.3",
+    "typescript": "^5.6.3",
     "typescript-plugin-css-modules": "^5.1.0",
     "webpack": "^5.92.1"
   },
