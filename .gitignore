@@ -50,3 +50,7 @@ next-env.d.ts
 
 # storybook example
 stories
+
+# for test
+test.js
+test.ts
