@@ -15,16 +15,19 @@ const limitBoundaryPrecision = (boundary: MapVertexes): MapVertexes => {
   };
 };
 
-const useFetchBoundaryStores = (boundary: MapVertexes) => {
+/**
+ * @QUERY_KEY ["fetchMapBoundaryStores", var(boundary)]
+ */
+const useFetchMapBoundaryStores = (boundary: MapVertexes) => {
   const { data } = useQuery({
-    queryKey: ['fetchBoundaryStores', limitBoundaryPrecision(boundary)],
-    queryFn: () => apiService.fetchBoundaryStores(boundary),
+    queryKey: ['fetchMapBoundaryStores', limitBoundaryPrecision(boundary)],
+    queryFn: () => apiService.fetchMapBoundaryStores(boundary),
     gcTime: 1000 * 60 * 1,
   });
 
   return {
-    stores: data,
+    stores: data ?? [],
   };
 };
 
-export default useFetchBoundaryStores;
+export default useFetchMapBoundaryStores;
