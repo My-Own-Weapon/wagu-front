@@ -1,6 +1,7 @@
-import useFetchBoundaryStores from '@/hooks/api/useFetchBoundaryStores';
-import { MapVertexes } from '@/types';
 import { useState } from 'react';
+
+import { useFetchMapBoundaryStores } from '@/hooks/api';
+import { MapVertexes } from '@/types';
 
 const INITIAL_BOUNDARY = {
   left: 127.03211537373265,
@@ -11,7 +12,7 @@ const INITIAL_BOUNDARY = {
 
 const useBoundaryStores = () => {
   const [boundary, setBoundary] = useState<MapVertexes>(INITIAL_BOUNDARY);
-  const { stores } = useFetchBoundaryStores(boundary);
+  const { stores } = useFetchMapBoundaryStores(boundary);
 
   return {
     stores,
