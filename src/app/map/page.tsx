@@ -6,7 +6,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import LiveFriends from '@/components/LiveFriendsList';
 import VoteUrlModal from '@/components/VoteUrlModal';
 import { MapVertexes, PostOfStoreResponse, StoreResponse } from '@/types';
@@ -16,6 +16,7 @@ import PostsOfMap from '@/app/map/_components/PostsOfMap';
 import Heading from '@/components/ui/Heading';
 
 import s from './page.module.scss';
+import { BoxButton } from '@/components/ui';
 
 declare global {
   interface Window {
@@ -31,9 +32,12 @@ interface Streamer {
   storeName: string;
 }
 
+type KakaoMapElement = HTMLDivElement;
+
 export default function MapPage() {
+  const $map = useRef<KakaoMapElement | null>(null);
+  const mapInstanceRef = useRef<any>(null);
   const [markers, setMarkers] = useState<any[]>([]);
-  const [, setMap] = useState<any>(null);
   const [posts, setPosts] = useState<PostOfStoreResponse[]>([]);
   const [streamers, setStreamers] = useState<Streamer[]>([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -42,7 +46,18 @@ export default function MapPage() {
   );
   const [voteUrl, setVoteUrl] = useState<string>('');
 
-  useEffect(() => {
+  const onLoadMapRef = useCallback((kakaoMapElement: KakaoMapElement) => {
+    if (!kakaoMapElement) {
+      const $garbageScript = document.head.querySelector(
+        'script[src*="https://dapi.kakao.com/v2/maps/sdk"]',
+      ) as HTMLScriptElement;
+      if (Boolean($garbageScript)) {
+        document.head.removeChild($garbageScript);
+      }
+
+      return;
+    }
+
     const script = document.createElement('script');
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=948985235eb596e79f570535fd01a71e&autoload=false&libraries=services`;
     script.async = true;
@@ -50,8 +65,7 @@ export default function MapPage() {
 
     script.onload = () => {
       window.kakao.maps.load(() => {
-        const container = document.getElementById('map');
-        if (!container) {
+        if (!kakaoMapElement) {
           alert(
             'document.getElementById("map") 지도 컨테이너를 찾을 수 없습니다.',
           );
@@ -66,19 +80,19 @@ export default function MapPage() {
           level: 5,
         };
 
-        const mapInstance = new window.kakao.maps.Map(container, options);
-        setMap(mapInstance);
+        const mapInstance = new window.kakao.maps.Map(kakaoMapElement, options);
+        mapInstanceRef.current = mapInstance;
 
         window.kakao.maps.event.addListener(mapInstance, 'idle', () => {
           const mapBounds = mapInstance.getBounds();
-          const swLatLng = mapBounds.getSouthWest();
-          const neLatLng = mapBounds.getNorthEast();
+          const SWaxis = mapBounds.getSouthWest();
+          const NEaxis = mapBounds.getNorthEast();
 
           fetchStoresOfMapBoundary(mapInstance, {
-            left: swLatLng.getLng(),
-            down: swLatLng.getLat(),
-            right: neLatLng.getLng(),
-            up: neLatLng.getLat(),
+            left: SWaxis.getLng(),
+            down: SWaxis.getLat(),
+            right: NEaxis.getLng(),
+            up: NEaxis.getLat(),
           });
         });
       });
@@ -99,8 +113,6 @@ export default function MapPage() {
   };
 
   const addMarkers = (mapInstance: any, stores: StoreResponse[]) => {
-    removeMarkers();
-
     const { kakao } = window;
 
     const newMarkers = stores.map((store) => {
@@ -133,13 +145,13 @@ export default function MapPage() {
       return marker;
     });
 
-    setMarkers(newMarkers);
-  };
+    setMarkers((prevMarkers) => {
+      if (prevMarkers.length > 0) {
+        prevMarkers.forEach((marker) => marker.setMap(null));
+      }
 
-  const removeMarkers = () => {
-    markers.forEach((marker) => marker.setMap(null));
-
-    setMarkers([]);
+      return [...newMarkers];
+    });
   };
 
   const fetchStreamers = async (storeId: number) => {
@@ -170,7 +182,7 @@ export default function MapPage() {
   return (
     <main className={s.container}>
       <div className={s.top}>
-        <div id="map" className={s.map} />
+        <div id="map" className={s.map} ref={onLoadMapRef} />
       </div>
       <div className={s.bottom}>
         {selectedStore?.liveStore && selectedStore?.storeName && (
@@ -188,13 +200,9 @@ export default function MapPage() {
         />
       </div>
       <div className={s.urlButtonContainer}>
-        <button
-          className={s.createUrlButton}
-          type="button"
-          onClick={getShareUrl}
-        >
+        <BoxButton height="48px" styleType="fill" onClick={getShareUrl}>
           함께 투표 링크 생성
-        </button>
+        </BoxButton>
       </div>
       <VoteUrlModal
         isOpen={modalIsOpen}
