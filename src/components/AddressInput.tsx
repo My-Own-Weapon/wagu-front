@@ -6,17 +6,22 @@
 
 /* eslint-disable camelcase */ // for KAKAO API response
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useReducer,
+  PropsWithChildren,
+} from 'react';
 import Image from 'next/image';
 
 import { apiService } from '@/services/apiService';
-import InputBox from '@/components/ui/InputBox';
+import { PropsWithNotUndefinedChildren } from '@/components/ui/_types';
 import { AddressSearchDetails } from '@/types';
 
 import s from './AddressInput.module.scss';
 
 interface AddressInputProps {
-  title?: string;
   value: string;
   onSelect: (addressSearchResult: AddressSearchDetails) => void;
 }
@@ -30,14 +35,54 @@ interface KAKAOSearchAddressResponse {
   place_url: string;
 }
 
-export default function AddressInput({
-  title = '',
-  value,
-  onSelect,
-}: AddressInputProps) {
+interface OverlayProps {
+  open: boolean;
+  onClose: () => void;
+  onClick: () => void;
+}
+
+function Overlay({
+  open,
+  onClose,
+  onClick,
+  children,
+}: PropsWithChildren<OverlayProps>) {
+  const STYLE = {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backdropFilter: 'blur(2px)',
+    zIndex: 9999,
+  } as const;
+
+  return open ? (
+    <div
+      style={{ ...STYLE }}
+      onClick={onClick}
+      onWheel={(e) => e.stopPropagation()}
+    >
+      {children}
+    </div>
+  ) : null;
+}
+
+// function Overlay({ onClick }: { onClick: () => void }) {
+//   return (
+//     <div
+//       className={s.overlay}
+//       onClick={onClick}
+//       onWheel={(e) => e.stopPropagation()}
+//     />
+//   );
+// }
+
+export default function AddressInput({ value, onSelect }: AddressInputProps) {
   const [query, setQuery] = useState(value);
   const [results, setResults] = useState<KAKAOSearchAddressResponse[]>([]);
-  const [isFocused, setIsFocused] = useState(false);
+  const [isOpen, toggleModal] = useReducer((isOpen) => !isOpen, false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -46,12 +91,12 @@ export default function AddressInput({
         inputRef.current &&
         !inputRef.current.contains(event.target as Node)
       ) {
-        setIsFocused(false);
+        toggleModal();
       }
     };
 
     const preventDefault = (e: Event) => {
-      if (isFocused) {
+      if (isOpen) {
         e.preventDefault();
         e.stopPropagation();
       }
@@ -63,18 +108,18 @@ export default function AddressInput({
 
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('keydown', handleKeyDown);
-    if (isFocused) {
+    if (isOpen) {
       document.addEventListener('drag', preventDefault);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
-      if (isFocused) {
+      if (isOpen) {
         document.removeEventListener('drag', preventDefault);
       }
     };
-  }, [inputRef, isFocused]);
+  }, [inputRef, isOpen]);
 
   const fetchKakaoAddress = async (
     query: string,
@@ -87,7 +132,7 @@ export default function AddressInput({
   const handleSelect = (addressSearchDetails: AddressSearchDetails) => {
     onSelect(addressSearchDetails);
     setQuery(addressSearchDetails.address);
-    setIsFocused(false);
+    toggleModal();
   };
 
   const handleSearchClick = async () => {
@@ -102,88 +147,115 @@ export default function AddressInput({
   };
 
   return (
-    <div className={`${s.container} ${isFocused ? s.blur : ''}`}>
-      {!isFocused && (
-        <InputBox>
-          <InputBox.Label>{title}</InputBox.Label>
-          <InputBox.Input
-            height={48}
-            placeholder="주소를 검색하면 식당 정보가 자동으로 입력됩니다."
-            name="address"
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => setIsFocused(true)}
-            readOnly={!isFocused}
-          />
-        </InputBox>
-      )}
-      {isFocused && (
-        <div ref={inputRef}>
-          <div
-            className={`${s.addressInputWrapper} ${isFocused ? s.expanded : ''}`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className={s.searchArea}>
-              <input
-                className={s.addressInput}
-                id="address"
-                name="address"
-                placeholder="ex) 스타벅스, 이디야"
-                type="text"
-                value={query}
-                onFocus={() => setIsFocused(true)}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={handleKeyDown}
-                readOnly={!isFocused}
-              />
-              <button
-                className={s.searchBtn}
-                type="button"
-                onClick={handleSearchClick}
-              >
-                <Image
-                  src="/images/search-glass.svg"
-                  alt="검색"
-                  width={20}
-                  height={20}
+    <>
+      <AdressSearchTrigger onClick={toggleModal}>
+        주소를 검색하면 식당 정보가 자동으로 입력됩니다.
+      </AdressSearchTrigger>
+      {isOpen && (
+        <div className={`${s.container} ${isOpen ? s.blur : ''}`}>
+          <div ref={inputRef}>
+            <div
+              className={`${s.addressInputWrapper} ${isOpen ? s.expanded : ''}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className={s.searchArea}>
+                <input
+                  className={s.addressInput}
+                  id="address"
+                  name="address"
+                  placeholder="ex) 스타벅스, 이디야"
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  readOnly={!isOpen}
                 />
-              </button>
-            </div>
-            {results.length > 0 && !!results ? (
-              <ul
-                className={s.results}
-                data-testid="address-search-results"
-                onWheel={(e) => e.stopPropagation()}
-              >
-                {results.map(({ id, address_name, place_name, x, y }) => (
-                  <li
-                    key={id}
-                    onClick={() => {
-                      handleSelect({
-                        address: address_name,
-                        storeName: place_name,
-                        posx: x,
-                        posy: y,
-                      });
-                    }}
-                  >
-                    <div className={s.searchResult}>
-                      <p className={s.storeName}>{place_name}</p>
-                      <div className={s.loadNameArea}>
-                        <span className={s.badge}>도로명</span>
-                        <p className={s.loadName}>{address_name}</p>
+                <button
+                  className={s.searchBtn}
+                  type="button"
+                  onClick={handleSearchClick}
+                >
+                  <Image
+                    src="/images/search-glass.svg"
+                    alt="검색"
+                    width={20}
+                    height={20}
+                  />
+                </button>
+              </div>
+              {results.length > 0 && !!results ? (
+                <ul
+                  className={s.results}
+                  data-testid="address-search-results"
+                  onWheel={(e) => e.stopPropagation()}
+                >
+                  {/* Stack 사용해서 리팩토링 */}
+                  {results.map(({ id, address_name, place_name, x, y }) => (
+                    <li
+                      key={id}
+                      onClick={() => {
+                        handleSelect({
+                          address: address_name,
+                          storeName: place_name,
+                          posx: x,
+                          posy: y,
+                        });
+                      }}
+                    >
+                      <div className={s.searchResult}>
+                        <p className={s.storeName}>{place_name}</p>
+                        <div className={s.loadNameArea}>
+                          <span className={s.badge}>도로명</span>
+                          <p className={s.loadName}>{address_name}</p>
+                        </div>
                       </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className={s.resultText}>검색결과가 없습니다.</p>
-            )}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className={s.resultText}>검색결과가 없습니다.</p>
+              )}
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </>
+  );
+}
+
+interface AdressSearchTriggerProps {
+  onClick: () => void;
+}
+
+function AdressSearchTrigger({
+  onClick,
+  children,
+}: PropsWithNotUndefinedChildren<AdressSearchTriggerProps>) {
+  const handleClick = () => {
+    if (!onClick) return;
+
+    onClick();
+  };
+
+  return (
+    <button
+      type="button"
+      style={{
+        width: '100%',
+        height: '48px',
+        padding: 0,
+
+        fontWeight: 500,
+        fontSize: '14px',
+        textAlign: 'left',
+        color: '#acaeb3',
+
+        backgroundColor: '#fff',
+        borderBottom: '1px solid #cdd0d8',
+      }}
+      onClick={handleClick}
+    >
+      {children}
+    </button>
   );
 }

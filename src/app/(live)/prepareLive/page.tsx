@@ -7,9 +7,9 @@ import { AddressSearchDetails } from '@/types';
 import { apiService } from '@services/apiService';
 import AddressInput from '@/components/AddressInput';
 import { BoxButton, Container } from '@/components/ui';
-import Camera from '@/app/live/prepare/Camera';
+import Camera from '@/app/(live)/live/_components/Camera';
 
-export default function PrepareStreamingPage() {
+export default function PrepareLivePage() {
   const [storeInfo, setStoreInfo] = useState<AddressSearchDetails | null>(null);
   const router = useRouter();
 

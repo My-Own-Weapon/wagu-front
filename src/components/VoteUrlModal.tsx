@@ -8,24 +8,40 @@
 import Modal from 'react-modal';
 import { useRouter } from 'next/navigation';
 
-import { KakaoLogoSVG, XSVG } from '@public/newDesign';
+import { XSVG } from '@public/newDesign';
 import Heading from '@/components/ui/Heading';
 import { NextImageWithCover } from '@/components/ui';
 
 import s from './VoteUrlModal.module.scss';
+import { useEffect, useState } from 'react';
+import { apiService } from '@/services/apiService';
 
 interface VoteUrlModalProps {
   isOpen: boolean;
   onRequestClose: () => void;
-  voteUrl: string;
 }
 
 export default function VoteUrlModal({
   isOpen,
   onRequestClose,
-  voteUrl,
 }: VoteUrlModalProps) {
   const router = useRouter();
+  const [voteUrl, setVoteUrl] = useState<string>('');
+
+  useEffect(() => {
+    const createVoteUrl = async () => {
+      const BASE_URL =
+        process.env.NODE_ENV === 'development'
+          ? 'http://localhost:3000'
+          : 'https://www.wagubook.shop';
+      const sessionId = await apiService.createShareMapRandomSessionId();
+      await apiService.publishShareMapSession(sessionId);
+
+      setVoteUrl(`${BASE_URL}/vote?sessionId=${sessionId}`);
+    };
+
+    createVoteUrl();
+  }, []);
 
   const handleShareMapUrlClick = (shareMapUrl: string) => {
     navigator.clipboard.writeText(shareMapUrl);
@@ -73,10 +89,6 @@ export default function VoteUrlModal({
             height="220px"
             alt="share-url-hand-img"
           />
-          <button className={s.shareButton}>
-            <KakaoLogoSVG />
-            <p className={s.shareText}>카카오톡으로 공유해보세요 !</p>
-          </button>
         </div>
       </div>
     </Modal>

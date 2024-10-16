@@ -4,6 +4,7 @@ import {
   MapVertexes,
   ProfileWithoutFollowResponse,
   SignupDetails,
+  StoreResponse,
   VotedStoreResponse,
 } from '@/types';
 
@@ -259,7 +260,7 @@ class ApiService {
   }
 
   /* about Store */
-  async fetchPostsOfStore(storeId: number) {
+  async fetchStorePosts(storeId: number | undefined) {
     const res = await fetch(
       `${this.baseUrl}/map/posts?storeId=${storeId}&page=0&size=12`,
       {
@@ -310,7 +311,7 @@ class ApiService {
     return res.json();
   }
 
-  async fetchLiveOnStreamersOfStore(storeId: number) {
+  async fetchOnLiveFollowingsAtStore(storeId: number | undefined) {
     const res = await fetch(`${this.baseUrl}/map/live?storeId=${storeId}`, {
       method: 'GET',
       credentials: 'include',
@@ -458,7 +459,12 @@ class ApiService {
   }
 
   /* about map page */
-  async fetchStoresOfMapBoundary({ left, right, up, down }: MapVertexes) {
+  async fetchMapBoundaryStores({
+    left,
+    right,
+    up,
+    down,
+  }: MapVertexes): Promise<StoreResponse[]> {
     const res = await fetch(
       `${this.baseUrl}/map?left=${left}&right=${right}&up=${up}&down=${down}`,
       {

@@ -1,7 +1,8 @@
-import { MainHeader } from '@/components/domain';
 import { ReactNode } from 'react';
 
-export default function StoreLayout({
+import { MainHeader } from '@/components/domain';
+
+export default function HomeLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   return (
