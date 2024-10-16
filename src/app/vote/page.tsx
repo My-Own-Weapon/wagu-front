@@ -453,7 +453,7 @@ export default function SharePage() {
     bounds: { left: number; down: number; right: number; up: number },
   ) => {
     try {
-      const stores = await apiService.fetchStoresOfMapBoundary(bounds);
+      const stores = await apiService.fetchMapBoundaryStores(bounds);
 
       addMarkers(mapInstance, stores);
     } catch (e) {
@@ -465,7 +465,7 @@ export default function SharePage() {
 
   const fetchPostsAndSet = async (storeId: number) => {
     try {
-      const posts = await apiService.fetchPostsOfStore(storeId);
+      const posts = await apiService.fetchStorePosts(storeId);
 
       setPostsOfStore(posts);
     } catch (e) {
@@ -783,7 +783,7 @@ export default function SharePage() {
     const fetchLiveStores = async () => {
       const liveStoresUpdates = await Promise.all(
         voteWinStores.map(({ storeId }) => {
-          return apiService.fetchLiveOnStreamersOfStore(storeId);
+          return apiService.fetchOnLiveFollowingsAtStore(storeId);
         }),
       );
       const flattedLiveStoresUpdates = liveStoresUpdates.flat();
@@ -799,7 +799,7 @@ export default function SharePage() {
 
     const fetchLiveStores = async (selectedStoreId: number) => {
       const streamers =
-        await apiService.fetchLiveOnStreamersOfStore(selectedStoreId);
+        await apiService.fetchOnLiveFollowingsAtStore(selectedStoreId);
 
       setStreamerFromStores(() => streamers);
     };

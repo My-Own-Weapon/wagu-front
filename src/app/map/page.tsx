@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import LiveFriends from '@/components/LiveFriendsList';
 import VoteUrlModal from '@/components/VoteUrlModal';
 import { PostOfStoreResponse, StoreResponse } from '@/types';
@@ -12,7 +12,7 @@ import PostsOfMap from '@/app/map/_components/PostsOfMap';
 import Heading from '@/components/ui/Heading';
 import { BoxButton } from '@/components/ui';
 import MapModel from '@/app/map/_lib/MapModel';
-import { useBoundaryStores } from '@/hooks/domains';
+import { useBoundaryStores, useSelectedStoreInfo } from '@/hooks/domains';
 
 import s from './page.module.scss';
 
@@ -34,15 +34,15 @@ export type KakaoMapElement = HTMLDivElement;
 export type MapMarker = any;
 
 export default function MapPage() {
-  const mapModelRef = useRef<any>(null);
-  const [posts, setPosts] = useState<PostOfStoreResponse[]>([]);
-  const [streamers, setStreamers] = useState<Streamer[]>([]);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [selectedStore, setSelectedStore] = useState<StoreResponse | null>(
-    null,
-  );
-  const [voteUrl, setVoteUrl] = useState<string>('');
+  const mapModelRef = useRef<MapModel | null>(null);
   const { stores, setBoundary } = useBoundaryStores();
+  const {
+    selectedStore,
+    setSelectedStore,
+    storePosts,
+    onLiveFollowingsAtStore,
+  } = useSelectedStoreInfo();
+  const [isModalOpen, toggleModalOpen] = useReducer((isOpen) => !isOpen, false);
 
   const onLoadMapRef = useCallback(
     (kakaoMapElement: KakaoMapElement) => {
@@ -87,6 +87,11 @@ export default function MapPage() {
 
             setBoundary(boundary);
           });
+
+          /* 업데이트가 안됨 */
+          mapModelRef.current?.createMarkers(stores, (store: StoreResponse) => {
+            setSelectedStore(store);
+          });
         });
       };
 
@@ -97,40 +102,9 @@ export default function MapPage() {
     [setBoundary],
   );
 
-  useEffect(() => {
-    if (!mapModelRef.current) return;
-
-    mapModelRef.current?.createMarkers(stores, (store: StoreResponse) => {
-      fetchStreamers(store.storeId);
-      fetchPosts(store.storeId);
-      setSelectedStore(store);
-    });
-  }, [stores]);
-
-  const fetchStreamers = async (storeId: number) => {
-    const liveOnStreamers =
-      await apiService.fetchLiveOnStreamersOfStore(storeId);
-
-    setStreamers(liveOnStreamers);
-  };
-
-  const fetchPosts = async (storeId: number) => {
-    const postsData = await apiService.fetchPostsOfStore(storeId);
-
-    setPosts(postsData);
-  };
-
-  const getShareUrl = async () => {
-    const BASE_URL =
-      process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3000'
-        : 'https://www.wagubook.shop';
-    const sessionId = await apiService.createShareMapRandomSessionId();
-    apiService.publishShareMapSession(sessionId);
-
-    setVoteUrl(`${BASE_URL}/vote?sessionId=${sessionId}`);
-    setModalIsOpen(true);
-  };
+  // useEffect(() => {
+  //   if (!mapModelRef.current) return;
+  // }, [stores]);
 
   return (
     <main className={s.container}>
@@ -143,25 +117,21 @@ export default function MapPage() {
             <Heading as="h3" fontSize="16px" fontWeight="bold" color="black">
               {selectedStore.storeName}에서 방송중이에요 !
             </Heading>
-            <LiveFriends liveFriends={streamers} />
+            <LiveFriends liveFriends={onLiveFollowingsAtStore} />
           </>
         )}
         <PostsOfMap
           selectedStoreName={selectedStore?.storeName}
           selectedStoreId={selectedStore?.storeId}
-          posts={posts}
+          posts={storePosts}
         />
       </div>
       <div className={s.urlButtonContainer}>
-        <BoxButton height="48px" styleType="fill" onClick={getShareUrl}>
+        <BoxButton height="48px" styleType="fill" onClick={toggleModalOpen}>
           함께 투표 링크 생성
         </BoxButton>
       </div>
-      <VoteUrlModal
-        isOpen={modalIsOpen}
-        onRequestClose={() => setModalIsOpen(false)}
-        voteUrl={voteUrl}
-      />
+      <VoteUrlModal isOpen={isModalOpen} onRequestClose={toggleModalOpen} />
     </main>
   );
 }
