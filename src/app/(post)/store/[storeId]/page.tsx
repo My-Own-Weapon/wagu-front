@@ -13,7 +13,7 @@ interface Props {
 
 export default async function StorePage({ params }: Props) {
   const { storeId } = params;
-  const posts = await apiService.fetchPostsOfStore(Number(storeId));
+  const posts = await apiService.fetchStorePosts(Number(storeId));
 
   return (
     <main>
