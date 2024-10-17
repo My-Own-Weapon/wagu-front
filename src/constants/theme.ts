@@ -41,14 +41,14 @@ export const colors = {
   brown: '#1C0A00',
   white: '#FFFFFF',
   black: '#000000',
-};
+} as const;
 
 export const borderRadius = {
   medium: '8px',
   small: '4px',
   large: '16px',
   circle: '50%',
-};
+} as const;
 
 export const fontWeight = {
   medium: 500,
@@ -56,4 +56,12 @@ export const fontWeight = {
   semiBold: 600,
   bold: 700,
   extraBold: 800,
-};
+} as const;
+
+export const zIndex = {
+  header: 50,
+  footer: 50,
+  dropDown: 100,
+  modal: 500,
+  toast: 1000,
+} as const;
