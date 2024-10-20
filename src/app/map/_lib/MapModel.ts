@@ -1,48 +1,61 @@
+/* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import type { KakaoMapElement, MapMarker } from '@/app/map/page';
 import type { StoreResponse } from '@/types';
+import { $, createElementWithAttr, elementsAppendChild } from '@/utils';
 
 export default class MapModel {
+  private SCRIPT_SRC = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=948985235eb596e79f570535fd01a71e&autoload=false&libraries=services`;
+
   private readonly $map: HTMLDivElement;
 
   public kakaoMapInstance: any;
 
   private markers: MapMarker[];
 
+  private initPromise: Promise<void>;
+
   constructor($map: KakaoMapElement) {
     this.$map = $map;
     this.kakaoMapInstance = null;
     this.markers = [];
 
-    this.init();
+    this.initPromise = this.init();
   }
 
-  private init() {
-    // const script = document.createElement('script');
-    // script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=948985235eb596e79f570535fd01a71e&autoload=false&libraries=services`;
-    // script.async = true;
-    // document.head.appendChild(script);
+  private init(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const $script = createElementWithAttr('script', {
+        src: this.SCRIPT_SRC,
+        async: true,
+      });
+      elementsAppendChild($script, document.head);
 
-    // script.onload = () => {
-    //   window.kakao.maps.load(() => {
-    // if (!this.$map) {
-    //   alert('document.getElementById("map") 지도 컨테이너를 찾을 수 없습니다.');
-    //   return;
-    // }
+      $script.onload = () => {
+        window.kakao.maps.load(() => {
+          if (!this.$map) {
+            reject(new Error('지도 컨테이너를 찾을 수 없습니다.'));
+            return;
+          }
 
-    const options = {
-      center: new window.kakao.maps.LatLng(37.5035685391056, 127.0416472341673),
-      level: 5,
-    };
+          const options = {
+            center: new window.kakao.maps.LatLng(
+              37.5035685391056,
+              127.0416472341673,
+            ),
+            level: 5,
+          };
 
-    this.kakaoMapInstance = new window.kakao.maps.Map(this.$map, options);
-    //   });
-    // };
+          this.kakaoMapInstance = new window.kakao.maps.Map(this.$map, options);
+          resolve();
+        });
+      };
 
-    // script.onerror = () => {
-    //   alert('카카오 지도 스크립트를 불러오지 못했습니다.');
-    // };
+      $script.onerror = () => {
+        reject(new Error('카카오 지도 스크립트를 불러오지 못했습니다.'));
+      };
+    });
   }
 
   removePrevMarkers() {
@@ -50,10 +63,17 @@ export default class MapModel {
     this.markers = [];
   }
 
-  createMarkers(
+  async createMarkers(
     stores: StoreResponse[],
     listner: (store: StoreResponse) => void,
   ) {
+    await this.initPromise;
+
+    if (!window.kakao || !window.kakao.maps) {
+      console.error('Kakao maps is not loaded');
+      return;
+    }
+
     this.removePrevMarkers();
     const { maps } = window.kakao;
 
@@ -84,7 +104,9 @@ export default class MapModel {
     });
   }
 
-  addEventListenerMap(event: string, cb: () => void) {
+  async addEventListenerMap(event: string, cb: () => void) {
+    await this.initPromise;
+
     if (!window.kakao) return;
 
     window.kakao.maps.event.addListener(this.kakaoMapInstance, event, cb);
@@ -95,5 +117,26 @@ export default class MapModel {
     if (!window.kakao) return;
 
     window.kakao.maps.event.addListener(marker, event, cb);
+  }
+
+  getUserMapBoundary() {
+    const mapBounds = this.kakaoMapInstance.getBounds();
+    const SWaxis = mapBounds.getSouthWest();
+    const NEaxis = mapBounds.getNorthEast();
+    return {
+      left: SWaxis.getLng(),
+      down: SWaxis.getLat(),
+      right: NEaxis.getLng(),
+      up: NEaxis.getLat(),
+    };
+  }
+
+  cleanupScript() {
+    const $garbageScript = $(
+      'script[src*="https://dapi.kakao.com/v2/maps/sdk"]',
+    ) as HTMLScriptElement;
+    if (Boolean($garbageScript)) {
+      document.head.removeChild($garbageScript);
+    }
   }
 }

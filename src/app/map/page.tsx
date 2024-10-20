@@ -1,12 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */ // for KakaoMap
 
 'use client';
 
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import { useCallback, useEffect, useReducer, useRef } from 'react';
 import LiveFriends from '@/components/LiveFriendsList';
 import VoteUrlModal from '@/components/VoteUrlModal';
-import { PostOfStoreResponse, StoreResponse } from '@/types';
-import { apiService } from '@/services/apiService';
+import { StoreResponse } from '@/types';
 
 import PostsOfMap from '@/app/map/_components/PostsOfMap';
 import Heading from '@/components/ui/Heading';
@@ -21,15 +20,6 @@ declare global {
     kakao: any;
   }
 }
-
-interface Streamer {
-  profileImage: string;
-  sessionId: string;
-  userName: string;
-  address: string;
-  storeName: string;
-}
-
 export type KakaoMapElement = HTMLDivElement;
 export type MapMarker = any;
 
@@ -45,66 +35,35 @@ export default function MapPage() {
   const [isModalOpen, toggleModalOpen] = useReducer((isOpen) => !isOpen, false);
 
   const onLoadMapRef = useCallback(
-    (kakaoMapElement: KakaoMapElement) => {
-      if (!kakaoMapElement) {
-        const $garbageScript = document.head.querySelector(
-          'script[src*="https://dapi.kakao.com/v2/maps/sdk"]',
-        ) as HTMLScriptElement;
-        if (Boolean($garbageScript)) {
-          document.head.removeChild($garbageScript);
-        }
-
+    (node: KakaoMapElement) => {
+      if (!node) {
+        mapModelRef.current?.cleanupScript();
         return;
       }
 
-      const script = document.createElement('script');
-      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=948985235eb596e79f570535fd01a71e&autoload=false&libraries=services`;
-      script.async = true;
-      document.head.appendChild(script);
-
-      script.onload = () => {
-        window.kakao.maps.load(() => {
-          if (!kakaoMapElement) {
-            alert(
-              'document.getElementById("map") 지도 컨테이너를 찾을 수 없습니다.',
-            );
-            return;
-          }
-
-          const mapModel = new MapModel(kakaoMapElement);
-          mapModelRef.current = mapModel;
-
-          mapModel.addEventListenerMap('idle', async () => {
-            const mapBounds = mapModel.kakaoMapInstance.getBounds();
-            const SWaxis = mapBounds.getSouthWest();
-            const NEaxis = mapBounds.getNorthEast();
-            const boundary = {
-              left: SWaxis.getLng(),
-              down: SWaxis.getLat(),
-              right: NEaxis.getLng(),
-              up: NEaxis.getLat(),
-            };
-
-            setBoundary(boundary);
-          });
-
-          /* 업데이트가 안됨 */
-          mapModelRef.current?.createMarkers(stores, (store: StoreResponse) => {
-            setSelectedStore(store);
-          });
-        });
-      };
-
-      script.onerror = () => {
-        alert('카카오 지도 스크립트를 불러오지 못했습니다.');
-      };
+      const mapModel = new MapModel(node);
+      mapModelRef.current = mapModel;
+      mapModel.addEventListenerMap('idle', async () => {
+        const boundary = mapModel.getUserMapBoundary();
+        setBoundary(boundary);
+      });
     },
     [setBoundary],
   );
 
-  // useEffect(() => {
-  //   if (!mapModelRef.current) return;
-  // }, [stores]);
+  /**
+   * ✅ TODO: 이전 움직임의 캐쉬된 위치 기반으로 움직이기 때문에
+   *          아주 조금씩 움직움직여 많은거리를 이동해도 마커를 새로 불러오지않음
+   */
+  useEffect(() => {
+    if (!mapModelRef.current) return;
+
+    const handleClickMarker = (store: StoreResponse) => {
+      setSelectedStore(store);
+    };
+
+    mapModelRef.current.createMarkers(stores, handleClickMarker);
+  }, [stores, setSelectedStore]);
 
   return (
     <main className={s.container}>
