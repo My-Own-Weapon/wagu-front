@@ -1,6 +1,9 @@
 import { apiService } from '@/services/apiService';
 import { useQuery } from '@tanstack/react-query';
 
+/**
+ * @QUERY_KEY ['checkLoginSession']
+ */
 const useCheckLoginSession = () => {
   const query = useQuery({
     queryKey: ['checkLoginSession'],
