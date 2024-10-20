@@ -1,6 +1,4 @@
-/* eslint-disable no-console */
-/* eslint-disable no-irregular-whitespace */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import { ComponentProps } from 'react';
 
 export const delay = (ms: number) => {
   return new Promise((resolve) => {
@@ -58,4 +56,37 @@ export const Result: ResultProps<void, void> = async (Ok, Err) => {
     }
     return new Error('An unknown error occurred');
   }
+};
+
+export const $ = (selector: string, parent: ParentNode = document) => {
+  return parent.querySelector(selector);
+};
+
+export const createElementWithAttr = <K extends keyof HTMLElementTagNameMap>(
+  tagName: K,
+  attrMap: ComponentProps<K>,
+) => {
+  const el = document.createElement(tagName);
+  (Object.keys(attrMap) as Array<keyof ComponentProps<K>>).forEach((attr) => {
+    /* setAttribute로 사용시 추론이 명확히 되지만 onClick과 같은 핸들러 등록시에 분기문이 많아지기에
+       type을 any로 변경하고 코드의 가독성을 높임  */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (el as any)[attr] = attrMap[attr];
+  });
+
+  return el;
+};
+
+export const elementsAppendChild = (
+  elementArr: Array<HTMLElement> | HTMLElement,
+  target: HTMLElement,
+) => {
+  if (Array.isArray(elementArr)) {
+    const fragment = document.createDocumentFragment();
+    elementArr.forEach((element) => fragment.appendChild(element));
+    target.appendChild(fragment);
+    return;
+  }
+
+  target.appendChild(elementArr);
 };
