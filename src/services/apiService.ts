@@ -1,3 +1,4 @@
+// eslint-disable-next-line max-classes-per-file
 import {
   AddressSearchDetails,
   LoginUserInputs,
@@ -7,6 +8,8 @@ import {
   StoreResponse,
   VotedStoreResponse,
 } from '@/types';
+import CheckLoginSessionError from '@/services/errors/CheckLoginSessionError';
+import { ERROR_MESSAGE } from '@/services/constants/errorMessage';
 
 interface ProfileDetailsResponse {
   userName: string;
@@ -27,6 +30,10 @@ interface AIAutoReviewResponse {
 
 type SuccessMessageResponse = Promise<string>;
 
+type PathMustStartWithSlash<T extends string> = T extends `/${string}`
+  ? T
+  : never;
+
 class ApiService {
   private mswBaseUrl = 'http://localhost:9090';
 
@@ -37,6 +44,66 @@ class ApiService {
 
   private kakaoBaseUrl =
     'https://dapi.kakao.com/v2/local/search/keyword.json?page=1&size=15&sort=accuracy&query=';
+
+  /**
+   * @example
+   * const res = awiat this.fetcher('/posts', {
+   *   method: 'GET',
+   *   credentials: 'include',
+   * })
+   */
+  private async fetcher<T extends string, E extends Error>(
+    path: PathMustStartWithSlash<T>,
+    options: globalThis.RequestInit,
+    {
+      CustomError,
+      errorMessage,
+    }: {
+      CustomError?: new (message: string) => E;
+      errorMessage?: string;
+    },
+  ): Promise<Response> {
+    if (!path.startsWith('/')) {
+      throw new Error('path must start with /');
+    }
+
+    const res = await fetch(`${this.baseUrl}${path}`, options);
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      if (CustomError) {
+        throw new CustomError(
+          this.errorMessageTemplate({
+            status,
+            error,
+            message: errorMessage ?? message,
+          }),
+        );
+      }
+
+      throw new Error(
+        this.errorMessageTemplate({
+          status,
+          error,
+          message: errorMessage ?? message,
+        }),
+      );
+    }
+
+    return res;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  private errorMessageTemplate = ({
+    status,
+    error,
+    message,
+  }: {
+    status: number;
+    error: string;
+    message: string;
+  }) => `[${status}] ${error}\n Message - ${message}`;
 
   /* Auth */
   async login({ username, password }: LoginUserInputs) {
@@ -105,19 +172,18 @@ class ApiService {
     return res.text();
   }
 
-  async checkSession() {
-    const res = await fetch(`${this.baseUrl}/session`, {
-      method: 'GET',
-      credentials: 'include',
-    });
-
-    if (!res.ok) {
-      const { status, error } = await res.json();
-
-      throw new Error(
-        `[${status}: ${error}] 세션이 만료되었습니다. 다시 로그인해주세요`,
-      );
-    }
+  public async checkLoginSession() {
+    const res = await this.fetcher(
+      '/session',
+      {
+        method: 'GET',
+        credentials: 'include',
+      },
+      {
+        CustomError: CheckLoginSessionError,
+        errorMessage: ERROR_MESSAGE.CHECK_LOGIN_SESSION,
+      },
+    );
 
     return res.text();
   }
@@ -223,12 +289,18 @@ class ApiService {
     count?: number;
   }) {
     const res = await fetch(
-      `${this.baseUrl}/posts?page=${page}&size=${count}`,
+      `${this.baseUrl}/posts?2page=${page}&size=${count}`,
       {
         method: 'GET',
         credentials: 'include',
       },
     );
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      throw new Error(`[${status}, ${error}] ${message}`);
+    }
 
     return res.json();
   }
