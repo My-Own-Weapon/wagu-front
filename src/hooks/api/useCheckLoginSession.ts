@@ -1,5 +1,7 @@
-import { apiService } from '@/services/apiService';
+'use client';
+
 import { useQuery } from '@tanstack/react-query';
+import { apiService } from '@/services/apiService';
 
 /**
  * @QUERY_KEY ['checkLoginSession']

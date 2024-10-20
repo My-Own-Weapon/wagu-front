@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { Store } from '@/components/StoreCard';
 import { User } from '@/components/UserCard';
-import { http, HttpResponse } from 'msw';
+import { delay, http, HttpResponse } from 'msw';
 
 import fixtures from './fixtures';
 
@@ -70,7 +70,7 @@ export const handlers = [
       );
     }
 
-    if (!name.match(/^[가-힣]+$/g)) {
+    if (!name?.match(/^[가-힣]+$/g)) {
       return HttpResponse.json(
         {
           message: '이름은 한글만 입력 가능합니다.',
@@ -81,7 +81,7 @@ export const handlers = [
       );
     }
 
-    if (!phoneNumber.match(/^[0-9]{3}-[0-9]{4}-[0-9]{4}$/)) {
+    if (!phoneNumber?.match(/^[0-9]{3}-[0-9]{4}-[0-9]{4}$/)) {
       return HttpResponse.json(
         {
           message: '휴대폰 번호는 000-0000-0000 형식으로 입력해주세요.',
@@ -190,6 +190,10 @@ export const handlers = [
       menuName: string;
       category: string;
     } | null;
+
+    /* for spinner */
+    await delay(1500);
+
     if (!body) {
       return HttpResponse.json(
         { error: 'Request body is missing' },
