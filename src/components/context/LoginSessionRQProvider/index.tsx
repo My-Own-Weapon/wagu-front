@@ -5,10 +5,10 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
-import { CheckLoginSessionError } from '@/services/apiService';
 import { useRouter } from 'next/navigation';
 import { ReactNode, useState } from 'react';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import CheckLoginSessionError from '@/services/errors/CheckLoginSessionError';
 
 export default function LoginSessionRQProvider({
   children,
