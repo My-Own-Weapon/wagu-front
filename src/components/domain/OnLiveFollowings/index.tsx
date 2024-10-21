@@ -1,12 +1,19 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 
 import { COLORS } from '@/components/ui/_contants';
 import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
+import { usePathname } from 'next/navigation';
 import { Flex } from '@/components/ui';
-import { Friend } from '@/types';
+
+export interface Friend {
+  profileImage: string;
+  sessionId: string;
+  userName: string;
+  address: string;
+  storeName: string;
+}
 
 interface Props {
   liveFriends: Friend[];
