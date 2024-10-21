@@ -1,36 +1,33 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 import { COLORS } from '@/components/ui/_contants';
 import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
-import { usePathname } from 'next/navigation';
-
-import s from './LiveFriendsList.module.scss';
-
-export interface Friend {
-  profileImage: string;
-  sessionId: string;
-  userName: string;
-  address: string;
-  storeName: string;
-}
+import { Flex } from '@/components/ui';
+import { Friend } from '@/types';
 
 interface Props {
   liveFriends: Friend[];
 }
 
-export default function LiveFriends({ liveFriends }: Props) {
+export default function OnLiveFollowings({
+  liveFriends: onLiveFollowings,
+}: Props) {
   const UserIconWithText = WithText<UserIconProps>(UserIcon);
   const path = usePathname();
 
   return (
-    <div className={s.container}>
-      {liveFriends.length > 0 ? (
-        <ul className={s.friendsWrapper}>
-          {liveFriends.map(({ profileImage, sessionId, userName }) => (
-            <Link href={`/live/${sessionId}`} key={sessionId}>
-              <li>
+    onLiveFollowings.length > 0 && (
+      <ul aria-label="라이브 중인 팔로잉 목록">
+        <Flex gap="12px" justifyContent="flex-start">
+          {onLiveFollowings.map(({ profileImage, sessionId, userName }) => (
+            <li key={sessionId}>
+              <Link
+                href={`/live/${sessionId}`}
+                aria-label={`${userName}의 라이브 방송 보기`}
+              >
                 <UserIconWithText
                   shape="circle"
                   size="large"
@@ -38,37 +35,17 @@ export default function LiveFriends({ liveFriends }: Props) {
                   color={path === '/' ? 'white' : 'black'}
                   border={`1.5px solid ${COLORS.PRIMARY_ORANGE}`}
                   imgSrc={
-                    !!profileImage
-                      ? profileImage
-                      : '/profile/profile-default-icon-female.svg'
+                    profileImage || '/profile/profile-default-icon-female.svg'
                   }
-                  alt="profile-icon"
+                  alt={`${userName}의 프로필 사진`}
                 >
                   {userName}
                 </UserIconWithText>
-              </li>
-            </Link>
+              </Link>
+            </li>
           ))}
-        </ul>
-      ) : null}
-    </div>
+        </Flex>
+      </ul>
+    )
   );
 }
-
-// function Cat() {
-//   return (
-//     <pre
-//       className={s.catAnimation}
-//       style={{
-//         margin: 0,
-//         fontFamily: 'monospace',
-//         whiteSpace: 'pre',
-//         lineHeight: '1',
-//       }}
-//     >
-//       {' '}
-//       /\_/\
-//       <br />( 8.8 )<br /> &gt; ^ &lt;
-//     </pre>
-//   );
-// }
