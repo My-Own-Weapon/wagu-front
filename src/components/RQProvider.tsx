@@ -1,32 +1,46 @@
 'use client';
 
 import { ReactNode, useState } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-// import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import {
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { useRouter } from 'next/navigation';
+import CheckLoginSessionError from '@/services/errors/CheckLoginSessionError';
 
 interface Props {
   children: ReactNode;
 }
 
 export default function RQProvider({ children }: Props) {
-  const [queryClient] = useState(
-    new QueryClient({
+  const router = useRouter();
+  const [queryClient] = useState(() => {
+    return new QueryClient({
       defaultOptions: {
         queries: {
           refetchOnWindowFocus: false,
           retry: false,
         },
       },
-    }),
-  );
+      queryCache: new QueryCache({
+        onError: (error) => {
+          if (error instanceof CheckLoginSessionError) {
+            alert(
+              `로그인 이후 이용한지 오래되지않아 로그아웃되었어요.\n다시 로그인해주세요.`,
+            );
+            router.push('/login');
+          }
+        },
+      }),
+    });
+  });
 
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      {/* ✅ TODO: playwright react query devtools가 안돌도록 env설정 변경해야함 */}
-      {/* <ReactQueryDevtools
-        initialIsOpen={process.env.NEXT_PUBLIC_MODE === 'local'}
-      /> */}
+      {process.env.REACT_APP_SHOW_DEV_TOOLS ? <ReactQueryDevtools /> : null}
     </QueryClientProvider>
   );
 }
