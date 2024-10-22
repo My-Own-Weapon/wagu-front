@@ -10,6 +10,7 @@ import {
 } from '@/types';
 import CheckLoginSessionError from '@/services/errors/CheckLoginSessionError';
 import { ERROR_MESSAGE } from '@/services/constants/errorMessage';
+import { z } from 'zod';
 
 interface ProfileDetailsResponse {
   userName: string;
@@ -34,7 +35,27 @@ type PathMustStartWithSlash<T extends string> = T extends `/${string}`
   ? T
   : never;
 
-class ApiService {
+type CustomErrorConstructor = new (message: string) => Error;
+
+// Zod 스키마 정의
+const ErrorConfigSchema = z
+  .union([
+    z.string(),
+    z.object({
+      CustomError: z
+        .custom<CustomErrorConstructor>((error) => {
+          return (
+            typeof error === 'function' && error.toString().startsWith('class')
+          );
+        })
+        .optional(),
+      errorMessage: z.string().optional(),
+    }),
+  ])
+  .optional();
+
+type ErrorConfig = z.infer<typeof ErrorConfigSchema>;
+export default class ApiService {
   private mswBaseUrl = 'http://localhost:9090';
 
   private baseUrl =
@@ -50,52 +71,86 @@ class ApiService {
    * const res = awiat this.fetcher('/posts', {
    *   method: 'GET',
    *   credentials: 'include',
-   * })
+   * },
+   * 'Failed to fetch posts');
+   *
+   * const res = awiat this.fetcher('/posts', {
+   *   method: 'GET',
+   *   credentials: 'include',
+   *  },
+   *  {
+   *   CustomError : FetchPostsError,
+   *   errorMessage: 'Failed to fetch posts',
+   * });
+   *
+   * const res = awiat this.fetcher('/posts', {
+   *   method: 'GET',
+   *   credentials: 'include',
+   *  },
+   *  {
+   *   errorMessage: 'Failed to fetch posts',
+   * });
    */
-  private async fetcher<T extends string, E extends Error>(
+  async fetcher<T extends string>(
     path: PathMustStartWithSlash<T>,
-    options: globalThis.RequestInit,
-    {
-      CustomError,
-      errorMessage,
-    }: {
-      CustomError?: new (message: string) => E;
-      errorMessage?: string;
-    },
+    requestInit: globalThis.RequestInit,
+    errorConfig?: ErrorConfig,
   ): Promise<Response> {
     if (!path.startsWith('/')) {
       throw new Error('path must start with /');
     }
 
-    const res = await fetch(`${this.baseUrl}${path}`, options);
+    const res = await fetch(`${this.baseUrl}${path}`, requestInit);
 
     if (!res.ok) {
       const { status, message, error } = await res.json();
 
-      if (CustomError) {
-        throw new CustomError(
-          this.errorMessageTemplate({
-            status,
-            error,
-            message: errorMessage ?? message,
-          }),
-        );
+      if (!errorConfig) {
+        throw new Error(this.errorMessageTemplate({ status, error, message }));
       }
 
-      throw new Error(
-        this.errorMessageTemplate({
+      const validatedErrorConfig = ErrorConfigSchema.parse(errorConfig);
+      if (validatedErrorConfig) {
+        const errorMessage = this.createErrorMessage(
+          validatedErrorConfig,
           status,
           error,
-          message: errorMessage ?? message,
-        }),
-      );
+          message,
+        );
+
+        // eslint-disable-next-line max-depth
+        if (
+          typeof validatedErrorConfig === 'object' &&
+          validatedErrorConfig.CustomError
+        ) {
+          throw new validatedErrorConfig.CustomError(errorMessage);
+        }
+
+        throw new Error(errorMessage);
+      }
+
+      throw new Error(this.errorMessageTemplate({ status, error, message }));
     }
 
     return res;
   }
 
+  private createErrorMessage(
+    errorConfig: NonNullable<ErrorConfig>,
+    status: number,
+    error: string,
+    serverMessage: string,
+  ): string {
+    const message =
+      typeof errorConfig === 'string'
+        ? errorConfig
+        : (errorConfig.errorMessage ?? serverMessage);
+
+    return this.errorMessageTemplate({ status, error, message });
+  }
+
   // eslint-disable-next-line class-methods-use-this
-  private errorMessageTemplate = ({
+  private errorMessageTemplate({
     status,
     error,
     message,
@@ -103,11 +158,13 @@ class ApiService {
     status: number;
     error: string;
     message: string;
-  }) => `[${status}] ${error}\n Message - ${message}`;
+  }) {
+    return `[${status}] ${error}\n Message - ${message}`;
+  }
 
   /* Auth */
   async login({ username, password }: LoginUserInputs) {
-    const res = await fetch(`${this.baseUrl}/login`, {
+    const res = await this.fetcher(`/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -558,16 +615,16 @@ class ApiService {
 
   /* about Share Map page */
   async createShareMapRandomSessionId(): Promise<string> {
-    const res = await fetch(`${this.baseUrl}/share`, {
-      method: 'POST',
-      credentials: 'include',
-    });
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
+    const res = await this.fetcher(
+      '/share',
+      {
+        method: 'POST',
+        credentials: 'include',
+      },
+      {
+        errorMessage: '함께 투표하기 방을 생성하는데 실패했습니다.',
+      },
+    );
 
     const sessionIdForShareUrl = await res.text();
 
