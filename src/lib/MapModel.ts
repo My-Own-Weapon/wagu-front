@@ -1,9 +1,13 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import type { KakaoMapElement, MapMarker } from '@/app/map/page';
-import type { StoreResponse } from '@/types';
-import { $, createElementWithAttr, elementsAppendChild } from '@/utils';
+import type { KakaoMapElement, MapMarker, StoreResponse } from '@/types';
+import {
+  $,
+  createElementWithAttr,
+  elementsAppendChild,
+  removeChild,
+} from '@/utils';
 
 export default class MapModel {
   private SCRIPT_SRC = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=948985235eb596e79f570535fd01a71e&autoload=false&libraries=services`;
@@ -136,7 +140,7 @@ export default class MapModel {
       'script[src*="https://dapi.kakao.com/v2/maps/sdk"]',
     ) as HTMLScriptElement;
     if (Boolean($garbageScript)) {
-      document.head.removeChild($garbageScript);
+      removeChild($garbageScript, document.head);
     }
   }
 }
