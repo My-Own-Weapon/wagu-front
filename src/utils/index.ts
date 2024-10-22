@@ -90,3 +90,23 @@ export const elementsAppendChild = (
 
   target.appendChild(elementArr);
 };
+
+export const removeChild = (
+  element: HTMLElement | string,
+  target: ParentNode = document,
+) => {
+  if (typeof element === 'string') {
+    const el = $(element);
+    if (!el) throw new Error('해당 element가 존재하지 않습니다.');
+
+    target.removeChild(el);
+    return;
+  }
+
+  if (typeof element === 'object') {
+    target.removeChild(element);
+    return;
+  }
+
+  throw new Error('string 또는 HTMLElement만 가능합니다.');
+};
