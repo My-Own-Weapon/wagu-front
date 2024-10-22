@@ -2,8 +2,8 @@ import type { Config } from 'jest';
 
 const config: Config = {
   verbose: true,
-  testEnvironment: 'jsdom',
-  testMatch: ['**/__tests__/**/*.ts?(x)'],
+  testEnvironment: 'jest-fixed-jsdom',
+  testMatch: ['**/__tests__/**/*.ts?(x)', '**/?(*.)+(test).ts?(x)'],
   transform: {
     '^.+\\.(t|j)sx?$': '@swc/jest',
     '^.+\\.(css|scss|sass)$': 'jest-transform-stub',
