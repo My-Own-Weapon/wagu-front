@@ -25,6 +25,7 @@ export default function LoginSessionRQProvider({
       queryCache: new QueryCache({
         onError: (error) => {
           if (error instanceof CheckLoginSessionError) {
+            alert('재 로그인이 필요합니다.');
             router.push('/login');
           }
         },
