@@ -23,14 +23,9 @@ export default function PostsOfMap({
     <div className={s.container}>
       <div className={s.titleWrapper}>
         <Heading as="h3" fontSize="16px" fontWeight="bold" color="black">
-          {isNotSelectStore({
-            selectedStoreId,
-            selectedStoreName,
-          })
-            ? '지도의 가게를 클릭해보세요 !'
-            : `${selectedStoreName} POST`}
+          {`${selectedStoreName} POST`}
         </Heading>
-        {isNoPost({
+        {!isNoPost({
           posts,
           selectedStoreId,
           selectedStoreName,
@@ -74,17 +69,10 @@ function PostCard({ imgUrl, postId }: { imgUrl: string; postId: number }) {
   );
 }
 
-function isNoPost({
+const isNoPost = ({
   posts,
   selectedStoreId,
   selectedStoreName,
-}: Props & { posts: PostOfStoreResponse[] }) {
+}: Props & { posts: PostOfStoreResponse[] }) => {
   return posts?.length === 0 && selectedStoreId && selectedStoreName;
-}
-
-function isNotSelectStore({
-  selectedStoreId,
-  selectedStoreName,
-}: Omit<Props, 'posts'>) {
-  return !selectedStoreId && !selectedStoreName;
-}
+};
