@@ -24,7 +24,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 import { Store, VotableCards, VotedStoreCards } from '@/components/StoreCard';
-import LiveFriends from '@/components/LiveFriendsList';
+import OnLiveFollowings from '@/components/LiveFriendsList';
 import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
 import { localStorageApi } from '@/services/localStorageApi';
 import { apiService } from '@/services/apiService';
@@ -940,7 +940,7 @@ export default function SharePage() {
               <Heading as="h3" fontSize="16px" fontWeight="bold" color="black">
                 {`${selectedStore.storeName}에서 방송중이에요 !`}
               </Heading>
-              <LiveFriends liveFriends={streamerFromStores} />
+              <OnLiveFollowings liveFriends={streamerFromStores} />
             </>
           )}
           <PostsOfMap

@@ -31,7 +31,6 @@ export default function PrepareStreamingPage() {
     <Container>
       <Camera />
       <AddressInput
-        title="가게 이름"
         value={
           storeInfo ? `[${storeInfo?.storeName}] ${storeInfo?.address}` : ''
         }
