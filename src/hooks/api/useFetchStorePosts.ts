@@ -1,14 +1,14 @@
 import { apiService } from '@/services/apiService';
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 
 /**
  * @QUERY_KEY ["fetchStorePosts", var(storeId)]
  */
-const useFetchStorePosts = (storeId: number | undefined) => {
-  const { data } = useQuery({
+const useFetchStorePosts = (storeId: number) => {
+  const { data } = useSuspenseQuery({
     queryKey: ['fetchStorePosts', storeId],
-    queryFn: () => apiService.fetchStorePosts(storeId),
-    enabled: Boolean(storeId),
+    queryFn: () => (storeId ? apiService.fetchStorePosts(storeId) : null),
+    staleTime: 1000 * 60 * 3,
   });
 
   return {

@@ -20,12 +20,16 @@ const limitBoundaryPrecision = (boundary: MapVertexes): MapVertexes => {
 
 /**
  * @QUERY_KEY ["fetchMapBoundaryStores", var(boundary)]
+ *
+ * @staleTime useFetchOnLiveFollowings와 같은 이유로 인플루언서가 라이브를 시작했을때
+ *            라이브중인 마커를 다시 불러오지 않아 사용자 관점에서 좋지 않을 수 있음
  */
 const useFetchMapBoundaryStores = (boundary: MapVertexes) => {
   const { data } = useQuery({
     queryKey: ['fetchMapBoundaryStores', limitBoundaryPrecision(boundary)],
     queryFn: () => apiService.fetchMapBoundaryStores(boundary),
-    gcTime: 1000 * 60 * 1,
+    staleTime: 0,
+    gcTime: 1000 * 60 * 3,
   });
 
   return {
