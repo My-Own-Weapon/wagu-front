@@ -4,21 +4,31 @@ import { PostOfStoreResponse } from '@/types';
 import { NextImageWithCover } from '@/components/ui';
 import Heading from '@/components/ui/Heading';
 import useDragScroll from '@/hooks/useDragScroll';
+import { useFetchStorePosts } from '@/hooks/api';
 
-import s from './PostsOfMap.module.scss';
+import s from './StorePosts.module.scss';
 
 interface Props {
-  selectedStoreName: string | undefined;
-  selectedStoreId: number | undefined;
-  posts: PostOfStoreResponse[];
+  selectedStoreName: string;
+  selectedStoreId: number;
 }
 
-export default function PostsOfMap({
+/**
+ * ✅ TODO: 분리
+ */
+const useStorePosts = ({ storeId }: { storeId: number }) => {
+  const { storePosts } = useFetchStorePosts(storeId);
+
+  return storePosts;
+};
+
+export default function StorePosts({
   selectedStoreName,
   selectedStoreId,
-  posts,
 }: Props) {
+  const posts = useStorePosts({ storeId: selectedStoreId });
   const ref = useDragScroll();
+
   return (
     <div className={s.container}>
       <div className={s.titleWrapper}>
