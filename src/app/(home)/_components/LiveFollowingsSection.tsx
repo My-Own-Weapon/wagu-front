@@ -1,5 +1,6 @@
+import { OnLiveFollowings } from '@/components/domain';
 import { Flex, Heading, Spacing, Stack } from '@/components/ui';
-import OnLiveFollowings from '@/components/LiveFriendsList';
+
 import { Friend } from '@/types';
 
 interface LiveFriendsSectionProps {
@@ -19,7 +20,7 @@ export default function LiveFollowingsSection({
       </Heading>
       <Spacing size={20} />
       <Flex justifyContent="flex-start">
-        <OnLiveFollowings liveFriends={liveFollowings} />
+        <OnLiveFollowings onLiveFollowings={liveFollowings} />
       </Flex>
       <Spacing size={40} />
     </Stack>
