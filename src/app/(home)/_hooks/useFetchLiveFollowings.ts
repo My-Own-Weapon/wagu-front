@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { apiService } from '@/services/apiService';
-import { Friend } from '@/components/LiveFriendsList';
+import { Friend } from '@/types';
 
 export default function useFetchLiveFollowings() {
   const [liveFollowings, setLiveFollowings] = useState<Friend[]>([]);
