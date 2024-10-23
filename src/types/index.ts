@@ -155,3 +155,5 @@ export interface Friend {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MapMarker = any;
 export type KakaoMapElement = HTMLDivElement;
+
+export type Nullable<T> = T | null;
