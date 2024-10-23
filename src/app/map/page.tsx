@@ -1,17 +1,13 @@
 'use client';
 
-import { useEffect, useReducer } from 'react';
-import OnLiveFollowings from '@/components/LiveFriendsList';
+import { Suspense, useEffect, useReducer, useState } from 'react';
+import OnLiveFollowings from '@/components/OnLiveFollowingsAtStore';
 import VoteUrlModal from '@/components/VoteUrlModal';
 import { StoreResponse } from '@/types';
 
-import PostsOfMap from '@/app/map/_components/PostsOfMap';
-import { BoxButton, Heading } from '@/components/ui';
-import {
-  useBoundaryStores,
-  useKakaoMap,
-  useSelectedStoreInfo,
-} from '@/hooks/domains';
+import StorePosts from '@/app/map/_components/StorePosts';
+import { BoxButton, Heading, Spacing } from '@/components/ui';
+import { useBoundaryStores, useKakaoMap } from '@/hooks/domains';
 import { Map } from '@/components/domain';
 
 import s from './page.module.scss';
@@ -19,12 +15,9 @@ import s from './page.module.scss';
 export default function MapPage() {
   const { stores, setBoundary } = useBoundaryStores();
   const { onLoadMapRef, createMarkers } = useKakaoMap(setBoundary);
-  const {
-    selectedStore,
-    setSelectedStore,
-    storePosts,
-    onLiveFollowingsAtStore,
-  } = useSelectedStoreInfo();
+  const [selectedStore, setSelectedStore] = useState<StoreResponse | null>(
+    null,
+  );
   const [isModalOpen, toggleModalOpen] = useReducer((isOpen) => !isOpen, false);
 
   /**
@@ -32,8 +25,6 @@ export default function MapPage() {
    *          아주 조금씩 움직움직여 많은거리를 이동해도 마커를 새로 불러오지않음
    */
   useEffect(() => {
-    // if (!mapModelRef.current) return;
-
     const handleClickMarker = (store: StoreResponse) => {
       setSelectedStore(store);
     };
@@ -54,23 +45,20 @@ export default function MapPage() {
         ) : (
           <>
             {selectedStore.liveStore && (
-              <>
-                <Heading
-                  as="h3"
-                  fontSize="16px"
-                  fontWeight="bold"
-                  color="black"
-                >
-                  {selectedStore.storeName}에서 방송중이에요 !
-                </Heading>
-                <OnLiveFollowings liveFriends={onLiveFollowingsAtStore} />
-              </>
+              <Suspense fallback={<div>로딩중...</div>}>
+                <OnLiveFollowings
+                  storeId={selectedStore.storeId}
+                  storeName={selectedStore.storeName}
+                />
+              </Suspense>
             )}
-            <PostsOfMap
-              selectedStoreName={selectedStore?.storeName}
-              selectedStoreId={selectedStore?.storeId}
-              posts={storePosts}
-            />
+            <Spacing size={24} />
+            <Suspense fallback={<div>로딩중...</div>}>
+              <StorePosts
+                selectedStoreName={selectedStore.storeName}
+                selectedStoreId={selectedStore.storeId}
+              />
+            </Suspense>
           </>
         )}
       </div>
