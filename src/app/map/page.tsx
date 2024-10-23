@@ -1,14 +1,13 @@
 'use client';
 
 import { Suspense, useEffect, useReducer, useState } from 'react';
-import OnLiveFollowings from '@/components/OnLiveFollowingsAtStore';
 import VoteUrlModal from '@/components/VoteUrlModal';
 import { StoreResponse } from '@/types';
 
 import StorePosts from '@/app/map/_components/StorePosts';
 import { BoxButton, Heading, Spacing } from '@/components/ui';
 import { useBoundaryStores, useKakaoMap } from '@/hooks/domains';
-import { Map } from '@/components/domain';
+import { Map, OnLiveFollowingsAtStore } from '@/components/domain';
 
 import s from './page.module.scss';
 
@@ -46,7 +45,7 @@ export default function MapPage() {
           <>
             {selectedStore.liveStore && (
               <Suspense fallback={<div>로딩중...</div>}>
-                <OnLiveFollowings
+                <OnLiveFollowingsAtStore
                   storeId={selectedStore.storeId}
                   storeName={selectedStore.storeName}
                 />
