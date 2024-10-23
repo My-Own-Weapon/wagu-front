@@ -2,7 +2,10 @@ import { apiService } from '@/services/apiService';
 import { MapVertexes } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 
-const limitPrecision = (num: number, precision: number = 2): number => {
+/**
+ * ✅ TODO: 127.30 -> 127.3으로 변환되어 캐싱에 문제가 생길 수 있음
+ */
+const limitPrecision = (num: number, precision: number = 2) => {
   return Number(num.toFixed(precision));
 };
 
