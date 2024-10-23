@@ -8,7 +8,7 @@ export default function PostCards({ posts }: { posts: PostOfStoreResponse[] }) {
     <Stack as="ul" data-testid="post-cards">
       {posts.map((post: PostOfStoreResponse, idx) => (
         <Fragment key={post.postId}>
-          <PostCard {...post} />
+          <PostCard {...post} priority={idx <= 1} />
           {idx !== posts.length - 1 && <Spacing size={24} />}
         </Fragment>
       ))}
