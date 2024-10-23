@@ -1,6 +1,17 @@
 /* eslint-disable max-classes-per-file */
 
-import ApiService from '@/services/apiService';
+import ApiService, { PathMustStartWithSlash } from '@/services/apiService';
+
+class FetcherTestHelper extends ApiService {
+  public async testFetcher<T extends string>(
+    path: PathMustStartWithSlash<T>,
+    ...args: Parameters<ApiService['fetcher']> extends [unknown, ...infer Rest]
+      ? Rest
+      : never
+  ): Promise<Response> {
+    return this.fetcher(path, ...args);
+  }
+}
 
 describe('fetcher', () => {
   const SERVER_ERROR = {
@@ -9,12 +20,12 @@ describe('fetcher', () => {
     error: 'Internal Server Error',
   };
 
-  let apiService: ApiService;
+  let apiService: FetcherTestHelper;
   const mockFetch = jest.fn();
   global.fetch = mockFetch;
 
   beforeEach(() => {
-    apiService = new ApiService();
+    apiService = new FetcherTestHelper();
     mockFetch.mockClear();
   });
 
@@ -28,7 +39,7 @@ describe('fetcher', () => {
 
   it('errorConfig가 없으면 서버 메시지를 사용한다', async () => {
     await expect(
-      apiService.fetcher('/test', { method: 'GET' }),
+      apiService.testFetcher('/test', { method: 'GET' }),
     ).rejects.toThrow(SERVER_ERROR.message);
   });
 
@@ -36,7 +47,7 @@ describe('fetcher', () => {
     const CUSTOM_ERROR_MESSAGE = 'Custom Error Message';
 
     await expect(
-      apiService.fetcher('/test', { method: 'GET' }, CUSTOM_ERROR_MESSAGE),
+      apiService.testFetcher('/test', { method: 'GET' }, CUSTOM_ERROR_MESSAGE),
     ).rejects.toThrow(CUSTOM_ERROR_MESSAGE);
   });
 
@@ -44,7 +55,7 @@ describe('fetcher', () => {
     const customMessage = 'Custom Error Message';
 
     await expect(
-      apiService.fetcher(
+      apiService.testFetcher(
         '/test',
         { method: 'GET' },
         { errorMessage: customMessage },
@@ -61,7 +72,7 @@ describe('fetcher', () => {
     }
 
     await expect(
-      apiService.fetcher('/test', { method: 'GET' }, { CustomError }),
+      apiService.testFetcher('/test', { method: 'GET' }, { CustomError }),
     ).rejects.toMatchObject({
       name: 'CustomError',
       message: expect.stringContaining(SERVER_ERROR.message),
@@ -78,7 +89,7 @@ describe('fetcher', () => {
     const CUSTOM_MESSAGE = 'Custom Error Message';
 
     await expect(
-      apiService.fetcher(
+      apiService.testFetcher(
         '/test',
         { method: 'GET' },
         { CustomError, errorMessage: CUSTOM_MESSAGE },
