@@ -16,12 +16,10 @@ export interface Friend {
 }
 
 interface Props {
-  liveFriends: Friend[];
+  onLiveFollowings: Friend[];
 }
 
-export default function OnLiveFollowings({
-  liveFriends: onLiveFollowings,
-}: Props) {
+export default function OnLiveFollowings({ onLiveFollowings }: Props) {
   const UserIconWithText = WithText<UserIconProps>(UserIcon);
   const path = usePathname();
 
