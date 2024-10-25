@@ -148,22 +148,34 @@ export const handlers = [
   http.post('/posts', async ({ request }) => {
     console.log('[POST] /posts');
 
-    /**
-     * @description request.formData()로 formdata를 받아와야 했지만 msw 내부적으로 formData 파싱이 안되는
-     * 이슈가 있어서 content-type을 확인해서 multipart/form-data인 경우에만 성공으로 처리
-     */
-    if (request.headers.get('content-type')?.includes('multipart/form-data')) {
-      return HttpResponse.text('success');
+    const formData = await request.formData();
+    const reviewBlob = formData.get('data') as Blob;
+    const reviewDetailsString = await reviewBlob.text();
+    const reviewDetails = JSON.parse(reviewDetailsString);
+
+    if (Object.entries(reviewDetails).some(([, value]) => !value)) {
+      return HttpResponse.json(
+        {
+          message: '리뷰 입력란을 모두 채워주세요.',
+        },
+        {
+          status: 400,
+        },
+      );
     }
 
-    return HttpResponse.json(
-      {
-        message: '리뷰 입력란을 모두 채워주세요.',
-      },
-      {
-        status: 400,
-      },
-    );
+    if (!formData.get('images')) {
+      return HttpResponse.json(
+        {
+          message: '이미지를 첨부해주세요.',
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    return HttpResponse.text('리뷰 작성 성공');
   }),
 
   /**

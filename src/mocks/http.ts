@@ -1,8 +1,9 @@
 /* eslint-disable no-console */
 
-import { createMiddleware } from '@mswjs/http-middleware';
 import express from 'express';
 import cors from 'cors';
+// import { createMiddleware } from '@mswjs/http-middleware';
+import { createMiddleware } from './createMiddleware';
 import { handlers } from './handlers';
 
 const app = express();
@@ -15,6 +16,10 @@ app.use(
     credentials: true,
   }),
 );
-app.use(express.json());
+
+/** for multipart/form-data
+ * @see https://github.com/mswjs/http-middleware/pull/39
+ */
+app.use(express.raw({ type: '*/*', limit: '10mb' }));
 app.use(createMiddleware(...handlers));
 app.listen(port, () => console.log(`Mock server is running on port: ${port}`));
