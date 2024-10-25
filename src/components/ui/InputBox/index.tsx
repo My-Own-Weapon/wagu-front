@@ -17,6 +17,7 @@ import React, {
 
 import { ErrorMessage } from '@/app/(auth)/_components';
 
+import Stack from '@/components/ui/Stack';
 import s from './index.module.scss';
 
 interface InputBoxContextValue {
@@ -29,7 +30,7 @@ const InputBoxContext = createContext<InputBoxContextValue | undefined>(
   undefined,
 );
 
-interface InputBoxProps {
+interface InputBoxProps extends ComponentPropsWithoutRef<'div'> {
   children: ReactNode;
   errorMessage?: string;
 }
@@ -37,6 +38,8 @@ interface InputBoxProps {
 export default function InputBox({
   children,
   errorMessage = undefined,
+  style = {},
+  ...rest
 }: InputBoxProps) {
   const id = useId();
   const error = !!errorMessage;
@@ -51,10 +54,10 @@ export default function InputBox({
 
   return (
     <InputBoxContext.Provider value={contextValue}>
-      <div className={s.container}>
+      <Stack style={{ ...style, gap: '8px' }} {...rest}>
         {children}
         {errorMessage && <InputBox.ErrorMessage />}
-      </div>
+      </Stack>
     </InputBoxContext.Provider>
   );
 }
