@@ -64,8 +64,6 @@ const useWritePageFormControl = () => {
     menuReviews: ReviewFormValues['menuReviews'];
     router: AppRouterInstance;
   }) => {
-    console.log('실행');
-
     if (!selectedCategory) {
       alert('카테고리를 선택해주세요 !');
       return;
