@@ -10,3 +10,4 @@ export { default as Container } from './Container';
 export { default as ImageInput } from './ImageInput';
 export { default as TextareaBox } from './TextareaBox';
 export { default as SlotHeader } from './SlotHeader';
+export { default as Overlay } from './Overlay/Overlay';
