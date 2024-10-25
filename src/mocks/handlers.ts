@@ -152,8 +152,14 @@ export const handlers = [
     const reviewBlob = formData.get('data') as Blob;
     const reviewDetailsString = await reviewBlob.text();
     const reviewDetails = JSON.parse(reviewDetailsString);
+    console.log(reviewDetails);
+    if (
+      !Object.entries(reviewDetails).every(([key, value]) => {
+        if (key === 'auto') return true;
 
-    if (Object.entries(reviewDetails).some(([, value]) => !value)) {
+        return Boolean(value);
+      })
+    ) {
       return HttpResponse.json(
         {
           message: '리뷰 입력란을 모두 채워주세요.',
