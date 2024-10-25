@@ -136,3 +136,24 @@ export interface ReviewRequestSchema {
   permission: 'PRIVATE' | 'PUBLIC';
   auto: boolean;
 }
+
+export interface Friend {
+  profileImage: string;
+  sessionId: string;
+  userName: string;
+  address: string;
+  storeName: string;
+}
+
+// declare global {
+//   interface Window {
+//     kakao: any;
+//   }
+// }
+
+/* for Kakao api does not provide types */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type MapMarker = any;
+export type KakaoMapElement = HTMLDivElement;
+
+export type Nullable<T> = T | null;

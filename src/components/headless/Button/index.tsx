@@ -16,9 +16,11 @@ export function Button({
   ...rest
 }: ButtonProps) {
   const handleClick: MouseEventHandler<HTMLButtonElement> = (e) => {
-    if (onClick) {
-      onClick(e);
+    if (!onClick) {
+      return;
     }
+
+    onClick(e);
   };
 
   return (

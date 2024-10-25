@@ -1,23 +1,34 @@
-'use client';
-
-/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-
 /* eslint-disable camelcase */ // for KAKAO API response
 
-import React, { useState, useRef, useEffect } from 'react';
-import Image from 'next/image';
+'use client';
+
+import React, {
+  useState,
+  ComponentPropsWithoutRef,
+  ReactNode,
+  MouseEventHandler,
+  KeyboardEventHandler,
+} from 'react';
 
 import { apiService } from '@/services/apiService';
-import InputBox from '@/components/ui/InputBox';
 import { AddressSearchDetails } from '@/types';
+import Select, { useSelectContext } from '@/components/headless/Select/Select';
+import {
+  Flex,
+  InputBox,
+  NextImageWithCover,
+  Overlay,
+  Spacing,
+  Stack,
+  Text,
+} from '@/components/ui';
+import { colors } from '@/constants/theme';
 
 import s from './AddressInput.module.scss';
 
 interface AddressInputProps {
-  title?: string;
-  value: string;
   onSelect: (addressSearchResult: AddressSearchDetails) => void;
 }
 
@@ -30,160 +41,190 @@ interface KAKAOSearchAddressResponse {
   place_url: string;
 }
 
-export default function AddressInput({
-  title = '',
-  value,
-  onSelect,
-}: AddressInputProps) {
-  const [query, setQuery] = useState(value);
+export default function AddressInput({ onSelect }: AddressInputProps) {
+  const handleSelect = (addressSearchDetails: AddressSearchDetails) => {
+    onSelect(addressSearchDetails);
+  };
+
+  return (
+    <Select onChange={handleSelect}>
+      <Select.Trigger
+        style={STYLE.TRIGGER}
+        data-testid="address-search-trigger"
+      >
+        주소를 검색하면 식당 정보가 자동으로 입력됩니다.
+      </Select.Trigger>
+      <Select.Content>
+        <SearchModal />
+      </Select.Content>
+    </Select>
+  );
+}
+
+function SearchModal() {
+  const { setIsOpen } = useSelectContext();
+  const [query, setQuery] = useState('');
   const [results, setResults] = useState<KAKAOSearchAddressResponse[]>([]);
-  const [isFocused, setIsFocused] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        inputRef.current &&
-        !inputRef.current.contains(event.target as Node)
-      ) {
-        setIsFocused(false);
-      }
-    };
+  const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
+    e.stopPropagation();
 
-    const preventDefault = (e: Event) => {
-      if (isFocused) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      e.stopPropagation();
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleKeyDown);
-    if (isFocused) {
-      document.addEventListener('drag', preventDefault);
+    if (e.key === 'Enter') {
+      handleSearchClick();
     }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleKeyDown);
-      if (isFocused) {
-        document.removeEventListener('drag', preventDefault);
-      }
-    };
-  }, [inputRef, isFocused]);
+  };
 
   const fetchKakaoAddress = async (
     query: string,
   ): Promise<KAKAOSearchAddressResponse[]> => {
     const res = await apiService.fetchKAKAOStoreInfo(query);
-
     return res.documents;
   };
 
-  const handleSelect = (addressSearchDetails: AddressSearchDetails) => {
-    onSelect(addressSearchDetails);
-    setQuery(addressSearchDetails.address);
-    setIsFocused(false);
-  };
-
   const handleSearchClick = async () => {
-    if (!query) return;
-
     const fetchedResults = await fetchKakaoAddress(query);
     setResults(fetchedResults);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') handleSearchClick();
+  return (
+    <Overlay close={() => setIsOpen(false)}>
+      <div
+        className={`${s.addressInputWrapper} ${results.length > 0 ? s.expanded : ''}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Flex justifyContent="center" alignItems="center" gap={8}>
+          <InputBox style={{ flexGrow: 1 }}>
+            <InputBox.Input
+              width="100%"
+              height={48}
+              name="address"
+              placeholder="ex) 스타벅스, 이디야"
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+          </InputBox>
+          <ImageButton
+            src="/images/search-glass.svg"
+            alt="검색"
+            width={20}
+            height={20}
+            onClick={handleSearchClick}
+          />
+        </Flex>
+        {results.length > 0 ? (
+          <Select.Group
+            className={s.results}
+            data-testid="address-search-results"
+            label="검색결과"
+          >
+            {results.map(({ id, address_name, place_name, x, y }) => (
+              <Select.Item
+                key={id}
+                value={{
+                  address: address_name,
+                  storeName: place_name,
+                  posx: x,
+                  posy: y,
+                }}
+              >
+                <Stack>
+                  <Text
+                    as="p"
+                    fontSize="medium"
+                    fontWeight="medium"
+                    color={colors.grayAsh900}
+                  >
+                    {place_name}
+                  </Text>
+                  <Spacing size={8} />
+                  <Flex justifyContent="flex-start" alignItems="center" gap={4}>
+                    <span className={s.badge}>도로명</span>
+                    <Text
+                      as="p"
+                      fontSize="small"
+                      fontWeight="regular"
+                      color={colors.grayAsh700}
+                      style={{
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {address_name}
+                    </Text>
+                  </Flex>
+                </Stack>
+              </Select.Item>
+            ))}
+          </Select.Group>
+        ) : (
+          <>
+            <Spacing size={16} />
+            <Text
+              as="p"
+              fontSize="medium"
+              fontWeight="regular"
+              color={colors.grayBlue700}
+            >
+              검색결과가 없습니다.
+            </Text>
+          </>
+        )}
+      </div>
+    </Overlay>
+  );
+}
+
+const STYLE = {
+  TRIGGER: {
+    width: '100%',
+    height: '48px',
+    padding: 0,
+    fontWeight: 500,
+    fontSize: '14px',
+    textAlign: 'left',
+    color: '#acaeb3',
+    backgroundColor: '#fff',
+    borderBottom: '1px solid #cdd0d8',
+  },
+} as const;
+
+interface ImageButtonProps extends ComponentPropsWithoutRef<'button'> {
+  width?: number;
+  height?: number;
+  src: string;
+  alt: string;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
+  svgComponent?: ReactNode;
+}
+
+function ImageButton({
+  src,
+  alt,
+  width = undefined,
+  height = undefined,
+  onClick = undefined,
+  svgComponent = undefined,
+  ...rest
+}: ImageButtonProps) {
+  const handleClick: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onClick?.(e);
   };
 
   return (
-    <div className={`${s.container} ${isFocused ? s.blur : ''}`}>
-      {!isFocused && (
-        <InputBox>
-          <InputBox.Label>{title}</InputBox.Label>
-          <InputBox.Input
-            height={48}
-            placeholder="주소를 검색하면 식당 정보가 자동으로 입력됩니다."
-            name="address"
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => setIsFocused(true)}
-            readOnly={!isFocused}
-          />
-        </InputBox>
+    <button
+      type="button"
+      style={{
+        padding: 0,
+        backgroundColor: 'transparent',
+      }}
+      onClick={handleClick}
+      {...rest}
+    >
+      {svgComponent || (
+        <NextImageWithCover src={src} alt={alt} width={width} height={height} />
       )}
-      {isFocused && (
-        <div ref={inputRef}>
-          <div
-            className={`${s.addressInputWrapper} ${isFocused ? s.expanded : ''}`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className={s.searchArea}>
-              <input
-                className={s.addressInput}
-                id="address"
-                name="address"
-                placeholder="ex) 스타벅스, 이디야"
-                type="text"
-                value={query}
-                onFocus={() => setIsFocused(true)}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={handleKeyDown}
-                readOnly={!isFocused}
-              />
-              <button
-                className={s.searchBtn}
-                type="button"
-                onClick={handleSearchClick}
-              >
-                <Image
-                  src="/images/search-glass.svg"
-                  alt="검색"
-                  width={20}
-                  height={20}
-                />
-              </button>
-            </div>
-            {results.length > 0 && !!results ? (
-              <ul
-                className={s.results}
-                data-testid="address-search-results"
-                onWheel={(e) => e.stopPropagation()}
-              >
-                {results.map(({ id, address_name, place_name, x, y }) => (
-                  <li
-                    key={id}
-                    onClick={() => {
-                      handleSelect({
-                        address: address_name,
-                        storeName: place_name,
-                        posx: x,
-                        posy: y,
-                      });
-                    }}
-                  >
-                    <div className={s.searchResult}>
-                      <p className={s.storeName}>{place_name}</p>
-                      <div className={s.loadNameArea}>
-                        <span className={s.badge}>도로명</span>
-                        <p className={s.loadName}>{address_name}</p>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className={s.resultText}>검색결과가 없습니다.</p>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
+    </button>
   );
 }

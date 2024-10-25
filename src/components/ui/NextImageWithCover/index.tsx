@@ -22,6 +22,7 @@ export default function NextImageWithCover({
   height = 'auto',
   borderRadius = undefined,
   backgroundColor = 'transparent',
+  alt = 'image',
   ...rest
 }: props) {
   return (
@@ -36,10 +37,12 @@ export default function NextImageWithCover({
     >
       <Image
         fill
+        sizes="calc(100vw - 48px)"
         style={{
           objectFit: 'cover',
           borderRadius,
         }}
+        alt={alt}
         {...rest}
       />
     </div>

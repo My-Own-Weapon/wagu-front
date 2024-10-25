@@ -7,7 +7,7 @@ import { AddressSearchDetails } from '@/types';
 import { apiService } from '@services/apiService';
 import AddressInput from '@/components/AddressInput';
 import { BoxButton, Container } from '@/components/ui';
-import Camera from '@/app/live/prepare/Camera';
+import Camera from '@/app/(live)/live/_components/Camera';
 
 export default function PrepareStreamingPage() {
   const [storeInfo, setStoreInfo] = useState<AddressSearchDetails | null>(null);
@@ -30,13 +30,7 @@ export default function PrepareStreamingPage() {
   return (
     <Container>
       <Camera />
-      <AddressInput
-        title="가게 이름"
-        value={
-          storeInfo ? `[${storeInfo?.storeName}] ${storeInfo?.address}` : ''
-        }
-        onSelect={setStoreInfo}
-      />
+      <AddressInput onSelect={setStoreInfo} />
       <BoxButton onClick={handleClickLiveStart}>라이브 시작</BoxButton>
     </Container>
   );

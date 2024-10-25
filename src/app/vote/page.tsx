@@ -24,16 +24,16 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 import { Store, VotableCards, VotedStoreCards } from '@/components/StoreCard';
-import LiveFriends from '@/components/LiveFriendsList';
 import { UserIcon, UserIconProps, WithText } from '@/components/UserIcon';
 import { localStorageApi } from '@/services/localStorageApi';
 import { apiService } from '@/services/apiService';
 import { StoreResponse } from '@/types';
-import PostsOfMap from '@/app/map/_components/PostsOfMap';
+import StorePosts from '@/app/map/_components/StorePosts';
 import Heading from '@/components/ui/Heading';
 import { NextImageWithCover } from '@/components/ui';
 import { KingSVG } from '@public/newDesign/vote';
 import { usePostsOfStore, useSelectedStore, useVotedStore } from '@/stores';
+import { OnLiveFollowings } from '@/components/domain';
 
 import s from './page.module.scss';
 
@@ -453,7 +453,7 @@ export default function SharePage() {
     bounds: { left: number; down: number; right: number; up: number },
   ) => {
     try {
-      const stores = await apiService.fetchStoresOfMapBoundary(bounds);
+      const stores = await apiService.fetchMapBoundaryStores(bounds);
 
       addMarkers(mapInstance, stores);
     } catch (e) {
@@ -465,7 +465,7 @@ export default function SharePage() {
 
   const fetchPostsAndSet = async (storeId: number) => {
     try {
-      const posts = await apiService.fetchPostsOfStore(storeId);
+      const posts = await apiService.fetchStorePosts(storeId);
 
       setPostsOfStore(posts);
     } catch (e) {
@@ -783,7 +783,7 @@ export default function SharePage() {
     const fetchLiveStores = async () => {
       const liveStoresUpdates = await Promise.all(
         voteWinStores.map(({ storeId }) => {
-          return apiService.fetchLiveOnStreamersOfStore(storeId);
+          return apiService.fetchOnLiveFollowingsAtStore(storeId);
         }),
       );
       const flattedLiveStoresUpdates = liveStoresUpdates.flat();
@@ -799,7 +799,7 @@ export default function SharePage() {
 
     const fetchLiveStores = async (selectedStoreId: number) => {
       const streamers =
-        await apiService.fetchLiveOnStreamersOfStore(selectedStoreId);
+        await apiService.fetchOnLiveFollowingsAtStore(selectedStoreId);
 
       setStreamerFromStores(() => streamers);
     };
@@ -940,13 +940,12 @@ export default function SharePage() {
               <Heading as="h3" fontSize="16px" fontWeight="bold" color="black">
                 {`${selectedStore.storeName}에서 방송중이에요 !`}
               </Heading>
-              <LiveFriends liveFriends={streamerFromStores} />
+              <OnLiveFollowings onLiveFollowings={streamerFromStores} />
             </>
           )}
-          <PostsOfMap
-            selectedStoreName={selectedStore?.storeName}
-            selectedStoreId={selectedStore?.storeId}
-            posts={postsOfStore}
+          <StorePosts
+            selectedStoreName={selectedStore!.storeName}
+            selectedStoreId={selectedStore!.storeId}
           />
           <div className={s.navUpperBtnContainer}>
             <button

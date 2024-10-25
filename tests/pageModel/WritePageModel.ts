@@ -10,22 +10,39 @@ export default class WritePageModel {
 
   private readonly $menuImageInput: Locator;
 
-  private readonly $menuPriceInput: Locator;
-
   private readonly $reviewInput: Locator;
 
   private readonly $categorySelectTrigger: Locator;
 
+  private readonly $addressSearchTrigger: Locator;
+
+  private readonly $addressSearchResults: Locator;
+
+  private readonly $menuNameInput: Locator;
+
+  private readonly $menuPriceInput: Locator;
+
+  private readonly $submitButton: Locator;
+
   constructor(private readonly page: Page) {
     this.$addressInput = this.getByNameAttrOfInput('address');
     this.$menuImageInput = this.getByNameAttrOfInput('menu');
-    this.$menuPriceInput = this.getByNameAttrOfInput('menuPrice');
-    this.$reviewInput = this.page.getByRole('textbox', {
-      name: '리뷰',
-    });
+    this.$reviewInput = this.page.locator(
+      'textarea[name="menuReviews.0.menuContent"]',
+    );
     this.$categorySelectTrigger = this.page.getByTestId(
       'category-select-trigger',
     );
+    this.$addressSearchTrigger = this.page.getByTestId(
+      'address-search-trigger',
+    );
+    this.$addressSearchResults = this.page.getByTestId(
+      'address-search-results',
+    );
+
+    this.$menuNameInput = this.getByNameAttrOfInput('menuReviews.0.menuName');
+    this.$menuPriceInput = this.getByNameAttrOfInput('menuReviews.0.menuPrice');
+    this.$submitButton = this.page.locator('button[type="submit"]');
   }
 
   private getByNameAttrOfInput(name: string) {
@@ -44,6 +61,10 @@ export default class WritePageModel {
     return this.$menuImageInput;
   }
 
+  get menuNameInput() {
+    return this.$menuNameInput;
+  }
+
   get menuPriceInput() {
     return this.$menuPriceInput;
   }
@@ -54,5 +75,17 @@ export default class WritePageModel {
 
   get categorySelectTrigger() {
     return this.$categorySelectTrigger;
+  }
+
+  get addressSearchTrigger() {
+    return this.$addressSearchTrigger;
+  }
+
+  get addressSearchResults() {
+    return this.$addressSearchResults;
+  }
+
+  get submitButton() {
+    return this.$submitButton;
   }
 }

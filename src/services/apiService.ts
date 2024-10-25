@@ -1,11 +1,17 @@
+// eslint-disable-next-line max-classes-per-file
 import {
   AddressSearchDetails,
   LoginUserInputs,
   MapVertexes,
+  PostOfStoreResponse,
   ProfileWithoutFollowResponse,
   SignupDetails,
+  StoreResponse,
   VotedStoreResponse,
 } from '@/types';
+import CheckLoginSessionError from '@/services/errors/CheckLoginSessionError';
+import { ERROR_MESSAGE } from '@/services/constants/errorMessage';
+import { z } from 'zod';
 
 interface ProfileDetailsResponse {
   userName: string;
@@ -26,20 +32,142 @@ interface AIAutoReviewResponse {
 
 type SuccessMessageResponse = Promise<string>;
 
-class ApiService {
+export type PathMustStartWithSlash<T extends string> = T extends `/${string}`
+  ? T
+  : never;
+
+type CustomErrorConstructor = new (message: string) => Error;
+
+const ErrorConfigSchema = z
+  .union([
+    z.string(),
+    z.object({
+      CustomError: z
+        .custom<CustomErrorConstructor>((error) => {
+          return (
+            typeof error === 'function' && error.toString().startsWith('class')
+          );
+        })
+        .optional(),
+      errorMessage: z.string().optional(),
+      url: z.string().optional(),
+    }),
+  ])
+  .optional();
+
+type CustomUrlOrErrorConfig = z.infer<typeof ErrorConfigSchema>;
+export default class ApiService {
   private mswBaseUrl = 'http://localhost:9090';
+
+  // private baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   private baseUrl =
     process.env.NODE_ENV === 'production'
       ? process.env.NEXT_PUBLIC_BASE_URL
       : this.mswBaseUrl;
 
-  private kakaoBaseUrl =
-    'https://dapi.kakao.com/v2/local/search/keyword.json?page=1&size=15&sort=accuracy&query=';
+  private kakaoBaseUrl = 'https://dapi.kakao.com/v2';
+
+  /**
+   * @example
+   * const res = awiat this.fetcher('/posts', {
+   *   method: 'GET',
+   *   credentials: 'include',
+   * },
+   * 'Failed to fetch posts');
+   *
+   * const res = awiat this.fetcher('/posts', {
+   *   method: 'GET',
+   *   credentials: 'include',
+   *  },
+   *  {
+   *   CustomError : FetchPostsError,
+   *   errorMessage: 'Failed to fetch posts',
+   * });
+   *
+   * const res = awiat this.fetcher('/posts', {
+   *   method: 'GET',
+   *   credentials: 'include',
+   *  },
+   *  {
+   *   errorMessage: 'Failed to fetch posts',
+   * });
+   */
+  protected async fetcher<T extends string>(
+    path: PathMustStartWithSlash<T>,
+    requestInit: globalThis.RequestInit,
+    config?: CustomUrlOrErrorConfig,
+  ): Promise<Response> {
+    if (!path.startsWith('/')) {
+      throw new Error('path must start with /');
+    }
+    const url =
+      typeof config === 'object' && config?.url ? config.url : this.baseUrl;
+    const res = await fetch(`${url}${path}`, requestInit);
+
+    if (!res.ok) {
+      const { status, message, error } = await res.json();
+
+      if (!config) {
+        throw new Error(this.errorMessageTemplate({ status, error, message }));
+      }
+
+      const validatedErrorConfig = ErrorConfigSchema.parse(config);
+      if (validatedErrorConfig) {
+        const errorMessage = this.createErrorMessage(
+          validatedErrorConfig,
+          status,
+          error,
+          message,
+        );
+
+        // eslint-disable-next-line max-depth
+        if (
+          typeof validatedErrorConfig === 'object' &&
+          validatedErrorConfig.CustomError
+        ) {
+          throw new validatedErrorConfig.CustomError(errorMessage);
+        }
+
+        throw new Error(errorMessage);
+      }
+
+      throw new Error(this.errorMessageTemplate({ status, error, message }));
+    }
+
+    return res;
+  }
+
+  private createErrorMessage(
+    errorConfig: NonNullable<CustomUrlOrErrorConfig>,
+    status: number,
+    error: string,
+    serverMessage: string,
+  ): string {
+    const message =
+      typeof errorConfig === 'string'
+        ? errorConfig
+        : (errorConfig.errorMessage ?? serverMessage);
+
+    return this.errorMessageTemplate({ status, error, message });
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  private errorMessageTemplate({
+    status,
+    error,
+    message,
+  }: {
+    status: number;
+    error: string;
+    message: string;
+  }) {
+    return `[${status}] ${error}\n Message - ${message}`;
+  }
 
   /* Auth */
   async login({ username, password }: LoginUserInputs) {
-    const res = await fetch(`${this.baseUrl}/login`, {
+    const res = await this.fetcher(`/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -48,27 +176,14 @@ class ApiService {
       credentials: 'include',
     });
 
-    if (!res.ok) {
-      const data = await res.json();
-      const { status, message, error } = data;
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
-
     return res.text();
   }
 
   async logout() {
-    const res = await fetch(`${this.baseUrl}/logout`, {
+    const res = await this.fetcher(`/logout`, {
       method: 'GET',
       credentials: 'include',
     });
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
 
     return res.text();
   }
@@ -80,7 +195,7 @@ class ApiService {
     name,
     phoneNumber,
   }: SignupDetails) {
-    const res = await fetch(`${this.baseUrl}/join`, {
+    const res = await this.fetcher(`/join`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -94,45 +209,31 @@ class ApiService {
       }),
     });
 
-    if (!res.ok) {
-      const data = await res.json();
-      const { status, message, error } = data;
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
-
     return res.text();
   }
 
-  async checkSession() {
-    const res = await fetch(`${this.baseUrl}/session`, {
-      method: 'GET',
-      credentials: 'include',
-    });
-
-    if (!res.ok) {
-      const { status, error } = await res.json();
-
-      throw new Error(
-        `[${status}: ${error}] 세션이 만료되었습니다. 다시 로그인해주세요`,
-      );
-    }
+  public async checkLoginSession() {
+    const res = await this.fetcher(
+      '/session',
+      {
+        method: 'GET',
+        credentials: 'include',
+      },
+      {
+        CustomError: CheckLoginSessionError,
+        errorMessage: ERROR_MESSAGE.CHECK_LOGIN_SESSION,
+      },
+    );
 
     return res.text();
   }
 
   /* about User */
   async fetchProfileDetails(memberId: number): Promise<ProfileDetailsResponse> {
-    const res = await fetch(`${this.baseUrl}/member/${memberId}/profile`, {
+    const res = await this.fetcher(`/member/${memberId}/profile`, {
       method: 'GET',
       credentials: 'include',
     });
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
 
     return res.json();
   }
@@ -140,16 +241,10 @@ class ApiService {
   async fetchProfileWithoutFollow(
     userName: string,
   ): Promise<ProfileWithoutFollowResponse> {
-    const res = await fetch(`${this.baseUrl}/member/${userName}/profile`, {
+    const res = await this.fetcher(`/member/${userName}/profile`, {
       method: 'GET',
       credentials: 'include',
     });
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
 
     const profile = await res.json();
 
@@ -157,7 +252,7 @@ class ApiService {
   }
 
   async fetchFollowings() {
-    const res = await fetch(`${this.baseUrl}/followings`, {
+    const res = await this.fetcher(`/followings`, {
       method: 'GET',
       credentials: 'include',
     });
@@ -166,49 +261,31 @@ class ApiService {
   }
 
   async followUser(memberId: number) {
-    const res = await fetch(`${this.baseUrl}/members/${memberId}/follow`, {
+    const res = await this.fetcher(`/members/${memberId}/follow`, {
       method: 'POST',
       credentials: 'include',
     });
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
 
     return res.text();
   }
 
   async unFollowUser(memberId: number) {
-    const res = await fetch(`${this.baseUrl}/members/${memberId}/follow`, {
+    const res = await this.fetcher(`/members/${memberId}/follow`, {
       method: 'DELETE',
       credentials: 'include',
     });
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
 
     return res.text();
   }
 
   async searchUsers(username: string) {
-    const res = await fetch(
-      `${this.baseUrl}/members?username=${username}&page=0&size=12`,
+    const res = await this.fetcher(
+      `/members?username=${username}&page=0&size=12`,
       {
         method: 'GET',
         credentials: 'include',
       },
     );
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
 
     return res.json();
   }
@@ -221,19 +298,16 @@ class ApiService {
     page?: number;
     count?: number;
   }) {
-    const res = await fetch(
-      `${this.baseUrl}/posts?page=${page}&size=${count}`,
-      {
-        method: 'GET',
-        credentials: 'include',
-      },
-    );
+    const res = await this.fetcher(`/posts?2page=${page}&size=${count}`, {
+      method: 'GET',
+      credentials: 'include',
+    });
 
     return res.json();
   }
 
   async fetchPost(postId: string) {
-    const res = await fetch(`${this.baseUrl}/posts/${postId}`, {
+    const res = await this.fetcher(`/posts/${postId}`, {
       method: 'GET',
       credentials: 'include',
     });
@@ -242,76 +316,62 @@ class ApiService {
   }
 
   async addPost(formData: FormData) {
-    const res = await fetch(`${this.baseUrl}/posts`, {
+    const res = await this.fetcher(`/posts`, {
       method: 'POST',
       body: formData,
       credentials: 'include',
     });
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
 
     /* ✅ TODO: response 변경시 수정  */
     return res;
   }
 
   /* about Store */
-  async fetchPostsOfStore(storeId: number) {
-    const res = await fetch(
-      `${this.baseUrl}/map/posts?storeId=${storeId}&page=0&size=12`,
+  async fetchStorePosts(
+    storeId: number | undefined,
+  ): Promise<PostOfStoreResponse[]> {
+    const res = await this.fetcher(
+      `/map/posts?storeId=${storeId}&page=0&size=12`,
       {
         method: 'GET',
         credentials: 'include',
       },
     );
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
 
     return res.json();
   }
 
   async fetchStoreDetails(storeId: number) {
-    const res = await fetch(`${this.baseUrl}/store/${storeId}`, {
+    const res = await this.fetcher(`/store/${storeId}`, {
       method: 'GET',
       credentials: 'include',
     });
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
 
     return res.json();
   }
 
   async searchStore(storeName: string) {
-    const res = await fetch(
-      `${this.baseUrl}/stores?keyword=${storeName}&page=0&size=12`,
+    const res = await this.fetcher(
+      `/stores?keyword=${storeName}&page=0&size=12`,
       {
         method: 'GET',
         credentials: 'include',
       },
     );
 
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
-
     return res.json();
   }
 
-  async fetchLiveOnStreamersOfStore(storeId: number) {
-    const res = await fetch(`${this.baseUrl}/map/live?storeId=${storeId}`, {
+  async fetchOnLiveFollowingsAtStore(storeId: number | undefined): Promise<
+    Array<{
+      profileImage: string;
+      userName: string;
+      address: string;
+      storeName: string;
+      sessionId: string;
+    }>
+  > {
+    const res = await this.fetcher(`/map/live?storeId=${storeId}`, {
       method: 'GET',
       credentials: 'include',
     });
@@ -320,14 +380,22 @@ class ApiService {
     return streamers;
   }
 
-  async fetchKAKAOStoreInfo(name: string) {
-    const url = `${this.kakaoBaseUrl}${encodeURIComponent(name)}`;
-    const res = await fetch(url, {
-      method: 'GET',
-      headers: {
-        Authorization: `KakaoAK f117ced1de2bab59de8005c69892ed73`,
+  async fetchKAKAOStoreInfo(name: string, page = 1, size = 15) {
+    const basePath = '/local/search/keyword.json';
+    const queryString = `?page=${page}&size=${size}&sort=accuracy&query=${encodeURIComponent(name)}`;
+
+    const res = await this.fetcher(
+      `${basePath}${queryString}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `KakaoAK f117ced1de2bab59de8005c69892ed73`,
+        },
       },
-    });
+      {
+        url: this.kakaoBaseUrl,
+      },
+    );
     const data = await res.json();
 
     return data;
@@ -340,7 +408,7 @@ class ApiService {
     posx,
     posy,
   }: AddressSearchDetails) {
-    const res = await fetch(`${this.baseUrl}/api/sessions`, {
+    const res = await this.fetcher(`/api/sessions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -355,11 +423,6 @@ class ApiService {
       }),
       credentials: 'include',
     });
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
 
     const data = await res.json();
 
@@ -367,19 +430,10 @@ class ApiService {
   }
 
   async fetchStreamingToken(sessionId: string) {
-    const res = await fetch(
-      `${this.baseUrl}/api/sessions/${sessionId}/connections`,
-      {
-        method: 'POST',
-        credentials: 'include',
-      },
-    );
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
+    const res = await this.fetcher(`/api/sessions/${sessionId}/connections`, {
+      method: 'POST',
+      credentials: 'include',
+    });
 
     const data = await res.json();
 
@@ -387,53 +441,30 @@ class ApiService {
   }
 
   async fetchSessionCreator(sessionId: string) {
-    const res = await fetch(
-      `${this.baseUrl}/api/sessions/${sessionId}/creator`,
-      {
-        method: 'GET',
-        credentials: 'include',
-      },
-    );
+    const res = await this.fetcher(`/api/sessions/${sessionId}/creator`, {
+      method: 'GET',
+      credentials: 'include',
+    });
 
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
     const data = await res.json();
 
     return data;
   }
 
   async removeLiveSession(sessionId: string) {
-    const res = await fetch(`${this.baseUrl}/api/sessions/${sessionId}`, {
+    const res = await this.fetcher(`/api/sessions/${sessionId}`, {
       method: 'DELETE',
       credentials: 'include',
     });
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
 
     return res.text();
   }
 
   async checkIsStreamerUserOfSession(sessionId: string) {
-    const res = await fetch(
-      `${this.baseUrl}/api/sessions/${sessionId}/creator`,
-      {
-        method: 'GET',
-        credentials: 'include',
-      },
-    );
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
+    const res = await this.fetcher(`/api/sessions/${sessionId}/creator`, {
+      method: 'GET',
+      credentials: 'include',
+    });
 
     const data = await res.json();
 
@@ -441,16 +472,10 @@ class ApiService {
   }
 
   async fetchLiveFollowings() {
-    const res = await fetch(`${this.baseUrl}/rooms/followings`, {
+    const res = await this.fetcher(`/rooms/followings`, {
       method: 'GET',
       credentials: 'include',
     });
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
 
     const data = await res.json();
 
@@ -458,20 +483,19 @@ class ApiService {
   }
 
   /* about map page */
-  async fetchStoresOfMapBoundary({ left, right, up, down }: MapVertexes) {
-    const res = await fetch(
-      `${this.baseUrl}/map?left=${left}&right=${right}&up=${up}&down=${down}`,
+  async fetchMapBoundaryStores({
+    left,
+    right,
+    up,
+    down,
+  }: MapVertexes): Promise<StoreResponse[]> {
+    const res = await this.fetcher(
+      `/map?left=${left}&right=${right}&up=${up}&down=${down}`,
       {
         method: 'GET',
         credentials: 'include',
       },
     );
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
 
     const stores = await res.json();
 
@@ -480,16 +504,16 @@ class ApiService {
 
   /* about Share Map page */
   async createShareMapRandomSessionId(): Promise<string> {
-    const res = await fetch(`${this.baseUrl}/share`, {
-      method: 'POST',
-      credentials: 'include',
-    });
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
+    const res = await this.fetcher(
+      '/share',
+      {
+        method: 'POST',
+        credentials: 'include',
+      },
+      {
+        errorMessage: '함께 투표하기 방을 생성하는데 실패했습니다.',
+      },
+    );
 
     const sessionIdForShareUrl = await res.text();
 
@@ -500,7 +524,7 @@ class ApiService {
   async publishShareMapSession(
     sessionId: string,
   ): Promise<ShareMapPublishSessionResponse> {
-    const res = await fetch(`${this.baseUrl}/api/sessions/voice`, {
+    const res = await this.fetcher(`/api/sessions/voice`, {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
@@ -508,12 +532,6 @@ class ApiService {
         customSessionId: sessionId,
       }),
     });
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
 
     return res.json();
   }
@@ -525,19 +543,10 @@ class ApiService {
     sessionId: string,
     storeId: string | number,
   ): SuccessMessageResponse {
-    const res = await fetch(
-      `${this.baseUrl}/share/${sessionId}?store_id=${storeId}`,
-      {
-        method: 'POST',
-        credentials: 'include',
-      },
-    );
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
+    const res = await this.fetcher(`/share/${sessionId}?store_id=${storeId}`, {
+      method: 'POST',
+      credentials: 'include',
+    });
 
     return res.text();
   }
@@ -545,16 +554,10 @@ class ApiService {
   async fetchStoresInVoteList(
     sessionId: string,
   ): Promise<VotedStoreResponse[]> {
-    const res = await fetch(`${this.baseUrl}/share/${sessionId}/vote/list`, {
+    const res = await this.fetcher(`/share/${sessionId}/vote/list`, {
       method: 'GET',
       credentials: 'include',
     });
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
 
     const voteList = await res.json();
 
@@ -562,37 +565,22 @@ class ApiService {
   }
 
   async deleteStoreFromVoteList(sessionId: string, storeId: string) {
-    const res = await fetch(
-      `${this.baseUrl}/share/${sessionId}?store_id=${storeId}`,
-      {
-        method: 'DELETE',
-        credentials: 'include',
-      },
-    );
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
+    const res = await this.fetcher(`/share/${sessionId}?store_id=${storeId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
 
     return res.text();
   }
 
   async fetchShareMapToken(sessionId: string) {
-    const res = await fetch(
-      `${this.baseUrl}/api/sessions/${sessionId}/connections/voice`,
+    const res = await this.fetcher(
+      `/api/sessions/${sessionId}/connections/voice`,
       {
         method: 'POST',
         credentials: 'include',
       },
     );
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
 
     const { token } = await res.json();
 
@@ -601,69 +589,43 @@ class ApiService {
 
   /* [AFTER 개표 (투표 LIST에 있는 선택지를 vote)] */
   async voteStore(sessionId: string, storeId: string): SuccessMessageResponse {
-    const res = await fetch(
-      `${this.baseUrl}/share/${sessionId}/vote?store_id=${storeId}`,
+    const res = await this.fetcher(
+      `/share/${sessionId}/vote?store_id=${storeId}`,
       {
         method: 'POST',
         credentials: 'include',
       },
     );
 
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
-
     return res.text();
   }
 
   async cancelVoteStore(sessionId: string, storeId: string) {
-    const res = await fetch(
-      `${this.baseUrl}/share/${sessionId}/vote?store_id=${storeId}`,
+    const res = await this.fetcher(
+      `/share/${sessionId}/vote?store_id=${storeId}`,
       {
         method: 'PATCH',
         credentials: 'include',
       },
     );
 
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
-
     return res.text();
   }
 
   async fetchVoteResults(sessionId: string) {
-    const res = await fetch(`${this.baseUrl}/share/${sessionId}/result`, {
+    const res = await this.fetcher(`/share/${sessionId}/result`, {
       method: 'GET',
       credentials: 'include',
     });
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
 
     return res.json();
   }
 
   async fetchConnectionPeopleCount(sessionId: string): Promise<number> {
-    const res = await fetch(
-      `${this.baseUrl}/api/sessions/${sessionId}/connections`,
-      {
-        method: 'GET',
-        credentials: 'include',
-      },
-    );
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
+    const res = await this.fetcher(`/api/sessions/${sessionId}/connections`, {
+      method: 'GET',
+      credentials: 'include',
+    });
 
     return res.json();
   }
@@ -676,7 +638,7 @@ class ApiService {
     category: string;
     menuName: string;
   }): Promise<AIAutoReviewResponse> {
-    const res = await fetch(`${this.baseUrl}/posts/auto`, {
+    const res = await this.fetcher(`/posts/auto`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -686,12 +648,6 @@ class ApiService {
         menuName,
       }),
     });
-
-    if (!res.ok) {
-      const { status, message, error } = await res.json();
-
-      throw new Error(`[${status}, ${error}] ${message}`);
-    }
 
     return res.json();
   }

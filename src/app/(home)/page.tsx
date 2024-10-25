@@ -2,7 +2,6 @@
 
 import { MouseEventHandler } from 'react';
 
-import { useCheckSession } from '@/hooks/useCheckSession';
 import { CategoriesEN } from '@/types';
 import { Heading } from '@/components/ui';
 import {
@@ -23,8 +22,6 @@ export default function HomePage() {
   const { liveFollowings } = useFetchLiveFollowings();
   const { filteredPosts, selectedCategory, setSelectedCategory } =
     useCategoryFilter(posts);
-
-  useCheckSession();
 
   const handleCategoryClick: MouseEventHandler = (e) => {
     e.stopPropagation();
