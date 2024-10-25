@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { Store } from '@/components/StoreCard';
 import { User } from '@/components/UserCard';
-import { http, HttpResponse } from 'msw';
+import { delay, http, HttpResponse } from 'msw';
 
 import fixtures from './fixtures';
 
@@ -70,7 +70,7 @@ export const handlers = [
       );
     }
 
-    if (!name.match(/^[가-힣]+$/g)) {
+    if (!name?.match(/^[가-힣]+$/g)) {
       return HttpResponse.json(
         {
           message: '이름은 한글만 입력 가능합니다.',
@@ -81,7 +81,7 @@ export const handlers = [
       );
     }
 
-    if (!phoneNumber.match(/^[0-9]{3}-[0-9]{4}-[0-9]{4}$/)) {
+    if (!phoneNumber?.match(/^[0-9]{3}-[0-9]{4}-[0-9]{4}$/)) {
       return HttpResponse.json(
         {
           message: '휴대폰 번호는 000-0000-0000 형식으로 입력해주세요.',
@@ -148,22 +148,40 @@ export const handlers = [
   http.post('/posts', async ({ request }) => {
     console.log('[POST] /posts');
 
-    /**
-     * @description request.formData()로 formdata를 받아와야 했지만 msw 내부적으로 formData 파싱이 안되는
-     * 이슈가 있어서 content-type을 확인해서 multipart/form-data인 경우에만 성공으로 처리
-     */
-    if (request.headers.get('content-type')?.includes('multipart/form-data')) {
-      return HttpResponse.text('success');
+    const formData = await request.formData();
+    const reviewBlob = formData.get('data') as Blob;
+    const reviewDetailsString = await reviewBlob.text();
+    const reviewDetails = JSON.parse(reviewDetailsString);
+    console.log(reviewDetails);
+    if (
+      !Object.entries(reviewDetails).every(([key, value]) => {
+        if (key === 'auto') return true;
+
+        return Boolean(value);
+      })
+    ) {
+      return HttpResponse.json(
+        {
+          message: '리뷰 입력란을 모두 채워주세요.',
+        },
+        {
+          status: 400,
+        },
+      );
     }
 
-    return HttpResponse.json(
-      {
-        message: '리뷰 입력란을 모두 채워주세요.',
-      },
-      {
-        status: 400,
-      },
-    );
+    if (!formData.get('images')) {
+      return HttpResponse.json(
+        {
+          message: '이미지를 첨부해주세요.',
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    return HttpResponse.text('리뷰 작성 성공');
   }),
 
   /**
@@ -190,6 +208,10 @@ export const handlers = [
       menuName: string;
       category: string;
     } | null;
+
+    /* for spinner */
+    await delay(1500);
+
     if (!body) {
       return HttpResponse.json(
         { error: 'Request body is missing' },

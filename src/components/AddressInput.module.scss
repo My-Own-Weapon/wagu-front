@@ -10,24 +10,11 @@
   width: 100%;
 }
 
-.blur {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: $modal;
-
-  width: 100%;
-  height: 100%;
-
-  background-color: rgb(0 0 0 / 20%);
-  backdrop-filter: blur(2px);
-}
-
 .addressInputWrapper {
   position: fixed;
   top: 50%;
   left: 50%;
-  z-index: $modal + 1;
+  z-index: 9999;
 
   width: 75%;
   max-width: 320px;
@@ -51,62 +38,6 @@
 
     transform: translate(-50%, -50%);
   }
-}
-
-.searchArea {
-  display: flex;
-
-  gap: 8px;
-
-  align-items: center;
-  justify-content: center;
-
-  .addressInput {
-    position: relative;
-
-    flex-grow: 1;
-
-    padding: 8px 12px;
-
-    font-size: $textMedium;
-    font-weight: $medium;
-    color: $textTitleColor;
-
-    border: none;
-    border-bottom: 1px solid $gray400;
-
-    &::placeholder {
-      font-size: $textSmall;
-      color: $placeholderColor;
-    }
-
-    &::after {
-      position: absolute;
-      bottom: 0;
-
-      width: 100%;
-      height: 2px;
-
-      content: '';
-
-      background: $primaryOrangeLight;
-      border-bottom: 1px solid $gray200;
-
-      transition: width 0.3s;
-    }
-  }
-
-  .searchBtn {
-    width: auto;
-    height: auto;
-    padding: 0;
-
-    background-color: transparent;
-  }
-}
-
-.searchItem {
-  padding: 0;
 }
 
 .results {
@@ -161,51 +92,15 @@
   display: none; /* Chrome, Safari, Opera */
 }
 
-.searchResult {
-  display: flex;
+.badge {
+  width: 30px;
+  padding: 2px;
 
-  flex-direction: column;
+  font-size: $textXSmall;
+  font-weight: $medium;
+  color: $primaryOrangeLight;
+  text-align: center;
 
-  gap: 8px;
-
-  align-items: flex-start;
-  justify-content: center;
-
-  .storeName {
-    font-size: $textMedium;
-    font-weight: $medium;
-    color: $textTitleColor;
-  }
-}
-
-.loadNameArea {
-  display: flex;
-
-  gap: 6px;
-
-  align-items: center;
-  justify-content: flex-start;
-
-  .badge {
-    width: 30px;
-    padding: 2px;
-
-    font-size: $textXSmall;
-    font-weight: $medium;
-    color: $primaryOrangeLight;
-    text-align: center;
-
-    border: 1px solid $border;
-    border-radius: $radiusSmall;
-  }
-
-  .loadName {
-    margin-bottom: 2px;
-    overflow: hidden;
-
-    font-size: $textSmall;
-    color: $textContent;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+  border: 1px solid $border;
+  border-radius: $radiusSmall;
 }

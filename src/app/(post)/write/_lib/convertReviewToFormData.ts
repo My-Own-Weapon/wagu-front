@@ -22,7 +22,11 @@ const convertReviewToFormData = ({
     return new Error('카테고리를 선택해주세요 !');
   }
 
-  if (!menuReviews.every(({ menuName }) => !!menuName)) {
+  if (!menuReviews.every(({ menuName }) => Boolean(menuName))) {
+    return new Error('메뉴 정보를 모두 입력해주세요 !');
+  }
+
+  if (!data.menuReviews[0]?.menuName) {
     return new Error('메뉴 정보를 모두 입력해주세요 !');
   }
 

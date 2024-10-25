@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable prefer-const */
+/* eslint-disable max-depth */
+/* eslint-disable no-restricted-syntax */
+
 const fs = require('fs');
 
 const rawData = fs.readFileSync('tokens.json');
@@ -6,6 +11,13 @@ const data = JSON.parse(rawData);
 const colors = {};
 const borderRadius = {};
 const fontWeight = {};
+const zIndex = {
+  header: 50,
+  footer: 50,
+  dropDown: 100,
+  modal: 500,
+  toast: 1000,
+};
 
 /* colors */
 function processColor(obj, prefix = '') {
@@ -57,19 +69,25 @@ let output = 'export const colors = {\n';
 for (const [key, value] of Object.entries(colors)) {
   output += `  ${key}: '${value}',\n`;
 }
-output += '};\n\n';
+output += '} as const;\n\n';
 
 output += 'export const borderRadius = {\n';
 for (const [key, value] of Object.entries(borderRadius)) {
   output += `  ${key}: '${value}',\n`;
 }
-output += '};\n\n';
+output += '} as const;\n\n';
 
 output += 'export const fontWeight = {\n';
 for (const [key, value] of Object.entries(fontWeight)) {
   output += `  ${key}: ${value},\n`;
 }
-output += '};\n';
+output += '} as const;\n\n';
+
+output += 'export const zIndex = {\n';
+for (const [key, value] of Object.entries(zIndex)) {
+  output += `  ${key}: ${value},\n`;
+}
+output += '} as const;\n';
 
 fs.writeFileSync('./src/constants/theme.ts', output);
 console.log('theme.ts 파일이 생성되었습니다.');

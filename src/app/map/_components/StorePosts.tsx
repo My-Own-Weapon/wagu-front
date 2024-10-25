@@ -4,33 +4,38 @@ import { PostOfStoreResponse } from '@/types';
 import { NextImageWithCover } from '@/components/ui';
 import Heading from '@/components/ui/Heading';
 import useDragScroll from '@/hooks/useDragScroll';
+import { useFetchStorePosts } from '@/hooks/api';
 
-import s from './PostsOfMap.module.scss';
+import s from './StorePosts.module.scss';
 
 interface Props {
-  selectedStoreName: string | undefined;
-  selectedStoreId: number | undefined;
-  posts: PostOfStoreResponse[];
+  selectedStoreName: string;
+  selectedStoreId: number;
 }
 
-export default function PostsOfMap({
+/**
+ * ✅ TODO: 분리
+ */
+const useStorePosts = ({ storeId }: { storeId: number }) => {
+  const { storePosts } = useFetchStorePosts(storeId);
+
+  return storePosts;
+};
+
+export default function StorePosts({
   selectedStoreName,
   selectedStoreId,
-  posts,
 }: Props) {
+  const posts = useStorePosts({ storeId: selectedStoreId });
   const ref = useDragScroll();
+
   return (
     <div className={s.container}>
       <div className={s.titleWrapper}>
         <Heading as="h3" fontSize="16px" fontWeight="bold" color="black">
-          {isNotSelectStore({
-            selectedStoreId,
-            selectedStoreName,
-          })
-            ? '지도의 가게를 클릭해보세요 !'
-            : `${selectedStoreName} POST`}
+          {`${selectedStoreName} POST`}
         </Heading>
-        {isNoPost({
+        {!isNoPost({
           posts,
           selectedStoreId,
           selectedStoreName,
@@ -74,17 +79,10 @@ function PostCard({ imgUrl, postId }: { imgUrl: string; postId: number }) {
   );
 }
 
-function isNoPost({
+const isNoPost = ({
   posts,
   selectedStoreId,
   selectedStoreName,
-}: Props & { posts: PostOfStoreResponse[] }) {
+}: Props & { posts: PostOfStoreResponse[] }) => {
   return posts?.length === 0 && selectedStoreId && selectedStoreName;
-}
-
-function isNotSelectStore({
-  selectedStoreId,
-  selectedStoreName,
-}: Omit<Props, 'posts'>) {
-  return !selectedStoreId && !selectedStoreName;
-}
+};

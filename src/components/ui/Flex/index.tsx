@@ -7,12 +7,14 @@ import {
 
 interface Props extends HTMLProps<HTMLDivElement> {
   justifyContent: JustifyContentOptions;
+  alignItems?: CSSProperties['alignItems'];
   gap?: CSSProperties['gap'];
 }
 
 export default function Flex({
   justifyContent,
   gap = undefined,
+  alignItems = undefined,
   children,
 }: PropsWithNotUndefinedChildren<Props>) {
   return (
@@ -20,6 +22,7 @@ export default function Flex({
       style={{
         display: 'flex',
         justifyContent,
+        alignItems,
         gap,
       }}
     >

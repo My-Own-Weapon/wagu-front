@@ -32,15 +32,12 @@
     right: 0;
     left: 0;
     z-index: 1;
-
-    gap: 24px;
+    overflow: hidden;
 
     padding: 24px 24px 152px;
 
     background-color: $white;
     border-radius: 24px 24px 0;
-
-    @include flexColumnStart;
   }
 
   .urlButtonContainer {

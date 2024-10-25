@@ -1,13 +1,8 @@
-'use client';
-
 import { ReactNode } from 'react';
-
-import { useCheckSession } from '@/hooks/useCheckSession';
+import { CheckLoginSessionProvider } from '@/components/context';
 
 export default function Layout({
   children,
 }: Readonly<{ children: ReactNode }>) {
-  useCheckSession();
-
-  return <div>{children}</div>;
+  return <CheckLoginSessionProvider>{children}</CheckLoginSessionProvider>;
 }

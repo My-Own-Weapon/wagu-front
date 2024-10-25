@@ -143,9 +143,9 @@ function FollowButton({
   };
 
   const btnClassName = classNames(s.followBtn, {
-    [s.eachFollow]: (saveFrom && each) || (saveFrom && to),
-    [s.follow]: !saveFrom,
-    [s.unFollow]: saveFrom,
+    [`${s.eachFollow}`]: (saveFrom && each) || (saveFrom && to),
+    [`${s.follow}`]: !saveFrom,
+    [`${s.unFollow}`]: saveFrom,
   });
 
   let text: FollowButtonText;

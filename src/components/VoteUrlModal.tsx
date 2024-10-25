@@ -11,10 +11,10 @@ import { useRouter } from 'next/navigation';
 import { XSVG } from '@public/newDesign';
 import Heading from '@/components/ui/Heading';
 import { NextImageWithCover } from '@/components/ui';
-
-import s from './VoteUrlModal.module.scss';
 import { useEffect, useState } from 'react';
 import { apiService } from '@/services/apiService';
+
+import s from './VoteUrlModal.module.scss';
 
 interface VoteUrlModalProps {
   isOpen: boolean;

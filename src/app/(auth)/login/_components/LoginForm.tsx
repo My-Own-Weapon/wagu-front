@@ -9,6 +9,7 @@ import { PendingMessage } from '@/app/(auth)/_components';
 import { apiService } from '@/services/apiService';
 import { localStorageApi } from '@/services/localStorageApi';
 import { LoginFormInputs } from '@/types';
+import { Result } from '@/utils';
 
 interface Props {
   setErrorMsg: (msg: string | null) => void;
@@ -27,15 +28,16 @@ export default function LoginForm({ setErrorMsg }: Props) {
   const onSubmit: SubmitHandler<LoginFormInputs> = async (loginInputs) => {
     const { username, password } = loginInputs;
 
-    try {
-      await apiService.login({ username, password });
-      localStorageApi.setUserName(username);
-      router.push('/');
-    } catch (error) {
-      if (error instanceof Error) {
+    Result(
+      async () => {
+        await apiService.login({ username, password });
+        localStorageApi.setUserName(username);
+        router.push('/');
+      },
+      (error) => {
         setErrorMsg(`${error.message}`);
-      }
-    }
+      },
+    );
   };
 
   return (

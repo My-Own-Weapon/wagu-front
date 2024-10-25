@@ -13,8 +13,9 @@ export default function Stack<T extends ElementType = 'div'>({
   as: Element = 'div',
   className = undefined,
   padding = undefined,
+  style = {},
   children,
-  ...restProps
+  ...rest
 }: PropsWithNotUndefinedChildren<StackProps<T>> & ComponentProps<T>) {
   return (
     <Element
@@ -23,8 +24,9 @@ export default function Stack<T extends ElementType = 'div'>({
         display: 'flex',
         flexDirection: 'column',
         padding,
+        ...style,
       }}
-      {...restProps}
+      {...rest}
     >
       {children}
     </Element>

@@ -15,16 +15,23 @@ const ellipsisStyle = {
   lineHeight: '150%',
 };
 
+type Props = Pick<
+  PostOfStoreResponse,
+  'postId' | 'storeName' | 'menuImage' | 'postMainMenu' | 'createdDate'
+> & {
+  priority?: boolean;
+  alt?: string;
+};
+
 export default function PostCard({
   postId,
   storeName,
   menuImage,
   postMainMenu,
   createdDate,
-}: Pick<
-  PostOfStoreResponse,
-  'postId' | 'storeName' | 'menuImage' | 'postMainMenu' | 'createdDate'
->) {
+  priority = false,
+  alt = 'post-image',
+}: Props) {
   if (!menuImage) return null;
 
   const formattedDate = formatDate(createdDate);
@@ -37,7 +44,8 @@ export default function PostCard({
           src={menuImage.url}
           height="240px"
           borderRadius="16px"
-          alt="post-image"
+          priority={priority}
+          alt={alt}
         />
         <Spacing size={16} />
         <Text
