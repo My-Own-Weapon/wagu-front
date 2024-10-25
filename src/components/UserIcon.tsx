@@ -30,8 +30,8 @@ export function UserIcon({
   alt,
 }: UserIconProps) {
   const className = classNames({
-    [s.circleIcon]: shape === 'circle',
-    [s.squareIcon]: shape === 'square',
+    [`${s.circleIcon}`]: shape === 'circle',
+    [`${s.squareIcon}`]: shape === 'square',
   });
 
   const sizeMap = {
@@ -64,9 +64,9 @@ export function WithText<T extends WithTextProps>(
 ) {
   return ({ children, fontSize = 'small', color = 'white', ...rest }: T) => {
     const className = classNames({
-      [s.smallName]: fontSize === 'small',
-      [s.mediumName]: fontSize === 'medium',
-      [s.largeName]: fontSize === 'large',
+      [`${s.smallName}`]: fontSize === 'small',
+      [`${s.mediumName}`]: fontSize === 'medium',
+      [`${s.largeName}`]: fontSize === 'large',
     });
 
     return (

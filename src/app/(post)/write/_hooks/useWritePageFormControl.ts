@@ -43,10 +43,10 @@ const useWritePageFormControl = () => {
       }
     };
 
-    form.addEventListener('keydown', ignoreFormSubmit);
+    form?.addEventListener('keydown', ignoreFormSubmit);
 
     return () => {
-      form.removeEventListener('keydown', ignoreFormSubmit);
+      form?.removeEventListener('keydown', ignoreFormSubmit);
     };
   }, []);
 

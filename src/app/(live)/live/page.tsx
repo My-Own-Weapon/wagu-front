@@ -30,12 +30,7 @@ export default function PrepareStreamingPage() {
   return (
     <Container>
       <Camera />
-      <AddressInput
-        value={
-          storeInfo ? `[${storeInfo?.storeName}] ${storeInfo?.address}` : ''
-        }
-        onSelect={setStoreInfo}
-      />
+      <AddressInput onSelect={setStoreInfo} />
       <BoxButton onClick={handleClickLiveStart}>라이브 시작</BoxButton>
     </Container>
   );
