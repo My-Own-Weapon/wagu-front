@@ -102,7 +102,7 @@ export interface VotedStoreResponse {
 }
 
 export interface LoginFormInputs {
-  username: string;
+  userName: string;
   password: string;
 }
 
