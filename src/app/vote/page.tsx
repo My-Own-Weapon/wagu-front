@@ -16,9 +16,15 @@
 
 'use client';
 
-import React, { useEffect, useState, useRef, MouseEventHandler } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  MouseEventHandler,
+  Suspense,
+} from 'react';
 import { useSearchParams } from 'next/navigation';
-import { OpenVidu, Subscriber } from 'openvidu-browser';
+import { OpenVidu, Session, Subscriber } from 'openvidu-browser';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -34,6 +40,7 @@ import { NextImageWithCover } from '@/components/ui';
 import { KingSVG } from '@public/newDesign/vote';
 import { usePostsOfStore, useSelectedStore, useVotedStore } from '@/stores';
 import { OnLiveFollowings } from '@/components/domain';
+import { useFetchUserProfile } from '@/feature/auth/applications/hooks';
 
 import s from './page.module.scss';
 
@@ -70,12 +77,6 @@ interface UsersProfile {
   [key: string]: UserProfile;
 }
 
-const SEND_LOCATION_INTERVAL = 10000;
-const MSG = {
-  NO_SESSION_INSTANCE: 'session 인스턴스가 없습니다.',
-  NO_SESSION_ID: 'session id가 없습니다.',
-};
-
 const UserIconWithText = WithText<UserIconProps>(UserIcon);
 
 export default function SharePage() {
@@ -83,30 +84,27 @@ export default function SharePage() {
   const sessionId = searchParams.get('sessionId')!;
   const firstRender = useRef(true);
 
+  /* kakao map */
   const [markers, setMarkers] = useState<any[]>([]);
-  const [map, setMap] = useState<any>(null);
+  const kakaoMapRef = useRef<any>(null);
 
   const userMarkers = useRef<Map<string, any>>(new Map());
   const [userLocations, setUserLocations] = useState<UserLocation[]>([]);
 
-  const [OV, setOV] = useState<OpenVidu | null>(null);
-  const [session, setSession] = useState<any>(null);
+  /* openvidu */
+  const OV = useRef<OpenVidu | null>(null);
+  const OVSession = useRef<Session | null>(null);
   const [publisher, setPublisher] = useState<any>(null);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
 
-  const [usersProfile, setUsersProfile] = useState(new Map());
-  // before zustand
-  // const [selectedStore, setSelectedStore] = useState<StoreResponse | null>();
+  /* zustand */
   const { selectedStore, setSelectedStore } = useSelectedStore();
-
-  // before zustand
-  // const [votedStores, setVotedStores] = useState<any[]>([]);
   const { votedStores, setVotedStores } = useVotedStore();
-  const [selectedStoreId, setSelectedStoreId] = useState<any>();
-  // before zustand
-  // const [postsOfStore, setPostsOfStore] = useState<any[]>([]);
   const { postsOfStore, setPostsOfStore } = usePostsOfStore();
 
+  /* local state */
+  const [selectedStoreId, setSelectedStoreId] = useState<any>();
+  const [usersProfile, setUsersProfile] = useState(new Map());
   const [isVoteStart, setIsVoteStart] = useState<boolean>(false);
   const [isVoteEnd, setIsVoteEnd] = useState<boolean>(false);
   const [voteEndCnt, setVoteEndCnt] = useState<number>(0);
@@ -119,141 +117,27 @@ export default function SharePage() {
   const [connectionPeopleCount, setConnectionPeopleCount] = useState<number>(1);
 
   useEffect(() => {
-    console.log('--- subscriber 배열 :', subscribers);
-    console.log('--- subscriber 배열 길이 :', subscribers.length);
-  }, [subscribers]);
+    const joinSessionAndKakaoMap = async (sessionId: string) => {
+      await makeKakaoMap();
+      await joinSession(sessionId);
 
-  useEffect(() => {
-    console.log('usersProfile :', usersProfile);
-  }, [usersProfile]);
-
-  useEffect(() => {
-    // 세션 생성 및 오디오 태그에 오디오 소스 연결
-    // joinSessionAndPatchAudioTag(sessionId);
-    const fetchcurrUserProfile = async () => {
-      const userName = localStorageApi.getUserName() as string;
-      const profile = await apiService.fetchProfileWithoutFollow(userName);
-      const { imageUrl, username, name } = profile;
-
-      localStorageApi.setName(name);
-      setMyProfile({ imageUrl, username, name, isVoted: false });
-      setUsersProfile((prev) => {
-        const updated = new Map(prev.entries());
-        updated.set(username, { imageUrl, username, name, isVoteEnd: false });
-        return updated;
-      });
-    };
-
-    fetchcurrUserProfile();
-
-    // kakao map 생성
-    const script = document.createElement('script');
-    script.src =
-      'https://dapi.kakao.com/v2/maps/sdk.js?appkey=948985235eb596e79f570535fd01a71e&autoload=false&libraries=services';
-    script.async = true;
-    document.head.appendChild(script);
-
-    script.onload = () => {
-      window.kakao.maps.load(() => {
-        const container = document.getElementById('map');
-        if (!container) {
-          console.error('지도 컨테이너를 찾을 수 없습니다.');
-          return;
-        }
-
-        const options = {
-          center: new window.kakao.maps.LatLng(
-            37.5035685391056,
-            127.0416472341673,
-          ),
-          level: 5,
-        };
-
-        const mapInstance = new window.kakao.maps.Map(container, options);
-        setMap(mapInstance);
-
-        // 맵이 로드되고 움직임이 있어야 본인의 프로필이 보이기 때문
-        setTimeout(() => {
-          mapInstance.panTo(
-            new window.kakao.maps.LatLng(37.5035585179056, 127.04164711416),
-          );
-
-          setTimeout(() => {
-            mapInstance.panTo(
-              new window.kakao.maps.LatLng(37.5035685391056, 127.0416472341673),
-            );
-          }, 300);
-        }, 500);
-
-        window.kakao.maps.event.addListener(mapInstance, 'idle', () => {
-          const mapBounds = mapInstance.getBounds();
-          const swLatLng = mapBounds.getSouthWest();
-          const neLatLng = mapBounds.getNorthEast();
-
-          fetchStoresData(mapInstance, {
-            left: swLatLng.getLng(),
-            down: swLatLng.getLat(),
-            right: neLatLng.getLng(),
-            up: neLatLng.getLat(),
-          });
-        });
-      });
-    };
-
-    script.onerror = () => {
-      console.error('카카오 지도 스크립트를 불러오지 못했습니다.');
-    };
-  }, []);
-
-  useEffect(() => {
-    const fetchcurrUserProfile = async () => {
-      const userName = localStorageApi.getUserName() as string;
-      const profile = await apiService.fetchProfileWithoutFollow(userName);
-
-      console.log('apiService profile', profile);
-
-      const { imageUrl, username, name } = profile;
-      localStorageApi.setName(name);
-
-      sendUserData({ imageUrl, username, name, isVoted: false });
-    };
-
-    fetchcurrUserProfile();
-  }, [subscribers]);
-
-  useEffect(() => {
-    if (map) {
       window.kakao.maps.event.addListener(
-        map,
+        kakaoMapRef.current,
         'center_changed',
         updateCenterLocation,
       );
+    };
 
-      if (sessionId) {
-        console.log('------ session 접속');
-        joinSessionAndPatchAudioTag(sessionId);
-      }
-    }
-  }, [map]);
+    joinSessionAndKakaoMap(sessionId);
 
-  // session이 없을때 map의 이벤트를 등록하면 updateCenterLocation 내부의 시그널이 등록되지 않습니다.
-  useEffect(() => {
-    if (map) {
-      window.kakao.maps.event.addListener(
-        map,
-        'center_changed',
-        updateCenterLocation,
-      );
-    }
-  }, [session]);
+    fetchcurrUserProfile();
 
-  useEffect(() => {
     window.addEventListener('beforeunload', leaveSession);
 
     return () => {
       window.removeEventListener('beforeunload', leaveSession);
     };
-  }, []);
+  }, [sessionId]);
 
   useEffect(() => {
     if (voteEndCnt === subscribers.length + 1) {
@@ -261,56 +145,39 @@ export default function SharePage() {
     }
   }, [voteEndCnt]);
 
-  useEffect(() => {
-    console.log('--- 세션에 연결된 사람 수 :', connectionPeopleCount);
-  }, [connectionPeopleCount]);
-
   const joinSession = async (sessionId: string) => {
-    const OV = new OpenVidu();
-    setOV(OV);
-    const session = OV.initSession();
-    setSession(session);
+    console.log('joinSession()');
+    const openVidu = new OpenVidu();
+    OV.current = openVidu;
+    const ovSession = openVidu.initSession();
+    OVSession.current = ovSession;
 
-    session.on('streamCreated', (event: any) => {
+    ovSession.on('streamCreated', (event: any) => {
       const fetchSubscribersCount = async () => {
         const count = await apiService.fetchConnectionPeopleCount(sessionId);
 
         setConnectionPeopleCount(() => count);
       };
 
-      fetchSubscribersCount();
+      // fetchSubscribersCount();
 
       const { clientData } = JSON.parse(event.stream.connection.data);
       const userName = localStorageApi.getUserName();
       if (clientData === userName) return;
 
-      /**
-       * let flag = false;
-       *
-       * [...usersProfile].forEach(([key, vale]) => {
-       *   console.log('---- user name ', key, vale);
-       *   if (key === clientData) {
-       *     flag = true;
-       *   }
-       * });
-       *
-       * if (flag) return;
-       * const subscriber = session.subscribe(event.stream, undefined);
-       */
-
-      const subscriber = session.subscribe(event.stream, undefined);
+      const subscriber = ovSession.subscribe(event.stream, undefined);
 
       setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
     });
 
-    session.on('signal:userLocation', (event: any) => {
+    ovSession.on('signal:userLocation', (event: any) => {
       const userLocation = JSON.parse(event.data);
 
       setUserLocations((prevLocations) => [...prevLocations, userLocation]);
       updateUserMarker(userLocation);
     });
 
-    session.on('streamDestroyed', (event) => {
+    ovSession.on('streamDestroyed', (event) => {
       setSubscribers((prevSubscribers) => {
         return prevSubscribers.filter(
           (sub) => sub !== event.stream.streamManager,
@@ -319,20 +186,20 @@ export default function SharePage() {
     });
 
     // 나 투표했으니까 다들 투표된거 업데이트해
-    session.on('signal:voteUpdate', async (e: any) => {
+    ovSession.on('signal:voteUpdate', async (e: any) => {
       e.preventDefault();
 
       const voteList = await apiService.fetchStoresInVoteList(sessionId);
       setVotedStores([...voteList]);
     });
 
-    session.on('signal:voteStart', (e: any) => {
+    ovSession.on('signal:voteStart', (e: any) => {
       e.preventDefault();
 
       setIsVoteStart(true);
     });
 
-    session.on('signal:voteDone', (e: any) => {
+    ovSession.on('signal:voteDone', (e: any) => {
       e.preventDefault();
       const { userName } = JSON.parse(e.data);
 
@@ -347,7 +214,7 @@ export default function SharePage() {
       setVoteEndCnt((voteCount) => voteCount + 1);
     });
 
-    session.on('signal:userData', async (e: any) => {
+    ovSession.on('signal:userData', async (e: any) => {
       const userDetail = JSON.parse(e.data);
 
       usersProfile.set(userDetail.username, userDetail);
@@ -360,48 +227,99 @@ export default function SharePage() {
 
     try {
       const token = await apiService.fetchShareMapToken(sessionId);
-      if (!token) {
-        throw new Error('토큰이 정의되지 않았습니다');
-      }
+      if (!token) throw new Error('토큰이 정의되지 않았습니다');
+
       const username = localStorageApi.getUserName();
-      await session.connect(token, { clientData: username });
-      const publisher = OV.initPublisher(undefined, {
+      await ovSession.connect(token, { clientData: username });
+      const publisher = openVidu.initPublisher(undefined, {
         audioSource: undefined,
         videoSource: false,
       });
-
-      session.publish(publisher);
-      setPublisher(publisher);
+      ovSession.publish(publisher);
     } catch (error) {
       console.error('세션 연결 중 오류 발생:', (error as Error).message);
     }
   };
 
-  const joinSessionAndPatchAudioTag = async (sessionId: string) => {
-    if (sessionId) {
-      await joinSession(sessionId);
+  const fetchcurrUserProfile = async () => {
+    const userName = localStorageApi.getUserName() as string;
+    const profile = await apiService.fetchProfileWithoutFollow(userName);
+    const { imageUrl, username, name } = profile;
 
-      if (publisher) {
-        const audioElement = document.getElementById(
-          'publisherAudio',
-        ) as HTMLAudioElement;
-        if (audioElement) {
-          audioElement.srcObject = publisher.stream.getMediaStream();
-        }
-      }
+    localStorageApi.setName(name);
+    setMyProfile({ imageUrl, username, name, isVoted: false });
+    setUsersProfile((prev) => {
+      const updated = new Map(prev.entries());
+      updated.set(username, { imageUrl, username, name, isVoteEnd: false });
+      return updated;
+    });
+  };
 
-      subscribers.forEach((subscriber, index) => {
-        const audioElement = document.getElementById(
-          `subscriberAudio${index}`,
-        ) as HTMLAudioElement;
+  const makeKakaoMap = async () => {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src =
+        'https://dapi.kakao.com/v2/maps/sdk.js?appkey=948985235eb596e79f570535fd01a71e&autoload=false&libraries=services';
+      script.async = true;
+      document.head.appendChild(script);
 
-        if (audioElement) {
-          audioElement.srcObject = subscriber.stream.getMediaStream();
-        }
-      });
-    } else {
-      console.error('세션 ID가 없습니다.');
-    }
+      script.onload = () => {
+        window.kakao.maps.load(() => {
+          const container = document.getElementById('map');
+          if (!container) {
+            console.error('지도 컨테이너를 찾을 수 없습니다.');
+            return;
+          }
+
+          const options = {
+            center: new window.kakao.maps.LatLng(
+              37.5035685391056,
+              127.0416472341673,
+            ),
+            level: 5,
+          };
+
+          const mapInstance = new window.kakao.maps.Map(container, options);
+          kakaoMapRef.current = mapInstance;
+
+          // 맵이 로드되고 움직임이 있어야 본인의 프로필이 보이기 때문
+          setTimeout(() => {
+            mapInstance.panTo(
+              new window.kakao.maps.LatLng(37.5035585179056, 127.04164711416),
+            );
+
+            setTimeout(() => {
+              mapInstance.panTo(
+                new window.kakao.maps.LatLng(
+                  37.5035685391056,
+                  127.0416472341673,
+                ),
+              );
+            }, 300);
+          }, 500);
+
+          window.kakao.maps.event.addListener(mapInstance, 'idle', () => {
+            const mapBounds = mapInstance.getBounds();
+            const swLatLng = mapBounds.getSouthWest();
+            const neLatLng = mapBounds.getNorthEast();
+
+            fetchStoresData(mapInstance, {
+              left: swLatLng.getLng(),
+              down: swLatLng.getLat(),
+              right: neLatLng.getLng(),
+              up: neLatLng.getLat(),
+            });
+          });
+        });
+
+        resolve(null);
+      };
+
+      script.onerror = () => {
+        console.error('카카오 지도 스크립트를 불러오지 못했습니다.');
+        reject();
+      };
+    });
   };
 
   /* 좌표를 맵에 추가하는 함수 */
@@ -594,10 +512,10 @@ export default function SharePage() {
   // 내가 투표를 종료했을을 알리는 SIG
   const broadcastImVoteDoneSIG = () => {
     // if (!session) throw new Error(MSG.NO_SESSION_INSTANCE);
-    if (session) {
+    if (OVSession.current) {
       const userName = localStorageApi.getUserName();
 
-      session.signal({
+      OVSession.current.signal({
         data: JSON.stringify({ userName }),
         to: [],
         type: 'voteDone',
@@ -609,8 +527,8 @@ export default function SharePage() {
   const broadcastUpdateVoteListSIG = () => {
     // if (!session) throw new Error(MSG.NO_SESSION_INSTANCE);
 
-    if (session) {
-      session.signal({
+    if (OVSession.current) {
+      OVSession.current.signal({
         to: [],
         type: 'voteUpdate',
       });
@@ -622,8 +540,8 @@ export default function SharePage() {
   const broadcastWantVoteStartSIG = () => {
     // if (!session) throw new Error(MSG.NO_SESSION_INSTANCE);
 
-    if (session) {
-      session.signal({
+    if (OVSession.current) {
+      OVSession.current.signal({
         to: [],
         type: 'voteStart',
       });
@@ -642,8 +560,8 @@ export default function SharePage() {
   };
 
   const leaveSession = async () => {
-    if (session) {
-      session.disconnect();
+    if (OVSession.current) {
+      OVSession.current.disconnect();
     }
     setVoteEndCnt((prev) => prev + 1);
     if (publisher) {
@@ -655,7 +573,7 @@ export default function SharePage() {
       }
     }
 
-    setSession(() => null);
+    OVSession.current = null;
     setSubscribers(() => []);
     setPublisher(() => null);
   };
@@ -665,11 +583,7 @@ export default function SharePage() {
     let overlay = userMarkers.current.get(username);
     const profileImg = usersProfile.get(username)?.imageUrl;
     const imageSrc = profileImg || '/profile/profile-default-icon-male.svg';
-    const currentLevel = map.getLevel();
-
-    // const name = localStorageApi.getName();
-    // const userName = localStorageApi.getUserName();
-    // console.log('name : ', name);
+    const currentLevel = kakaoMapRef.current.getLevel();
 
     const content = document.createElement('div');
     content.style.width = '40px';
@@ -713,7 +627,7 @@ export default function SharePage() {
       //   animate: { duration: 1000 },
       // });
       // const movePosition = new window.kakao.maps.LatLng(lat, lng);
-      map.panTo(movePosition);
+      kakaoMapRef.current.panTo(movePosition);
     };
 
     if (overlay) {
@@ -725,7 +639,7 @@ export default function SharePage() {
         yAnchor: 1,
         zIndex: 10,
       });
-      overlay.setMap(map);
+      overlay.setMap(kakaoMapRef.current);
       userMarkers.current.set(username, overlay);
     }
   };
@@ -734,9 +648,9 @@ export default function SharePage() {
   const sendUserData = ({ imageUrl, username, name }: UserProfile) => {
     // if (!session) throw new Error(MSG.NO_SESSION_INSTANCE);
 
-    if (session) {
+    if (OVSession.current) {
       console.log('세션있음');
-      session.signal({
+      OVSession.current.signal({
         data: JSON.stringify({ imageUrl, username, name }),
         to: [],
         type: 'userData',
@@ -751,8 +665,8 @@ export default function SharePage() {
     // if (!session) throw new Error(MSG.NO_SESSION_INSTANCE);
     const username = localStorageApi.getUserName();
 
-    if (session) {
-      session.signal({
+    if (OVSession.current) {
+      OVSession.current.signal({
         // ✅ 이전코드임
         // data: JSON.stringify({ userId: username, lat, lng, userDetails }),
         data: JSON.stringify({ userId: username, lat, lng }),
@@ -769,7 +683,7 @@ export default function SharePage() {
   const updateCenterLocation = () => {
     if (!markers || isVoteStart) return;
 
-    const center = map.getCenter();
+    const center = kakaoMapRef.current.getCenter();
 
     sendLocation(center.getLat(), center.getLng());
   };
@@ -834,7 +748,7 @@ export default function SharePage() {
                       imgSrc={
                         !!imageUrl
                           ? imageUrl
-                          : '/profile/profile-default-icon-female.svg'
+                          : '/profile/profile-default-icon-male.svg'
                       }
                       alt="profile-icon"
                     >
@@ -924,7 +838,7 @@ export default function SharePage() {
                   imgSrc={
                     !!imageUrl
                       ? imageUrl
-                      : '/profile/profile-default-icon-female.svg'
+                      : '/profile/profile-default-icon-male.svg'
                   }
                   alt="profile-icon"
                 >
@@ -943,10 +857,13 @@ export default function SharePage() {
               <OnLiveFollowings onLiveFollowings={streamerFromStores} />
             </>
           )}
-          <StorePosts
-            selectedStoreName={selectedStore!.storeName}
-            selectedStoreId={selectedStore!.storeId}
-          />
+          <Suspense fallback={<div>Loading...</div>}>
+            <StorePosts
+              selectedStoreName={selectedStore?.storeName || ''}
+              selectedStoreId={selectedStore?.storeId || 0}
+            />
+          </Suspense>
+          {/* )} */}
           <div className={s.navUpperBtnContainer}>
             <button
               className={s.addVoteListBtn}
