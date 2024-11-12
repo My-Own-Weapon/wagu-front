@@ -15,6 +15,7 @@ export default function Flex({
   justifyContent,
   gap = undefined,
   alignItems = undefined,
+  style = {},
   children,
 }: PropsWithNotUndefinedChildren<Props>) {
   return (
@@ -24,6 +25,7 @@ export default function Flex({
         justifyContent,
         alignItems,
         gap,
+        ...style,
       }}
     >
       {children}
