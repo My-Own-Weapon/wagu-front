@@ -1,35 +1,49 @@
+/* eslint-disable class-methods-use-this */
+
 'use client';
 
 class LocalStorage {
-  private NAME = 'name';
+  private NAME = 'fullName';
 
-  private USERNAME = 'username';
+  private USERNAME = 'useName';
 
-  getUserName() {
+  private PROFILE_IMAGE = 'profileImage';
+
+  private saveGet(key: string) {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem(this.USERNAME);
+      return localStorage.getItem(key);
     }
-
     return null;
   }
 
-  setUserName(name: string) {
+  private saveSet(key: string, value: string) {
     if (typeof window !== 'undefined') {
-      localStorage.setItem(this.USERNAME, name);
+      localStorage.setItem(key, value);
     }
+  }
+
+  getUserName() {
+    return this.saveGet(this.USERNAME);
+  }
+
+  setUserName(name: string) {
+    this.saveSet(this.USERNAME, name);
   }
 
   getName() {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem(this.NAME);
-    }
-    return null; // or any other default value
+    return this.saveGet(this.NAME);
   }
 
   setName(name: string) {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(this.NAME, name);
-    }
+    this.saveSet(this.NAME, name);
+  }
+
+  getProfileImage() {
+    return this.saveGet(this.PROFILE_IMAGE);
+  }
+
+  setProfileImage(profileImage: string) {
+    this.saveSet(this.PROFILE_IMAGE, profileImage);
   }
 }
 

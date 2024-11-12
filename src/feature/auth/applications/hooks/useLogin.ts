@@ -21,8 +21,8 @@ const useLogin = ({ setErrorMsg }: Props) => {
       return mutate(
         { userName, password },
         {
-          onSuccess: ({ userName }) => {
-            loginSuccess(userName, router);
+          onSuccess: (data) => {
+            loginSuccess(data, router);
           },
           onError: (error) => {
             loginFail(error.message, setErrorMsg);
