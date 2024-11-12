@@ -62,11 +62,6 @@ export default class MapModel {
     });
   }
 
-  removePrevMarkers() {
-    this.markers.forEach((marker) => marker.setMap(null));
-    this.markers = [];
-  }
-
   async createMarkers(
     stores: StoreResponse[],
     listner: (store: StoreResponse) => void,
@@ -79,33 +74,43 @@ export default class MapModel {
     }
 
     this.removePrevMarkers();
-    const { maps } = window.kakao;
-
-    stores?.forEach((store) => {
-      const { liveStore } = store;
-      const imageSrc = liveStore
-        ? '/newDesign/map/pin_book_live.svg'
-        : '/newDesign/map/pin_book.svg';
-      const imageSize = new maps.Size(32, 32);
-      const imageOption = { offset: new maps.Point(16, 32) };
-      const markerImage = new maps.MarkerImage(
-        imageSrc,
-        imageSize,
-        imageOption,
-      );
-      const markerPosition = new maps.LatLng(store.posy, store.posx);
-      const marker = new maps.Marker({
-        position: markerPosition,
-        key: store.storeId,
-        image: markerImage,
-      });
-
-      this.markers.push(marker);
-      marker.setMap(this.kakaoMapInstance);
+    this.markers = stores.map((store) => {
+      const marker = this.createMarker(store);
       this.addEventListnerMarker(marker, 'click', () => {
         listner(store);
       });
+
+      return marker;
     });
+
+    this.markers.forEach((marker) => marker.setMap(this.kakaoMapInstance));
+  }
+
+  private removePrevMarkers() {
+    this.markers.forEach((marker) => marker.setMap(null));
+    this.markers = [];
+  }
+
+  private createMarker(store: StoreResponse) {
+    const { liveStore } = store;
+    const imageSrc = liveStore
+      ? '/newDesign/map/pin_book_live.svg'
+      : '/newDesign/map/pin_book.svg';
+    const imageSize = new window.kakao.maps.Size(32, 32);
+    const imageOption = { offset: new window.kakao.maps.Point(16, 32) };
+    const markerImage = new window.kakao.maps.MarkerImage(
+      imageSrc,
+      imageSize,
+      imageOption,
+    );
+    const markerPosition = new window.kakao.maps.LatLng(store.posy, store.posx);
+    const marker = new window.kakao.maps.Marker({
+      position: markerPosition,
+      key: store.storeId,
+      image: markerImage,
+    });
+
+    return marker;
   }
 
   async addEventListenerMap(event: string, cb: () => void) {
