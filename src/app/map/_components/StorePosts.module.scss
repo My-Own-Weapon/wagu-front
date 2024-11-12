@@ -1,39 +1,11 @@
 @import '@styles/mixins/index.scss';
-@import '@styles/variables/textSize.scss';
 
-.container {
-  gap: 16px;
+.postsWrapper {
+  display: flex;
+
+  gap: 12px;
 
   width: 100%;
 
-  @include flexColumnStart;
-
-  .titleWrapper {
-    display: flex;
-
-    align-items: center;
-    justify-content: space-between;
-
-    width: 100%;
-
-    .allPostsAnchor {
-      font-size: $textSmall;
-      color: $textSub-content;
-    }
-  }
-
-  .postsWrapper {
-    display: flex;
-
-    gap: 12px;
-
-    width: 100%;
-
-    @include Scroll;
-
-    .noPostsText {
-      font-size: $textMedium;
-      color: $textSub-content;
-    }
-  }
+  @include Scroll;
 }
