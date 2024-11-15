@@ -3,13 +3,16 @@
 'use client';
 
 import Link from 'next/link';
-import { MouseEvent, MouseEventHandler, useState } from 'react';
+import { MouseEvent, MouseEventHandler, useReducer, useState } from 'react';
 
 import { UserIcon } from '@/components/UserIcon';
 import { NextImageWithCover } from '@/components/ui';
 import { VotedStoreResponse } from '@/types';
 
 import s from './StoreCard.module.scss';
+import useGetCandidateStores from '@/feature/vote/applications/hooks/useGetCandidateStores';
+import { CandidateStoresViewModel } from '@/feature/vote/applications/viewModels';
+import { CandidateStore } from '@/components/domain/vote';
 
 export interface Store {
   storeId: number;
@@ -69,57 +72,29 @@ export function StoreCard({ storeId, storeName, menuImage, postCount }: Store) {
   );
 }
 
-export function VotedStoreCards({
-  stores,
+export function CandidateStoreList({
+  sessionId,
   handleRemoveVotedStore,
 }: {
-  stores: VotedStoreResponse[];
+  sessionId: string;
   handleRemoveVotedStore: MouseEventHandler<HTMLButtonElement>;
 }) {
+  const { candidateStoresViewModels } = useGetCandidateStores(sessionId);
+
   return (
     <ul className={s.votedStoreCardsContainer}>
-      {stores.map((store) => (
-        <VotedStoreCard
-          key={store.storeId}
-          {...store}
-          handleRemoveVotedStore={handleRemoveVotedStore}
+      {candidateStoresViewModels.map((model) => (
+        <CandidateStore
+          key={model.getStoreId()}
+          viewModel={model}
+          onRemoveCandidateStore={handleRemoveVotedStore}
         />
       ))}
     </ul>
   );
 }
 
-/* ✅ TODO: 리사이저블한 SVG 만들기 */
-function VotedStoreCard({
-  storeId,
-  storeName,
-  handleRemoveVotedStore,
-}: VotedStoreCardProps) {
-  // const [isVoteDone, setIsVoteDone] = useState<boolean>(false);
-  // const { url } = menuImage;
-
-  return (
-    <li className={s.votedStoreCardWrapper}>
-      <p className={s.storeName}>{storeName}</p>
-      <UserIcon
-        size="small"
-        shape="circle"
-        imgSrc="/profile/profile-default-icon-male.svg"
-        alt="profile-img"
-      />
-      <button
-        className={s.removeBtn}
-        type="button"
-        data-store-id={storeId}
-        onClick={handleRemoveVotedStore}
-      >
-        x
-      </button>
-    </li>
-  );
-}
-
-export function VotableCards({
+export function VotableStoreCards({
   stores,
   handleAddVote,
   handleDeleteVote,
@@ -131,7 +106,7 @@ export function VotableCards({
   return (
     <ul className={s.votableCardsContainer}>
       {stores.map((store) => (
-        <VotableCard
+        <VotableStoreCard
           key={store.storeId}
           store={store}
           handleAddVote={handleAddVote}
@@ -142,7 +117,7 @@ export function VotableCards({
   );
 }
 
-export function VotableCard({
+export function VotableStoreCard({
   store,
   handleAddVote,
   handleDeleteVote,
@@ -151,7 +126,7 @@ export function VotableCard({
   handleAddVote: (e: MouseEvent) => void;
   handleDeleteVote: (e: MouseEvent) => void;
 }) {
-  const [isVoted, setIsVoted] = useState<boolean>(false);
+  const [isVoted, toggleVoted] = useReducer((prev) => !prev, false);
   const { storeId } = store;
 
   return (
@@ -169,11 +144,11 @@ export function VotableCard({
           isVoted
             ? (e) => {
                 handleDeleteVote(e);
-                setIsVoted(!isVoted);
+                toggleVoted();
               }
             : (e) => {
                 handleAddVote(e);
-                setIsVoted(!isVoted);
+                toggleVoted();
               }
         }
       >
