@@ -14,9 +14,18 @@ export const handlers = [
     const { username, password } = requestBody as Record<string, string>;
 
     if (username === 'test' && password === 'test') {
-      return HttpResponse.text('login 성공', {
-        status: 200,
-      });
+      return HttpResponse.json(
+        {
+          memberUsername: 'test',
+          memberImage: {
+            id: 1,
+            url: '/profile/profile-default-icon-male.svg',
+          },
+        },
+        {
+          status: 200,
+        },
+      );
     }
 
     return HttpResponse.json(
@@ -93,9 +102,14 @@ export const handlers = [
     }
 
     if (username === 'test' && password === 'test') {
-      return HttpResponse.text('회원가입 성공', {
-        status: 200,
-      });
+      return HttpResponse.json(
+        {
+          signupResponse: '회원가입 성공',
+        },
+        {
+          status: 200,
+        },
+      );
     }
 
     return HttpResponse.json(
