@@ -157,3 +157,13 @@ export type MapMarker = any;
 export type KakaoMapElement = HTMLDivElement;
 
 export type Nullable<T> = T | null;
+
+export type PickNullable<T, K extends keyof T> = Omit<T, K> & {
+  [P in K]: T[P] extends object
+    ? { [Q in keyof T[P]]: T[P][Q] | null }
+    : T[P] | null;
+};
+
+export type NullableProps<T> = {
+  [K in keyof T]: T[K] | null;
+};
