@@ -1,0 +1,66 @@
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/textSize.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/radius.scss';
+
+.circleIcon {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 3px;
+
+  cursor: pointer;
+
+  background-color: transparent;
+  border: 1.5px solid $primaryOrange;
+  border-radius: 50%;
+
+  img {
+    background-color: rgba(115, 115, 115, 0.5);
+    border-radius: 50%;
+  }
+}
+
+.squareIcon {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  background-color: transparent;
+  border: 1px solid $primaryOrange;
+  border-radius: $radiusMedium;
+}
+
+.withtextIconContainer {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+
+  align-items: center;
+  justify-content: center;
+
+  .smallName {
+    font-size: $textSmall;
+    font-weight: $medium;
+    color: $white;
+  }
+
+  .mediumName {
+    font-size: $textMedium;
+    font-weight: $medium;
+    color: $white;
+  }
+
+  .largeName {
+    font-size: $textMedium;
+    font-weight: $medium;
+    color: $white;
+  }
+}
