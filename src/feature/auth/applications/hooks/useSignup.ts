@@ -1,4 +1,4 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { z } from 'zod';
 
 import { authApiService } from '@/feature/auth/services/api/authApiService';
@@ -35,12 +35,12 @@ const useSignup = ({
     phoneNumber: parsed.phoneNumber,
   };
 
-  const { data: signupResponse } = useSuspenseQuery({
-    queryKey: ['signup'],
-    queryFn: () => authApiService.signup(serverParams),
+  const mutation = useMutation({
+    mutationKey: ['signup'],
+    mutationFn: () => authApiService.signup(serverParams),
   });
 
-  return signupResponse;
+  return mutation;
 };
 
 export default useSignup;
