@@ -6,14 +6,17 @@ type ServerData = OriginalServerData<
   typeof voteApiService.fetchCandidateStores
 >;
 
-const useFetchCandidateStores = <T = DefaultItem>(
-  sessionId: RTCSessionId,
-  selector?: Selector<ServerData, T>,
-) => {
+const useFetchCandidateStores = <T = DefaultItem>({
+  sessionId,
+  selector = defaultSelector as Selector<ServerData, T>,
+}: {
+  sessionId: RTCSessionId;
+  selector?: Selector<ServerData, T>;
+}) => {
   const query = useSuspenseQuery<ServerData, Error, T[]>({
     queryKey: ['fetchCandidateStores', sessionId],
     queryFn: () => voteApiService.fetchCandidateStores(sessionId),
-    select: selector ?? (defaultSelector as Selector<ServerData, T>),
+    select: selector,
   });
 
   return query;
