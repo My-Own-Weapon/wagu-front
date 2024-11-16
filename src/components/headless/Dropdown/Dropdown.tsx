@@ -15,7 +15,7 @@ const DropdownContext = createContext<{
   $trigger: React.RefObject<HTMLButtonElement>;
 } | null>(null);
 
-const useDropdownContext = () => {
+export const useDropdownContext = () => {
   const context = useContext(DropdownContext);
   if (!context) {
     throw new Error('Dropdown components must be used within a Dropdown');
@@ -26,7 +26,6 @@ const useDropdownContext = () => {
 function Dropdown({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const $trigger = useRef<HTMLButtonElement>(null);
-
   const value = useMemo(() => ({ isOpen, setIsOpen, $trigger }), [isOpen]);
 
   return (
@@ -38,7 +37,7 @@ function Dropdown({ children }: { children: React.ReactNode }) {
 
 Dropdown.Trigger = function Dropdown__Trigger({
   children,
-  ...props
+  ...rest
 }: {
   children: React.ReactNode;
 }) {
@@ -54,7 +53,7 @@ Dropdown.Trigger = function Dropdown__Trigger({
   };
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (e) => {
-    if (isOpen && $trigger.current?.contains(e.target as Node)) {
+    if (isOpen && $trigger.current === e.target) {
       setIsOpen(false);
       return;
     }
@@ -71,7 +70,7 @@ Dropdown.Trigger = function Dropdown__Trigger({
       aria-haspopup="menu"
       aria-expanded={isOpen}
       data-testid="dropdown-trigger"
-      {...props}
+      {...rest}
     >
       {children}
     </button>
@@ -88,14 +87,6 @@ Dropdown.Portal = function Dropdown__Portal({
   children: React.ReactNode;
 }) {
   const { isOpen, $trigger } = useDropdownContext();
-  const [portalContainer] = useState(() => document.createElement('div'));
-
-  useEffect(() => {
-    document.body.appendChild(portalContainer);
-    return () => {
-      document.body.removeChild(portalContainer);
-    };
-  }, [portalContainer]);
 
   const triggerRect = $trigger.current?.getBoundingClientRect();
   if (!triggerRect) return null;
@@ -118,7 +109,7 @@ Dropdown.Portal = function Dropdown__Portal({
 
 Dropdown.Content = function Dropdown__Content({
   children,
-  ...props
+  ...rest
 }: {
   children: React.ReactNode;
 }) {
@@ -225,7 +216,7 @@ Dropdown.Content = function Dropdown__Content({
         tabIndex={-1}
         data-testid="dropdown-content"
         onKeyDown={handleKeyDown}
-        {...props}
+        {...rest}
       >
         {children}
       </ul>
@@ -237,7 +228,7 @@ Dropdown.Item = function Dropdown__Item({
   children,
   onSelect = undefined,
   disabled = false,
-  ...props
+  ...rest
 }: {
   children: React.ReactNode;
   onSelect?: React.MouseEventHandler<HTMLLIElement>;
@@ -296,7 +287,7 @@ Dropdown.Item = function Dropdown__Item({
       aria-disabled={disabled}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      {...props}
+      {...rest}
     >
       {children}
     </li>
@@ -306,13 +297,13 @@ Dropdown.Item = function Dropdown__Item({
 Dropdown.Group = function Dropdown__Group({
   children,
   label,
-  ...props
+  ...rest
 }: {
   children: React.ReactNode;
   label: string;
 }) {
   return (
-    <div role="group" aria-label={label} {...props}>
+    <div role="group" aria-label={label} {...rest}>
       {children}
     </div>
   );
@@ -320,12 +311,12 @@ Dropdown.Group = function Dropdown__Group({
 
 Dropdown.Label = function Dropdown__Label({
   children,
-  ...props
+  ...rest
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <span role="presentation" tabIndex={-1} {...props}>
+    <span role="presentation" tabIndex={-1} {...rest}>
       {children}
     </span>
   );
