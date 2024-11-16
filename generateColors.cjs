@@ -6,7 +6,7 @@
 const fs = require('fs');
 
 const rawData = fs.readFileSync('tokens.json');
-const data = JSON.parse(rawData);
+const tokenInfo = JSON.parse(rawData);
 
 const colors = {};
 const borderRadius = {};
@@ -20,73 +20,75 @@ const zIndex = {
 };
 
 /* colors */
-function processColor(obj, prefix = '') {
-  for (const [key, value] of Object.entries(obj)) {
-    if (value.type === 'color') {
-      let colorName = prefix + key;
+function parsingTheme(tokenInfo, prefix = '') {
+  Object.entries(tokenInfo).forEach(([color, token]) => {
+    if (token.type === 'color') {
+      let colorName = prefix + color;
       colorName = colorName.charAt(0).toLowerCase() + colorName.slice(1);
-      colors[colorName] = value.value;
-    } else if (typeof value === 'object') {
+
+      colors[colorName] = token.value;
+    } else if (typeof token === 'object') {
       if (
-        key !== 'key-color' &&
-        key !== 'borderRadius' &&
-        key !== 'fontWeight'
+        color !== 'key-color' &&
+        color !== 'borderRadius' &&
+        color !== 'fontWeight'
       ) {
         let newPrefix = prefix
-          ? prefix + key.charAt(0).toUpperCase() + key.slice(1)
-          : key;
-        processColor(value, newPrefix);
+          ? prefix + color.charAt(0).toUpperCase() + color.slice(1)
+          : color;
+        parsingTheme(token, newPrefix);
       }
     }
-  }
+  });
 }
 
-processColor(data.global);
+parsingTheme(tokenInfo.global);
 
 /* key-color */
-if (data.global['key-color']) {
-  for (const [key, value] of Object.entries(data.global['key-color'])) {
+if (tokenInfo.global['key-color']) {
+  Object.entries(tokenInfo.global['key-color']).forEach(([key, value]) => {
     colors[key.charAt(0).toLowerCase() + key.slice(1)] = value.value;
-  }
+  });
 }
 
 /* borderRadius */
-if (data.global.borderRadius) {
-  for (const [key, value] of Object.entries(data.global.borderRadius)) {
+if (tokenInfo.global.borderRadius) {
+  Object.entries(tokenInfo.global.borderRadius).forEach(([key, value]) => {
     borderRadius[key] = value.value; // 문자열 그대로 유지
-  }
+  });
 }
 
 /* fontWeight */
-if (data.global.fontWeight) {
-  for (const [key, value] of Object.entries(data.global.fontWeight)) {
+if (tokenInfo.global.fontWeight) {
+  Object.entries(tokenInfo.global.fontWeight).forEach(([key, value]) => {
     fontWeight[key] = Number(value.value); // 숫자로 변환
-  }
+  });
 }
 
 /* TS 파일 생성 */
 let output = 'export const colors = {\n';
-for (const [key, value] of Object.entries(colors)) {
+
+Object.entries(colors).forEach(([key, value]) => {
   output += `  ${key}: '${value}',\n`;
-}
+});
 output += '} as const;\n\n';
 
 output += 'export const borderRadius = {\n';
-for (const [key, value] of Object.entries(borderRadius)) {
+Object.entries(borderRadius).forEach(([key, value]) => {
   output += `  ${key}: '${value}',\n`;
-}
+});
 output += '} as const;\n\n';
 
 output += 'export const fontWeight = {\n';
-for (const [key, value] of Object.entries(fontWeight)) {
+Object.entries(fontWeight).forEach(([key, value]) => {
   output += `  ${key}: ${value},\n`;
-}
+});
 output += '} as const;\n\n';
 
 output += 'export const zIndex = {\n';
-for (const [key, value] of Object.entries(zIndex)) {
+Object.entries(zIndex).forEach(([key, value]) => {
   output += `  ${key}: ${value},\n`;
-}
+});
 output += '} as const;\n';
 
 fs.writeFileSync('./src/constants/theme.ts', output);
