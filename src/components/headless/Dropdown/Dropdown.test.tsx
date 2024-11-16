@@ -1,7 +1,7 @@
 import { expect, test, describe, beforeEach, vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 
-import React, { use } from 'react';
+import React from 'react';
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Dropdown from './Dropdown';
@@ -88,15 +88,18 @@ describe('Dropdown Component', () => {
     );
 
     await user.click(screen.getByText('Open Menu'));
+
     await user.keyboard('{ArrowDown}');
-
     expect(screen.getByText('Item 1')).toHaveFocus();
-
     await user.keyboard('{ArrowDown}');
     expect(screen.getByText('Item 2')).toHaveFocus();
+    await user.keyboard('{ArrowUp}');
+    expect(screen.getByText('Item 1')).toHaveFocus();
+    /* reverse */
+    await user.keyboard('{ArrowUp}');
+    expect(screen.getByText('Item 3')).toHaveFocus();
 
     await user.keyboard('{Enter}');
-
     expect(onSelect).toHaveBeenCalledTimes(1);
   });
 
@@ -111,12 +114,12 @@ describe('Dropdown Component', () => {
             <Dropdown.Item onSelect={() => {}}>Item 1</Dropdown.Item>
           </Dropdown.Content>
         </Dropdown>
-        <button>Outside Button</button>
+        <button type="button">Outside Button</button>
       </div>,
     );
 
     await user.click(screen.getByText('Open Menu'));
-    expect(screen.getByRole('menu')).toBeInTheDocument();
+    expect(screen.queryByRole('menu')).toBeInTheDocument();
 
     await user.click(screen.getByText('Outside Button'));
 
