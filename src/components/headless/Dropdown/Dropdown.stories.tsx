@@ -36,58 +36,31 @@ export const Default: Story = {
 
 export const DoublGrouped: Story = {
   render: () => (
-    <>
-      <Dropdown>
-        <Dropdown.Trigger>그룹 메뉴 열기</Dropdown.Trigger>
-        <Dropdown.Portal>
-          <Dropdown.Content>
-            <Dropdown.Group label="그룹 1">
-              <Dropdown.Label>그룹 1 레이블</Dropdown.Label>
-              <Dropdown.Item onSelect={() => alert('그룹 1 - 메뉴 1')}>
-                그룹 1 - 메뉴 1
-              </Dropdown.Item>
-              <Dropdown.Item onSelect={() => alert('그룹 1 - 메뉴 2')}>
-                그룹 1 - 메뉴 2
-              </Dropdown.Item>
-            </Dropdown.Group>
-            <Dropdown.Group label="그룹 2">
-              <Dropdown.Label>그룹 2 레이블</Dropdown.Label>
-              <Dropdown.Item onSelect={() => alert('그룹 2 - 메뉴 1')}>
-                그룹 2 - 메뉴 1
-              </Dropdown.Item>
-              <Dropdown.Item onSelect={() => alert('그룹 2 - 메뉴 2')}>
-                그룹 2 - 메뉴 2
-              </Dropdown.Item>
-            </Dropdown.Group>
-          </Dropdown.Content>
-        </Dropdown.Portal>
-      </Dropdown>
-      <Dropdown>
-        <Dropdown.Trigger>그룹 메뉴 열기</Dropdown.Trigger>
-        <Dropdown.Portal>
-          <Dropdown.Content>
-            <Dropdown.Group label="그룹 1">
-              <Dropdown.Label>그룹 1 레이블</Dropdown.Label>
-              <Dropdown.Item onSelect={() => alert('그룹 1 - 메뉴 1')}>
-                그룹 1 - 메뉴 1
-              </Dropdown.Item>
-              <Dropdown.Item onSelect={() => alert('그룹 1 - 메뉴 2')}>
-                그룹 1 - 메뉴 2
-              </Dropdown.Item>
-            </Dropdown.Group>
-            <Dropdown.Group label="그룹 2">
-              <Dropdown.Label>그룹 2 레이블</Dropdown.Label>
-              <Dropdown.Item onSelect={() => alert('그룹 2 - 메뉴 1')}>
-                그룹 2 - 메뉴 1
-              </Dropdown.Item>
-              <Dropdown.Item onSelect={() => alert('그룹 2 - 메뉴 2')}>
-                그룹 2 - 메뉴 2
-              </Dropdown.Item>
-            </Dropdown.Group>
-          </Dropdown.Content>
-        </Dropdown.Portal>
-      </Dropdown>
-    </>
+    <Dropdown>
+      <Dropdown.Trigger>그룹 메뉴 열기</Dropdown.Trigger>
+      <Dropdown.Portal>
+        <Dropdown.Content>
+          <Dropdown.Group label="그룹 1">
+            <Dropdown.Label>그룹 1 레이블</Dropdown.Label>
+            <Dropdown.Item onSelect={() => alert('그룹 1 - 메뉴 1')}>
+              그룹 1 - 메뉴 1
+            </Dropdown.Item>
+            <Dropdown.Item onSelect={() => alert('그룹 1 - 메뉴 2')}>
+              그룹 1 - 메뉴 2
+            </Dropdown.Item>
+          </Dropdown.Group>
+          <Dropdown.Group label="그룹 2">
+            <Dropdown.Label>그룹 2 레이블</Dropdown.Label>
+            <Dropdown.Item onSelect={() => alert('그룹 2 - 메뉴 1')}>
+              그룹 2 - 메뉴 1
+            </Dropdown.Item>
+            <Dropdown.Item onSelect={() => alert('그룹 2 - 메뉴 2')}>
+              그룹 2 - 메뉴 2
+            </Dropdown.Item>
+          </Dropdown.Group>
+        </Dropdown.Content>
+      </Dropdown.Portal>
+    </Dropdown>
   ),
 };
 
