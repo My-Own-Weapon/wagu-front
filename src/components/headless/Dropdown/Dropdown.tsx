@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, {
   createContext,
   useContext,
@@ -50,7 +49,6 @@ Dropdown.Trigger = function Dropdown__Trigger({
     e.stopPropagation();
 
     if (e.key === 'Enter' || e.key === ' ') {
-      console.log('keydown');
       setIsOpen(true);
     }
   };
@@ -90,7 +88,6 @@ Dropdown.Portal = function Dropdown__Portal({
   children: React.ReactNode;
 }) {
   const { isOpen, $trigger } = useDropdownContext();
-  const [positionStyles, setPositionStyles] = useState({});
   const [portalContainer] = useState(() => document.createElement('div'));
 
   useEffect(() => {
@@ -100,22 +97,23 @@ Dropdown.Portal = function Dropdown__Portal({
     };
   }, [portalContainer]);
 
-  useEffect(() => {
-    if (isOpen && $trigger.current) {
-      const triggerRect = $trigger.current.getBoundingClientRect();
+  const triggerRect = $trigger.current?.getBoundingClientRect();
+  if (!triggerRect) return null;
 
-      setPositionStyles({
-        position: 'absolute',
-        top: `${triggerRect.bottom + window.scrollY + offsetY}px`,
-        left: `${triggerRect.left + window.scrollX + offsetX}px`,
-        zIndex: zIndex.dropDown,
-      });
-    }
-  }, [isOpen, $trigger, offsetX, offsetY]);
-
-  if (!isOpen) return null;
-
-  return <div style={positionStyles}>{children}</div>;
+  return (
+    isOpen && (
+      <div
+        style={{
+          position: 'fixed',
+          top: `${triggerRect.bottom + window.scrollY + offsetY}px`,
+          left: `${triggerRect.left + window.scrollX + offsetX}px`,
+          zIndex: zIndex.dropDown,
+        }}
+      >
+        {children}
+      </div>
+    )
+  );
 };
 
 Dropdown.Content = function Dropdown__Content({
@@ -126,6 +124,7 @@ Dropdown.Content = function Dropdown__Content({
 }) {
   const { isOpen, setIsOpen, $trigger } = useDropdownContext();
   const $content = useRef<HTMLUListElement>(null);
+  const focusIndex = useRef(-1);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -134,47 +133,103 @@ Dropdown.Content = function Dropdown__Content({
         !$content.current.contains(e.target as Node) &&
         !$trigger.current?.contains(e.target as Node)
       ) {
-        console.log('content click outside');
         setIsOpen(false);
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isOpen || !$content.current) return;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+
+        const $menuItems = $content.current.querySelectorAll(
+          '[role="menuitem"]',
+        ) as NodeListOf<HTMLElement>;
+        if (!$menuItems?.length) return;
+
+        /* 첫번째 arrowDown 일 때 */
+        if (focusIndex.current === -1) {
+          focusIndex.current = 0;
+          $menuItems[focusIndex.current]!.focus();
+          return;
+        }
+
+        focusIndex.current = (focusIndex.current + 1) % $menuItems.length;
+        $menuItems[focusIndex.current]!.focus();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+
+        const $menuItems = $content.current.querySelectorAll(
+          '[role="menuitem"]',
+        ) as NodeListOf<HTMLElement>;
+        if (!$menuItems?.length) return;
+
+        /* 첫번째 arrowUp 일 때 */
+        if (focusIndex.current === -1) {
+          focusIndex.current = $menuItems.length - 1;
+          $menuItems[focusIndex.current]!.focus();
+          return;
+        }
+
+        focusIndex.current =
+          (focusIndex.current - 1 + $menuItems.length) % $menuItems.length;
+        $menuItems[focusIndex.current]!.focus();
       }
     };
 
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
-      $content.current?.focus();
+      document.addEventListener('keydown', handleKeyDown);
+
+      const $firstMenuItem = $content.current?.querySelector(
+        '[role="menuitem"]',
+      ) as HTMLElement;
+      if (!$firstMenuItem) return;
+
+      $firstMenuItem.focus();
     } else {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
     }
 
+    // eslint-disable-next-line consistent-return
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen, setIsOpen]);
+  }, [$trigger, isOpen, setIsOpen]);
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLUListElement> = (
     event,
   ) => {
-    if (event.key === 'Escape') {
-      setIsOpen(false);
+    switch (event.key) {
+      case 'Escape':
+        setIsOpen(false);
+        break;
+      case 'ArrowDown':
+        event.preventDefault();
+        break;
+      default:
+        break;
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <ul
-      ref={$content}
-      role="menu"
-      /** focus되지 않도록
-       * @see https://html.spec.whatwg.org/multipage/interaction.html#sequential-focus-navigation-and-the-tabindex-attribute
-       */
-      tabIndex={-1}
-      data-testid="dropdown-content"
-      onKeyDown={handleKeyDown}
-      {...props}
-    >
-      {children}
-    </ul>
+    isOpen && (
+      <ul
+        ref={$content}
+        role="menu"
+        /** focus되지 않도록
+         * @see https://html.spec.whatwg.org/multipage/interaction.html#sequential-focus-navigation-and-the-tabindex-attribute
+         */
+        tabIndex={-1}
+        data-testid="dropdown-content"
+        onKeyDown={handleKeyDown}
+        {...props}
+      >
+        {children}
+      </ul>
+    )
   );
 };
 
@@ -188,6 +243,8 @@ Dropdown.Item = function Dropdown__Item({
   onSelect?: React.MouseEventHandler<HTMLLIElement>;
   disabled?: boolean;
 }) {
+  const { setIsOpen } = useDropdownContext();
+
   const handleClick = (event: React.MouseEvent<HTMLLIElement>) => {
     if (!onSelect) return;
     if (disabled) {
@@ -196,15 +253,49 @@ Dropdown.Item = function Dropdown__Item({
     }
 
     onSelect(event);
+    setIsOpen(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLLIElement>) => {
+    if (disabled) return;
+    const { target } = e;
+
+    switch (e.key) {
+      case 'Enter':
+      case ' ':
+        e.preventDefault();
+        if (onSelect) {
+          onSelect(e as unknown as React.MouseEvent<HTMLLIElement>);
+          setIsOpen(false);
+        }
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+
+        const { nextElementSibling } = target as HTMLElement;
+        if (!nextElementSibling) return;
+
+        (nextElementSibling as HTMLElement).focus();
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        const { previousElementSibling } = target as HTMLElement;
+        if (!previousElementSibling) return;
+
+        (previousElementSibling as HTMLElement).focus();
+        break;
+      default:
+        break;
+    }
   };
 
   return (
     <li
       role="menuitem"
-      /* disabled 시 focus 되지 않도록 */
       tabIndex={disabled ? -1 : 0}
       aria-disabled={disabled}
       onClick={handleClick}
+      onKeyDown={handleKeyDown}
       {...props}
     >
       {children}
