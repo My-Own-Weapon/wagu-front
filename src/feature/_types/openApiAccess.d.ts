@@ -43,6 +43,14 @@ export type GetResponses = {
     : never]: ExtractMethodResponse<paths[Path], 'get'>;
 };
 
+export type GetResonsesWithRequired = {
+  [Path in keyof paths as paths[Path] extends { get: any }
+    ? Path
+    : never]: ExtractMethodResponse<paths[Path], 'get'> extends Array<infer T>
+    ? Array<Required<T>>
+    : Required<ExtractMethodResponse<paths[Path], 'get'>>;
+};
+
 export type PostResponses = {
   [Path in keyof paths as paths[Path] extends { post: any }
     ? Path
@@ -115,7 +123,35 @@ export type PatchParameters = {
     : never]: ExtractMethodParams<paths[Path], 'patch'>;
 };
 
-type PathParams<T> = T extends {
+/* Query */
+type QueryParam<T> = T extends {
+  parameters: {
+    query: infer Q;
+  };
+}
+  ? Q
+  : never;
+
+type ExtractQueryParams<P, M extends HttpMethod> = P extends {
+  [Key in M]: infer R;
+}
+  ? R extends { parameters: { query?: any } }
+    ? QueryParam<R>
+    : never
+  : never;
+
+export type QueryParams<Method extends HttpMethod> = {
+  [Path in keyof paths as paths[Path] extends { [K in Method]: any }
+    ? Path
+    : never]: ExtractQueryParams<paths[Path], Method>;
+};
+export type GetQueryParams = QueryParams<'get'>;
+export type PostQueryParams = QueryParams<'post'>;
+export type DeleteQueryParams = QueryParams<'delete'>;
+export type PatchQueryParams = QueryParams<'patch'>;
+
+/* Path */
+type PathParam<T> = T extends {
   parameters: {
     path: infer P;
   };
@@ -123,16 +159,21 @@ type PathParams<T> = T extends {
   ? P
   : never;
 
-type ExtractQueryParams<P, M extends HttpMethod> = P extends {
+type ExtractPathParams<P, M extends HttpMethod> = P extends {
   [Key in M]: infer R;
 }
   ? R extends { parameters: { path?: any } }
-    ? PathParams<R>
+    ? PathParam<R>
     : never
   : never;
 
-export type GetQueryParams = {
-  [Path in keyof paths as paths[Path] extends { get: any }
+export type PathParams<Method extends HttpMethod> = {
+  [Path in keyof paths as paths[Path] extends { [K in Method]: any }
     ? Path
-    : never]: ExtractQueryParams<paths[Path], 'get'>;
+    : never]: ExtractPathParams<paths[Path], Method>;
 };
+
+export type GetPathParams = PathParams<'get'>;
+export type PostPathParams = PathParams<'post'>;
+export type DeletePathParams = PathParams<'delete'>;
+export type PatchPathParams = PathParams<'patch'>;
