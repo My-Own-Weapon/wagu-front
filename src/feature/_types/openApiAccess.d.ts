@@ -87,7 +87,7 @@ export type ApiParameters = {
   };
 };
 
-type RequestBody<T> = T extends {
+type ExtractRequestBody<T> = T extends {
   requestBody: { content: { 'application/json': infer B } };
 }
   ? B
@@ -96,7 +96,7 @@ type RequestBody<T> = T extends {
 type ExtractMethodParams<P, M extends HttpMethod> = P extends {
   [K in M]: infer R;
 }
-  ? RequestBody<R>
+  ? ExtractRequestBody<R>
   : never;
 
 export type GetParameters = {
@@ -126,7 +126,7 @@ export type PatchParameters = {
 /* Query */
 type QueryParam<T> = T extends {
   parameters: {
-    query: infer Q;
+    query?: infer Q;
   };
 }
   ? Q
