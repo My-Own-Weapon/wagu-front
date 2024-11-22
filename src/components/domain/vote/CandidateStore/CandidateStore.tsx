@@ -1,5 +1,5 @@
 import { MouseEventHandler } from 'react';
-import { CandidateStoresViewModel } from '@/feature/vote/applications/viewModels';
+import { CandidateStoresViewModel } from '@/feature/vote/viewModels';
 import { UserIcon } from '@/components/UserIcon';
 
 import s from './CandidateStore.module.scss';
