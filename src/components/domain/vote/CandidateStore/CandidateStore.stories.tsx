@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import CandidateStore from './CandidateStore';
-import { CandidateStoresViewModel } from '@/feature/vote/applications/viewModels';
+import { CandidateStoresViewModel } from '@/feature/vote/viewModels';
+import { CandidateStore } from '@/components/domain/vote';
+import { Spacing } from '@/components/ui';
+import { Fragment } from 'react';
 
 const meta = {
   title: 'Domain/Vote/CandidateStore',
@@ -11,7 +13,7 @@ const meta = {
   tags: ['autodocs'],
   decorators: [
     (Story) => (
-      <div style={{ width: '410px' }}>
+      <div style={{ width: '410px', padding: '16px' }}>
         <Story />
       </div>
     ),
@@ -48,5 +50,37 @@ export const LongStoreName: Story = {
     onRemoveCandidateStore: () => {
       alert('가게가 투표 목록에서 제거되었습니다.');
     },
+  },
+};
+
+export const candidateStoreList: Story = {
+  args: {
+    viewModel: mockViewModel,
+    onRemoveCandidateStore: () => {
+      alert('가게가 투표 목록에서 제거되었습니다.');
+    },
+  },
+
+  render: (args) => {
+    return (
+      <ul>
+        {Array.from({ length: 5 }).map((_, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <Fragment key={index}>
+            <div
+              style={{
+                position: 'relative',
+                border: '1px solid tomato',
+                borderRadius: '4px',
+                paddingLeft: '16px',
+              }}
+            >
+              <CandidateStore {...args} />
+            </div>
+            {index !== 4 && <Spacing size={16} />}
+          </Fragment>
+        ))}
+      </ul>
+    );
   },
 };
