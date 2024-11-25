@@ -1,1 +1,1 @@
-export { default as useFetchStorePostsApi } from './useFetchStorePostsApi';
+export { default as useFetchStorePosts } from './useFetchStorePosts';
