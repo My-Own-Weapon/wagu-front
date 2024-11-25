@@ -7,7 +7,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 const useFetchStorePosts = (storeId: number) => {
   const { data } = useSuspenseQuery({
     queryKey: ['fetchStorePosts', storeId],
-    queryFn: () => (storeId ? apiService.fetchStorePosts(storeId) : null),
+    queryFn: () => (!!storeId ? apiService.fetchStorePosts(storeId) : null),
     staleTime: 1000 * 60 * 3,
   });
 

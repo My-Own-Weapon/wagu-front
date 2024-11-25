@@ -3,16 +3,14 @@
 'use client';
 
 import Link from 'next/link';
-import { MouseEvent, MouseEventHandler, useReducer, useState } from 'react';
+import { MouseEvent, MouseEventHandler, useReducer } from 'react';
 
-import { UserIcon } from '@/components/UserIcon';
 import { NextImageWithCover } from '@/components/ui';
 import { VotedStoreResponse } from '@/types';
+import useGetCandidateStores from '@/feature/vote/applications/hooks/useGetCandidateStores';
+import { CandidateStore } from '@/components/domain/vote';
 
 import s from './StoreCard.module.scss';
-import useGetCandidateStores from '@/feature/vote/applications/hooks/useGetCandidateStores';
-import { CandidateStoresViewModel } from '@/feature/vote/applications/viewModels';
-import { CandidateStore } from '@/components/domain/vote';
 
 export interface Store {
   storeId: number;
@@ -148,7 +146,6 @@ export function VotableStoreCard({
               }
             : (e) => {
                 handleAddVote(e);
-                toggleVoted();
               }
         }
       >
