@@ -54,3 +54,6 @@ stories
 # for test
 test.js
 test.ts
+
+# for openvidu component compare
+/src/app/vote/_components/ov

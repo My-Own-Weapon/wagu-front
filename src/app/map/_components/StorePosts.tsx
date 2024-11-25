@@ -1,10 +1,16 @@
 import Link from 'next/link';
 
-import { PostOfStoreResponse } from '@/types';
-import { NextImageWithCover } from '@/components/ui';
+import {
+  Flex,
+  NextImageWithCover,
+  Spacing,
+  Stack,
+  Text,
+} from '@/components/ui';
 import Heading from '@/components/ui/Heading';
 import useDragScroll from '@/hooks/useDragScroll';
-import { useFetchStorePosts } from '@/hooks/api';
+import { colors } from '@/constants/theme';
+import { useGetStorePosts } from '@/feature/post/applications/hooks';
 
 import s from './StorePosts.module.scss';
 
@@ -13,57 +19,65 @@ interface Props {
   selectedStoreId: number;
 }
 
-/**
- * ✅ TODO: 분리
- */
-const useStorePosts = ({ storeId }: { storeId: number }) => {
-  const { storePosts } = useFetchStorePosts(storeId);
-
-  return storePosts;
-};
-
 export default function StorePosts({
-  selectedStoreName,
-  selectedStoreId,
+  selectedStoreName: storeName,
+  selectedStoreId: storeId,
 }: Props) {
-  const posts = useStorePosts({ storeId: selectedStoreId });
+  const { posts } = useGetStorePosts(storeId);
   const ref = useDragScroll();
 
   return (
-    <div className={s.container}>
-      <div className={s.titleWrapper}>
+    <Stack style={{ width: '100%' }}>
+      <Flex
+        justifyContent="space-between"
+        alignItems="center"
+        style={{ width: '100%' }}
+      >
         <Heading as="h3" fontSize="16px" fontWeight="bold" color="black">
-          {`${selectedStoreName} POST`}
+          {`${storeName} POST`}
         </Heading>
-        {!isNoPost({
-          posts,
-          selectedStoreId,
-          selectedStoreName,
-        }) && (
-          <Link className={s.allPostsAnchor} href={`/store/${selectedStoreId}`}>
-            모든 POST 보기
+        {posts.length > 0 && (
+          <Link href={`/store/${storeId}`}>
+            <Text
+              fontSize="small"
+              fontWeight="regular"
+              color={colors.grayAsh600}
+            >
+              모든 POST 보기
+            </Text>
           </Link>
         )}
-      </div>
-      <ul className={s.postsWrapper} ref={ref}>
-        {!isNoPost({
-          posts,
-          selectedStoreId,
-          selectedStoreName,
-        }) ? (
-          posts?.map(({ menuImage, postId }) => {
-            const { url } = menuImage;
-            return <PostCard key={postId} imgUrl={url} postId={postId} />;
-          })
-        ) : (
-          <p className={s.noPostsText}>등록된 리뷰가 없어요...</p>
-        )}
-      </ul>
-    </div>
+      </Flex>
+      <Spacing size={16} />
+      {posts.length === 0 ? (
+        <Text
+          as="p"
+          fontSize="small"
+          color={colors.grayBlue700}
+          fontWeight="regular"
+        >
+          등록된 리뷰가 없어요...
+        </Text>
+      ) : (
+        <ul className={s.postsWrapper} ref={ref}>
+          {posts.map(({ menuImage, postId }) => (
+            <PostOfStoreCard
+              key={postId}
+              imgUrl={menuImage.url}
+              postId={postId}
+            />
+          ))}
+        </ul>
+      )}
+    </Stack>
   );
 }
 
-function PostCard({ imgUrl, postId }: { imgUrl: string; postId: number }) {
+interface PostOfStoreCardProps {
+  imgUrl: string;
+  postId: number;
+}
+function PostOfStoreCard({ imgUrl, postId }: PostOfStoreCardProps) {
   return (
     <li>
       <Link href={`/posts/${postId}`}>
@@ -78,11 +92,3 @@ function PostCard({ imgUrl, postId }: { imgUrl: string; postId: number }) {
     </li>
   );
 }
-
-const isNoPost = ({
-  posts,
-  selectedStoreId,
-  selectedStoreName,
-}: Props & { posts: PostOfStoreResponse[] }) => {
-  return posts?.length === 0 && selectedStoreId && selectedStoreName;
-};

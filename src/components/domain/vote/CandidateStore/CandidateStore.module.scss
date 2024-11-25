@@ -1,0 +1,36 @@
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/textSize.scss';
+@import '@styles/variables/fontWeight.scss';
+
+.removeBtn {
+  position: absolute;
+  top: 2px;
+  left: -14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 20px;
+  height: 20px;
+
+  background-color: $red700;
+  border-radius: 50%;
+
+  &:before,
+  &:after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 2px;
+    background-color: $white;
+  }
+
+  &:before {
+    transform: rotate(45deg);
+  }
+
+  &:after {
+    transform: rotate(-45deg);
+  }
+}

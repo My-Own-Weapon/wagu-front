@@ -1,22 +1,17 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { BoxButton, InputBox, Spacing, Stack } from '@/components/ui';
 import { PendingMessage } from '@/app/(auth)/_components';
-
-import { apiService } from '@/services/apiService';
-import { localStorageApi } from '@/services/localStorageApi';
+import { useLogin } from '@/feature/auth/applications/hooks';
 import { LoginFormInputs } from '@/types';
-import { Result } from '@/utils';
 
 interface Props {
   setErrorMsg: (msg: string | null) => void;
 }
 
 export default function LoginForm({ setErrorMsg }: Props) {
-  const router = useRouter();
   const {
     handleSubmit,
     register,
@@ -24,33 +19,25 @@ export default function LoginForm({ setErrorMsg }: Props) {
   } = useForm<LoginFormInputs>({
     mode: 'onChange',
   });
-
-  const onSubmit: SubmitHandler<LoginFormInputs> = async (loginInputs) => {
-    const { username, password } = loginInputs;
-
-    Result(
-      async () => {
-        await apiService.login({ username, password });
-        localStorageApi.setUserName(username);
-        router.push('/');
-      },
-      (error) => {
-        setErrorMsg(`${error.message}`);
-      },
-    );
+  const { login } = useLogin({ setErrorMsg });
+  const onSubmit: SubmitHandler<LoginFormInputs> = async ({
+    userName,
+    password,
+  }) => {
+    login({ userName, password });
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Stack padding="0 24px">
         <Spacing size={20} />
-        <InputBox errorMessage={errors.username?.message}>
+        <InputBox errorMessage={errors.userName?.message}>
           <InputBox.Label>아이디</InputBox.Label>
           <InputBox.Input
             height={56}
             placeholder="아이디를 입력해 주세요"
             type="text"
-            {...register('username', {
+            {...register('userName', {
               required: true,
               pattern: {
                 value: /^[a-zA-Z0-9]+$/,
