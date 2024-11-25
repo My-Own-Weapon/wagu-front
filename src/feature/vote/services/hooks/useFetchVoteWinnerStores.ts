@@ -5,12 +5,13 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 type ServerData = OriginalServerData<
   typeof voteApiService.fetchVoteWinnerStores
 >;
-const useFetchVoteWinnerStores = <TReturnData>({
+
+const useFetchVoteWinnerStores = <TReturnData = ServerData>({
   sessionId,
   selector,
 }: {
   sessionId: string;
-  selector: Selector<ServerData, TReturnData>;
+  selector?: Selector<ServerData, TReturnData>;
 }) => {
   const query = useSuspenseQuery({
     queryKey: ['fetchVoteWinnerStores', sessionId],
