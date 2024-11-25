@@ -1,13 +1,12 @@
 import '@testing-library/jest-dom/vitest';
 
-import { MouseEventHandler } from 'react';
+import React, { MouseEventHandler } from 'react';
 import { cleanup, render, screen } from '@testing-library/react';
 import { describe, vi, expect, beforeEach, it } from 'vitest';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 
 import { CandidateStoresViewModel } from '@/feature/vote/viewModels';
 import CandidateStore from './CandidateStore';
-import React from 'react';
 
 describe('CandidateStore', () => {
   let I: UserEvent;
@@ -60,22 +59,23 @@ describe('CandidateStore', () => {
   it('여러개의 CandidateStore 컴포넌트가 렌더링되고 특정 컴포넌트를 remove 했을시에 해당 컴포넌트만 삭제되어야 한다.', async () => {
     const initialViewModels: CandidateStoresViewModel[] = Array.from(
       { length: 3 },
-      (_, index) =>
-        new CandidateStoresViewModel({
+      (_, index) => {
+        return new CandidateStoresViewModel({
           mainMenuName: `test${index}`,
           mainMenuImageUrl: `test${index}`,
           storeName: `test${index}`,
           storeId: index,
-        }),
+        });
+      },
     );
 
     function TestCandidateStores() {
       const [viewModels, setViewModels] = React.useState(initialViewModels);
 
       const handleRemoveCandidateStore = (storeId: number) => {
-        setViewModels((prev) =>
-          prev.filter((vm) => vm.getStoreId() !== storeId),
-        );
+        setViewModels((prev) => {
+          return prev.filter((vm) => vm.getStoreId() !== storeId);
+        });
       };
 
       return (
@@ -84,9 +84,9 @@ describe('CandidateStore', () => {
             <CandidateStore
               key={viewModel.getStoreId()}
               viewModel={viewModel}
-              onRemoveCandidateStore={() =>
-                handleRemoveCandidateStore(viewModel.getStoreId())
-              }
+              onRemoveCandidateStore={() => {
+                handleRemoveCandidateStore(viewModel.getStoreId());
+              }}
             />
           ))}
         </ul>

@@ -5,8 +5,9 @@ import { webRTCService } from '@/feature/webRTC/services/api/webRTCService';
 const useFetchConnectionToken = () => {
   const mutation = useMutation({
     mutationKey: ['fetchConnectionToken'],
-    mutationFn: (sessionId: RTCSessionId) =>
-      webRTCService.fetchConnectionToken(sessionId),
+    mutationFn: (sessionId: RTCSessionId) => {
+      return webRTCService.fetchConnectionToken(sessionId);
+    },
     throwOnError: true,
   });
 
