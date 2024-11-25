@@ -44,14 +44,16 @@ export default function MapPage() {
         ) : (
           <>
             {selectedStore.liveStore && (
-              <Suspense fallback={<div>로딩중...</div>}>
-                <OnLiveFollowingsAtStore
-                  storeId={selectedStore.storeId}
-                  storeName={selectedStore.storeName}
-                />
-              </Suspense>
+              <>
+                <Suspense fallback={<div>로딩중...</div>}>
+                  <OnLiveFollowingsAtStore
+                    storeId={selectedStore.storeId}
+                    storeName={selectedStore.storeName}
+                  />
+                </Suspense>
+                <Spacing size={24} />
+              </>
             )}
-            <Spacing size={24} />
             <Suspense fallback={<div>로딩중...</div>}>
               <StorePosts
                 selectedStoreName={selectedStore.storeName}
