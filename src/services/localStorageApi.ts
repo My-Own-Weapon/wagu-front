@@ -4,22 +4,19 @@
 
 class LocalStorage {
   private NAME = 'fullName';
-
   private USERNAME = 'useName';
-
   private PROFILE_IMAGE = 'profileImage';
 
   private saveGet(key: string) {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem(key);
-    }
-    return null;
+    if (typeof window === 'undefined') return null;
+
+    return localStorage.getItem(key);
   }
 
   private saveSet(key: string, value: string) {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(key, value);
-    }
+    if (typeof window === 'undefined') return;
+
+    localStorage.setItem(key, value);
   }
 
   getUserName() {
