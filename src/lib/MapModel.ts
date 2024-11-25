@@ -52,6 +52,22 @@ export default class MapModel {
           };
 
           this.kakaoMapInstance = new window.kakao.maps.Map(this.$map, options);
+
+          /* 맵이 로드되고 움직임이 있어야 본인의 프로필이 보이기 때문 */
+          setTimeout(() => {
+            this.kakaoMapInstance.panTo(
+              new window.kakao.maps.LatLng(37.5035585179056, 127.04164711416),
+            );
+
+            setTimeout(() => {
+              this.kakaoMapInstance.panTo(
+                new window.kakao.maps.LatLng(
+                  37.5035685391056,
+                  127.0416472341673,
+                ),
+              );
+            }, 300);
+          }, 500);
           resolve();
         });
       };
@@ -60,11 +76,6 @@ export default class MapModel {
         reject(new Error('카카오 지도 스크립트를 불러오지 못했습니다.'));
       };
     });
-  }
-
-  removePrevMarkers() {
-    this.markers.forEach((marker) => marker.setMap(null));
-    this.markers = [];
   }
 
   async createMarkers(
@@ -79,33 +90,43 @@ export default class MapModel {
     }
 
     this.removePrevMarkers();
-    const { maps } = window.kakao;
-
-    stores?.forEach((store) => {
-      const { liveStore } = store;
-      const imageSrc = liveStore
-        ? '/newDesign/map/pin_book_live.svg'
-        : '/newDesign/map/pin_book.svg';
-      const imageSize = new maps.Size(32, 32);
-      const imageOption = { offset: new maps.Point(16, 32) };
-      const markerImage = new maps.MarkerImage(
-        imageSrc,
-        imageSize,
-        imageOption,
-      );
-      const markerPosition = new maps.LatLng(store.posy, store.posx);
-      const marker = new maps.Marker({
-        position: markerPosition,
-        key: store.storeId,
-        image: markerImage,
-      });
-
-      this.markers.push(marker);
-      marker.setMap(this.kakaoMapInstance);
+    this.markers = stores.map((store) => {
+      const marker = this.createMarker(store);
       this.addEventListnerMarker(marker, 'click', () => {
         listner(store);
       });
+
+      return marker;
     });
+
+    this.markers.forEach((marker) => marker.setMap(this.kakaoMapInstance));
+  }
+
+  private removePrevMarkers() {
+    this.markers.forEach((marker) => marker.setMap(null));
+    this.markers = [];
+  }
+
+  private createMarker(store: StoreResponse) {
+    const { liveStore } = store;
+    const imageSrc = liveStore
+      ? '/newDesign/map/pin_book_live.svg'
+      : '/newDesign/map/pin_book.svg';
+    const imageSize = new window.kakao.maps.Size(32, 32);
+    const imageOption = { offset: new window.kakao.maps.Point(16, 32) };
+    const markerImage = new window.kakao.maps.MarkerImage(
+      imageSrc,
+      imageSize,
+      imageOption,
+    );
+    const markerPosition = new window.kakao.maps.LatLng(store.posy, store.posx);
+    const marker = new window.kakao.maps.Marker({
+      position: markerPosition,
+      key: store.storeId,
+      image: markerImage,
+    });
+
+    return marker;
   }
 
   async addEventListenerMap(event: string, cb: () => void) {

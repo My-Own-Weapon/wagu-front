@@ -16,8 +16,8 @@ interface UsePostsOfStore {
 }
 
 interface UseVotedStore {
-  votedStores: VotedStoreResponse[];
-  setVotedStores: (votedStores: VotedStoreResponse[]) => void;
+  candidateStores: VotedStoreResponse[];
+  setCandidateStores: (votedStores: VotedStoreResponse[]) => void;
 }
 
 export const useSelectedStore = create<UseSelectedStore>((set) => ({
@@ -33,6 +33,8 @@ export const usePostsOfStore = create<UsePostsOfStore>((set) => ({
 }));
 
 export const useVotedStore = create<UseVotedStore>((set) => ({
-  votedStores: [],
-  setVotedStores: (votedStores: VotedStoreResponse[]) => set({ votedStores }),
+  candidateStores: [],
+  setCandidateStores: (candidateStores: VotedStoreResponse[]) => {
+    set({ candidateStores });
+  },
 }));

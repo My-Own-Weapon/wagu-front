@@ -14,6 +14,7 @@ import React, {
 type SelectContextValue<T> = {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  $trigger: React.RefObject<HTMLButtonElement>;
   value: NonNullable<T>;
   onSelect: (newValue: NonNullable<T>) => void;
 };
@@ -25,6 +26,7 @@ export const useSelectContext = () => {
   if (!context) {
     throw new Error('Select components must be used within a Select');
   }
+
   return context;
 };
 
@@ -42,18 +44,16 @@ export default function Select<T>({
 }: SelectProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState(defaultValue || undefined);
+  const $trigger = useRef<HTMLButtonElement>(null);
 
   const isControlled = controlledValue !== undefined && onChange !== undefined;
   const value = isControlled ? controlledValue : selectedValue;
 
   const handleSelect = useCallback(
     (newValue: NonNullable<T>) => {
-      if (!isControlled) {
-        setSelectedValue(newValue);
-      }
-      if (onChange) {
-        onChange(newValue);
-      }
+      if (!isControlled) setSelectedValue(newValue);
+      if (onChange) onChange(newValue);
+
       setIsOpen(false);
     },
     [isControlled, onChange],
@@ -65,8 +65,9 @@ export default function Select<T>({
       setIsOpen,
       value,
       onSelect: handleSelect,
+      $trigger,
     }),
-    [isOpen, value, handleSelect],
+    [isOpen, value, handleSelect, $trigger],
   );
 
   return (
@@ -78,18 +79,25 @@ export default function Select<T>({
 
 interface SelectTriggerProps extends ComponentPropsWithoutRef<'button'> {}
 Select.Trigger = function Trigger({ children, ...rest }: SelectTriggerProps) {
-  const { isOpen, setIsOpen } = useSelectContext();
+  const { isOpen, setIsOpen, $trigger } = useSelectContext();
 
-  const handleClick = () => {
-    setIsOpen(!isOpen);
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (isOpen && $trigger.current === e.target) {
+      setIsOpen(false);
+      return;
+    }
+
+    setIsOpen(true);
   };
 
   return (
     <button
+      ref={$trigger}
       onClick={handleClick}
       aria-haspopup="listbox"
       aria-expanded={isOpen}
       type="button"
+      data-testid="select-trigger"
       {...rest}
     >
       {children}
@@ -99,34 +107,44 @@ Select.Trigger = function Trigger({ children, ...rest }: SelectTriggerProps) {
 
 interface SelectContentProps extends ComponentPropsWithoutRef<'ul'> {}
 Select.Content = function Content({ children, ...rest }: SelectContentProps) {
-  const { isOpen, setIsOpen } = useSelectContext();
+  const { isOpen, setIsOpen, $trigger } = useSelectContext();
   const contentRef = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (e: MouseEvent) => {
+      e.stopPropagation();
       if (
         contentRef.current &&
-        !contentRef.current.contains(event.target as Node)
+        !contentRef.current.contains(e.target as Node) &&
+        !($trigger.current && $trigger.current.contains(e.target as Node))
       ) {
         setIsOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen, setIsOpen]);
 
-  if (!isOpen) {
-    return null;
-  }
-
   return (
-    <ul ref={contentRef} role="listbox" tabIndex={-1} {...rest}>
-      {children}
-    </ul>
+    isOpen && (
+      <ul
+        ref={contentRef}
+        role="listbox"
+        tabIndex={-1}
+        data-testid="select-content"
+        {...rest}
+      >
+        {children}
+      </ul>
+    )
   );
 };
 
@@ -135,7 +153,7 @@ interface SelectGroupProps extends ComponentPropsWithoutRef<'div'> {
 }
 Select.Group = function Group({ children, label, ...rest }: SelectGroupProps) {
   return (
-    <div role="group" aria-label={label} {...rest}>
+    <div role="group" aria-label={label} data-testid="select-group" {...rest}>
       {children}
     </div>
   );
@@ -169,6 +187,7 @@ Select.Item = function Item({
       onClick={handleSelect}
       onKeyDown={handleKeyDown}
       tabIndex={0}
+      data-testid="select-item"
       {...rest}
     >
       {children}

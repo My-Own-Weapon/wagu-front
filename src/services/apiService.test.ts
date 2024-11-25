@@ -1,6 +1,7 @@
 /* eslint-disable max-classes-per-file */
 
 import ApiService, { PathMustStartWithSlash } from '@/services/apiService';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 class FetcherTestHelper extends ApiService {
   public async testFetcher<T extends string>(
@@ -21,7 +22,7 @@ describe('fetcher', () => {
   };
 
   let apiService: FetcherTestHelper;
-  const mockFetch = jest.fn();
+  const mockFetch = vi.fn();
   global.fetch = mockFetch;
 
   beforeEach(() => {

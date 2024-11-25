@@ -41,18 +41,15 @@
 
   .bottom {
     position: absolute;
-    z-index: 1;
     top: 424px;
-    left: 0;
     right: 0;
+    left: 0;
+    z-index: 1;
+    overflow: hidden;
 
-    padding: 24px 24px 152px 24px;
-
-    @include flexColumnStart;
-    gap: 24px;
+    padding: 24px 24px 152px;
 
     background-color: $white;
-
     border-radius: 24px 24px 0;
 
     .navUpperBtnContainer {
@@ -99,13 +96,6 @@
         font-weight: $semiBold;
         letter-spacing: -0.025em;
       }
-    }
-
-    .votedStoresWrapper {
-      @include flexColumnStart;
-      gap: 16px;
-
-      width: 100%;
     }
   }
 }
@@ -187,32 +177,6 @@
       // padding: 24px 24px 0 24px;
 
       border-radius: 24px 24px 0;
-    }
-  }
-}
-
-.winStoreCardContainer {
-  width: 100%;
-
-  @include flexColumnStart;
-  gap: 12px;
-
-  .titleArea {
-    @include flexColumnStart;
-    gap: 8px;
-
-    .storeName {
-      color: $textTitleColor;
-      font-size: $textTitle;
-      font-weight: $bold;
-      line-height: 150%;
-    }
-
-    .menuName {
-      color: $textTitleGray;
-      font-size: $textLarge;
-      font-weight: $medium;
-      line-height: 150%;
     }
   }
 }
