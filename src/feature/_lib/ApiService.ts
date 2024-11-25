@@ -24,7 +24,6 @@ type CustomUrlOrErrorConfig = z.infer<typeof ConfigSchema>;
 
 export default abstract class ApiService {
   private readonly mswBaseUrl = 'http://localhost:9090';
-
   private readonly baseUrl =
     process.env.NODE_ENV === 'production'
       ? process.env.NEXT_PUBLIC_BASE_URL
@@ -71,6 +70,7 @@ export default abstract class ApiService {
       const { status, message, error } = await res.json();
 
       if (!config) {
+        console.error(`${path} 에러 발생`);
         throw new Error(this.errorMessageTemplate({ status, error, message }));
       }
 
