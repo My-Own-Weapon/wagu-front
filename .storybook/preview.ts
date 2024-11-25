@@ -6,6 +6,11 @@ import '../src/styles/reset.css';
 
 const preview: Preview = {
   parameters: {
+    docs: {
+      story: {
+        height: '300px',
+      },
+    },
     viewport: {
       viewports: {
         small: {
