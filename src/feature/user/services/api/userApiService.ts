@@ -3,9 +3,9 @@ import {
   GetResponses,
   PostResponses,
   DeleteResponses,
-  GetQueryParams,
-  PostQueryParams,
-  QueryParams,
+  GetPathParams,
+  PostPathParams,
+  PathParams,
 } from '@/feature/_types/openApiAccess';
 import { PickNullable } from '@/types';
 import { z } from 'zod';
@@ -17,7 +17,7 @@ class UserApiService extends ApiService {
    * @returns user profile image & full name
    */
   async fetchProfileWithoutFollow(
-    username: GetQueryParams['/member/{username}/profile'],
+    username: GetPathParams['/member/{username}/profile'],
   ): Promise<ProfileDetailsResponse> {
     const res = await this.fetcher(`/member/${username}/profile`, {
       method: 'GET',
@@ -69,7 +69,7 @@ class UserApiService extends ApiService {
    * @returns 팔로우 성공 여부
    */
   async followUser(
-    memberId: PostQueryParams['/members/{fromMemberId}/follow'],
+    memberId: PostPathParams['/members/{fromMemberId}/follow'],
   ): Promise<FollowUserResponse> {
     const res = await this.fetcher(`/members/${memberId}/follow`, {
       method: 'POST',
@@ -85,7 +85,7 @@ class UserApiService extends ApiService {
    * @returns 언팔로우 성공 여부
    */
   async unFollowUser(
-    memberId: QueryParams<'delete'>['/members/{fromMemberId}/follow'],
+    memberId: PathParams<'delete'>['/members/{fromMemberId}/follow'],
   ): Promise<UnFollowUserResponse> {
     const res = await this.fetcher(`/members/${memberId}/follow`, {
       method: 'DELETE',
