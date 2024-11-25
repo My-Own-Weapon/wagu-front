@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 
 import { authApiService } from '@/feature/auth/services/api/authApiService';
 import { z } from 'zod';
+import { PostParameters } from '@/feature/_types/openApiAccess';
 
 export const loginClientParams = z.object({
   userName: z.string(),
@@ -17,7 +18,7 @@ const useLoginApi = () => {
       const serverParams = {
         username: userName,
         password,
-      };
+      } satisfies PostParameters['/login'];
       const data = await authApiService.login(serverParams);
 
       return {
