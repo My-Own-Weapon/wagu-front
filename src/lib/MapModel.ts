@@ -52,6 +52,22 @@ export default class MapModel {
           };
 
           this.kakaoMapInstance = new window.kakao.maps.Map(this.$map, options);
+
+          /* 맵이 로드되고 움직임이 있어야 본인의 프로필이 보이기 때문 */
+          setTimeout(() => {
+            this.kakaoMapInstance.panTo(
+              new window.kakao.maps.LatLng(37.5035585179056, 127.04164711416),
+            );
+
+            setTimeout(() => {
+              this.kakaoMapInstance.panTo(
+                new window.kakao.maps.LatLng(
+                  37.5035685391056,
+                  127.0416472341673,
+                ),
+              );
+            }, 300);
+          }, 500);
           resolve();
         });
       };
