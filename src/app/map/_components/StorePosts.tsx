@@ -9,8 +9,8 @@ import {
 } from '@/components/ui';
 import Heading from '@/components/ui/Heading';
 import useDragScroll from '@/hooks/useDragScroll';
-import { useFetchStorePosts } from '@/feature/post/applications';
 import { colors } from '@/constants/theme';
+import { useGetStorePosts } from '@/feature/post/applications/hooks';
 
 import s from './StorePosts.module.scss';
 
@@ -23,7 +23,7 @@ export default function StorePosts({
   selectedStoreName: storeName,
   selectedStoreId: storeId,
 }: Props) {
-  const { posts } = useFetchStorePosts(storeId);
+  const { posts } = useGetStorePosts(storeId);
   const ref = useDragScroll();
 
   return (
