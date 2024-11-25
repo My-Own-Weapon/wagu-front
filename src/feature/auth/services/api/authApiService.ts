@@ -2,18 +2,13 @@ import ApiService from '@/feature/_lib/ApiService';
 import {
   ApiParameters,
   ApiResponses,
+  GetPathParams,
+  GetResponses,
   PostResponses,
 } from '@/feature/_types/openApiAccess';
 import CheckLoginSessionError from '@/feature/auth/services/api/errors/CheckLoginSessionError';
+import { PickNullable } from '@/types';
 import { z } from 'zod';
-
-const loginServerResponse = z.object({
-  memberUsername: z.string(),
-  memberImage: z.object({
-    id: z.number().optional().nullable(),
-    url: z.string().optional().nullable(),
-  }),
-}) as z.ZodType<Required<PostResponses['/login']>>;
 
 class AuthApiService extends ApiService {
   async login({
@@ -48,7 +43,7 @@ class AuthApiService extends ApiService {
     passwordConfirm,
     name,
     phoneNumber,
-  }: ApiParameters['/join']['POST']): Promise<PostResponses['/join']> {
+  }: Required<ApiParameters['/join']['POST']>) {
     const res = await this.fetcher(`/join`, {
       method: 'POST',
       headers: {
@@ -66,7 +61,7 @@ class AuthApiService extends ApiService {
     return res.text();
   }
 
-  public async checkLoginSession(): Promise<ApiResponses['/session']['GET']> {
+  async checkLoginSession(): Promise<ApiResponses['/session']['GET']> {
     const res = await this.fetcher(
       '/session',
       {
@@ -81,9 +76,45 @@ class AuthApiService extends ApiService {
 
     return res.text();
   }
+
+  async fetchUserProfile({
+    username,
+  }: GetPathParams['/member/{username}/profile']): Promise<ProfileServerResponse> {
+    const res = await this.fetcher(`/member/${username}/profile`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+    const data = await res.json();
+
+    return profileServerResponse.parse(data);
+  }
 }
 
-export const ERROR_MESSAGE = {
+const loginServerResponse = z.object({
+  memberUsername: z.string(),
+  memberImage: z.object({
+    id: z.number().nullable(),
+    url: z.string().nullable(),
+  }),
+}) satisfies z.ZodType<
+  PickNullable<Required<PostResponses['/login']>, 'memberImage'>
+>;
+export type LoginServerResponse = z.infer<typeof loginServerResponse>;
+
+const profileServerResponse = z.object({
+  memberId: z.number(),
+  imageUrl: z.string().nullable(),
+  username: z.string(),
+  name: z.string(),
+}) satisfies z.ZodType<
+  PickNullable<Required<GetResponses['/member/{username}/profile']>, 'imageUrl'>
+>;
+export type ProfileServerResponse = z.infer<typeof profileServerResponse>;
+export const fetchUserProfileParams = z.object({
+  username: z.string(),
+}) satisfies z.ZodType<GetPathParams['/member/{username}/profile']>;
+
+const ERROR_MESSAGE = {
   CHECK_LOGIN_SESSION:
     '로그인 유지 기간이 만료되었습니다. 다시 로그인해주세요.',
 };
