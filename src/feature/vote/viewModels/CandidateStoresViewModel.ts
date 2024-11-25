@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import ViewModel from '@/feature/_lib/ViewModel';
 
-export default class CandidateStoresViewModel extends ViewModel<CandidateStoreViewModelProps> {
+export default class CandidateStoresViewModel extends ViewModel {
   private readonly mainMenuName: string;
   private readonly mainMenuImageUrl: string;
   private readonly storeName: string;
