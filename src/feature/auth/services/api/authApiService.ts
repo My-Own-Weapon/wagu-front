@@ -2,7 +2,6 @@ import ApiService from '@/feature/_lib/ApiService';
 import {
   ApiParameters,
   ApiResponses,
-  GetPathParams,
   GetResponses,
   PostResponses,
 } from '@/feature/_types/openApiAccess';
@@ -33,8 +32,9 @@ class AuthApiService extends ApiService {
       method: 'GET',
       credentials: 'include',
     });
+    const message = await res.text();
 
-    return res.text();
+    return logoutServerResponse.parse(message);
   }
 
   async signup({
@@ -57,8 +57,9 @@ class AuthApiService extends ApiService {
         phoneNumber,
       }),
     });
+    const message = await res.text();
 
-    return res.text();
+    return signupServerResponse.parse(message);
   }
 
   async checkLoginSession(): Promise<ApiResponses['/session']['GET']> {
@@ -73,20 +74,9 @@ class AuthApiService extends ApiService {
         errorMessage: ERROR_MESSAGE.CHECK_LOGIN_SESSION,
       },
     );
+    const message = await res.text();
 
-    return res.text();
-  }
-
-  async fetchUserProfile({
-    username,
-  }: GetPathParams['/member/{username}/profile']): Promise<ProfileServerResponse> {
-    const res = await this.fetcher(`/member/${username}/profile`, {
-      method: 'GET',
-      credentials: 'include',
-    });
-    const data = await res.json();
-
-    return profileServerResponse.parse(data);
+    return checkLoginSessionServerResponse.parse(message);
   }
 }
 
@@ -101,18 +91,22 @@ const loginServerResponse = z.object({
 >;
 export type LoginServerResponse = z.infer<typeof loginServerResponse>;
 
-const profileServerResponse = z.object({
-  memberId: z.number(),
-  imageUrl: z.string().nullable(),
-  username: z.string(),
-  name: z.string(),
-}) satisfies z.ZodType<
-  PickNullable<Required<GetResponses['/member/{username}/profile']>, 'imageUrl'>
+const logoutServerResponse = z.string() satisfies z.ZodType<
+  Required<GetResponses['/logout']>
 >;
-export type ProfileServerResponse = z.infer<typeof profileServerResponse>;
-export const fetchUserProfileParams = z.object({
-  username: z.string(),
-}) satisfies z.ZodType<GetPathParams['/member/{username}/profile']>;
+export type LogoutServerResponse = z.infer<typeof logoutServerResponse>;
+
+const signupServerResponse = z.string() satisfies z.ZodType<
+  Required<PostResponses['/join']>
+>;
+export type SignupServerResponse = z.infer<typeof signupServerResponse>;
+
+const checkLoginSessionServerResponse = z.string() satisfies z.ZodType<
+  Required<GetResponses['/session']>
+>;
+export type CheckLoginSessionServerResponse = z.infer<
+  typeof checkLoginSessionServerResponse
+>;
 
 const ERROR_MESSAGE = {
   CHECK_LOGIN_SESSION:
