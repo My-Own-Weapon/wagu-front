@@ -71,7 +71,12 @@ export const createElementWithAttr = <K extends keyof HTMLElementTagNameMap>(
     /* setAttribute로 사용시 추론이 명확히 되지만 onClick과 같은 핸들러 등록시에 분기문이 많아지기에
        type을 any로 변경하고 코드의 가독성을 높임  */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (el as any)[attr] = attrMap[attr];
+    if (attr === 'style') {
+      Object.assign(el.style, attrMap[attr]);
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (el as any)[attr] = attrMap[attr];
+    }
   });
 
   return el;
@@ -109,4 +114,10 @@ export const removeChild = (
   }
 
   throw new Error('string 또는 HTMLElement만 가능합니다.');
+};
+
+export const isLastIndex = (array: Array<unknown>, index: number) => {
+  if (array.length === 0) return false;
+
+  return index === array.length - 1;
 };
