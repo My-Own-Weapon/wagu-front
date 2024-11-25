@@ -1,7 +1,5 @@
-import UserIcon from '@/components/ui/UserIcon/UserIcon';
 import type { Meta, StoryObj } from '@storybook/react';
-
-import { Fragment } from 'react';
+import UserIcon from '@/components/ui/UserIcon/UserIcon';
 
 const meta = {
   title: 'UI/UserIcon',
