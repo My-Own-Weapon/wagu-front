@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import Image from 'next/image';
-import React, { createContext, useContext, ReactElement } from 'react';
+import React, { createContext, useContext, ReactElement, useMemo } from 'react';
 
 import s from './UserIcon.module.scss';
 
@@ -24,14 +24,11 @@ export default (function UserIcon() {
 interface RootProps extends UserIconContextType {
   children: ReactElement | ReactElement[];
 }
-function UserIcon__Root({
-  children,
-  size = 'medium',
-  shape = 'circle',
-  border = 'none',
-}: RootProps) {
+function UserIcon__Root({ children, size, shape, border = 'none' }: RootProps) {
+  const value = useMemo(() => ({ size, shape, border }), [size, shape, border]);
+
   return (
-    <UserIconContext.Provider value={{ size, shape, border }}>
+    <UserIconContext.Provider value={value}>
       <div className={s.withtextIconContainer}>{children}</div>
     </UserIconContext.Provider>
   );
@@ -46,8 +43,9 @@ function UserIcon__Image({
   alt,
 }: ImageProps) {
   const context = useContext(UserIconContext);
-  if (!context)
+  if (!context) {
     throw new Error('UserIcon.Image must be used within UserIcon.Root');
+  }
 
   const { size, shape, border } = context;
 

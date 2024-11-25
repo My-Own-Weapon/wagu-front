@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { VoteWinnerStoreViewModel } from '@/feature/vote/viewModels';
+import { WinnerStoreViewModel } from '@/feature/vote/viewModels';
 import WinnerStoreCard from './WinnerStoreCard';
 
 interface StoryArgs {
-  viewModel?: VoteWinnerStoreViewModel;
+  viewModel?: WinnerStoreViewModel;
   storeName: string;
   mainMenuName: string;
 }
@@ -54,12 +54,11 @@ export const Default: Story = {
     viewModel: undefined,
   },
   render: (args) => {
-    const viewModel = new VoteWinnerStoreViewModel({
+    const viewModel = new WinnerStoreViewModel({
       storeId: 1,
       storeName: args.storeName,
       mainMenuImageUrl: 'https://picsum.photos/400/300',
       mainMenuName: args.mainMenuName,
-      storePostCount: 10,
     });
 
     return <WinnerStoreCard viewModel={viewModel} />;
@@ -72,12 +71,11 @@ export const LongText: Story = {
     mainMenuName: '매우 긴 메뉴 이름을 가진 시그니처 메뉴',
   },
   render: (args) => {
-    const viewModel = new VoteWinnerStoreViewModel({
+    const viewModel = new WinnerStoreViewModel({
       storeId: 2,
       mainMenuImageUrl: 'https://picsum.photos/400/300',
       storeName: args.storeName,
       mainMenuName: args.mainMenuName,
-      storePostCount: 10,
     });
 
     return <WinnerStoreCard viewModel={viewModel} />;
