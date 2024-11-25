@@ -54,7 +54,7 @@
     "no-plusplus": "error",
     // "operator-linebreak": ["error", "after"], // airbnb와 충돌
     "no-extra-boolean-cast": "off",
-    "no-case-declarations": "error",
+    "no-case-declarations": "warn",
     "no-unneeded-ternary": "error",
     "no-nested-ternary": "error",
     "no-mixed-operators": "off", // 프리티어와 충돌 -> 프리티어가 지속적으로 괄호를 삭제함(1.13 버전에서 수정되었지만 결국 현재 버전에서는 괄호를 삭제함)
@@ -87,28 +87,40 @@
     "no-dupe-class-members": "off",
     "react/require-default-props": [2, { "functions": "defaultArguments" }],
     "func-names": ["error", "as-needed"],
-    "no-shadow": [
-      "error",
-      {
-        "hoist": "functions",
-        "ignoreOnInitialization": true,
-        "allow": [
-          "resolve",
-          "reject",
-          "done",
-          "next",
-          "err",
-          "error",
-          "query",
-          "fontWeight",
-          "colors"
-        ]
-      }
-    ],
+    // "no-shadow": [
+    //   "error",
+    //   {
+    //     "hoist": "functions",
+    //     "ignoreOnInitialization": true,
+    //     "allow": [
+    //       "resolve",
+    //       "reject",
+    //       "done",
+    //       "next",
+    //       "err",
+    //       "error",
+    //       "query",
+    //       "fontWeight",
+    //       "colors"
+    //     ]
+    //   }
+    // ],
+    "no-shadow": "off", // for enum bug (ex: is aleady declared upper scope)
     /* ✅ TODO : remove */
     "no-alert": "off",
     /* https://typescript-eslint.io/troubleshooting/faqs/general/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors */
-    "no-undef": "off"
+    "no-undef": "off",
+
+    /* 클래스 멤버변수는 빈줄 없이, 메서드는 빈줄 있게 */
+    "lines-between-class-members": [
+      "error",
+      {
+        "enforce": [
+          { "blankLine": "never", "prev": "field", "next": "field" },
+          { "blankLine": "always", "prev": "method", "next": "method" }
+        ]
+      }
+    ]
   },
   "overrides": [
     {
