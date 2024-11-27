@@ -93,7 +93,7 @@ export default function SharePage() {
   const userMarkers = useRef<Map<string, any>>(new Map());
 
   /* openvidu */
-  const { subscribers } = useJoinVoiceCall({ sessionId });
+  const { subscribers } = useJoinVoiceCall(sessionId);
 
   /* local state */
   const [selectedStoreId, setSelectedStoreId] = useState<number>();
@@ -193,8 +193,8 @@ export default function SharePage() {
 
     sendMessage('userLocation', { userName, lat, lng });
   };
-  const debouncedSendLocation = useDebounce(sendLocation, 500);
 
+  const debouncedSendLocation = useDebounce(sendLocation, 500);
   useEffect(() => {
     if (status === 'OPEN' && mapModelRef.current?.kakaoMapInstance) {
       window.kakao.maps.event.addListener(

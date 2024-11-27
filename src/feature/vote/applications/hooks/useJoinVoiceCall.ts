@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { OpenVidu, Publisher, StreamEvent, Subscriber } from 'openvidu-browser';
 import { useGetRTCConnectionToken } from '@/feature/webRTC/applications/hooks';
 import { localStorageApi } from '@/services/localStorageApi';
 
-const useJoinVoiceCall = ({ sessionId }: { sessionId: string }) => {
+const useJoinVoiceCall = (sessionId: string) => {
   const [openVidu] = useState(() => new OpenVidu());
   const [ovSession] = useState(() => openVidu.initSession());
-  const [publisher, setPublisher] = useState<Publisher>();
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
+  const publisherRef = useRef<Publisher>();
 
   const { getConnectionToken } = useGetRTCConnectionToken();
 
@@ -43,12 +43,12 @@ const useJoinVoiceCall = ({ sessionId }: { sessionId: string }) => {
         });
 
         ovSession.publish(publisher);
-        setPublisher(publisher);
+        publisherRef.current = publisher;
       } catch (error) {
         console.error('세션 연결 중 오류 발생:', (error as Error).message);
       }
     },
-    [getConnectionToken, ovSession, openVidu],
+    [getConnectionToken, openVidu, ovSession],
   );
 
   const leaveVoiceCall = useCallback(() => {
@@ -56,6 +56,7 @@ const useJoinVoiceCall = ({ sessionId }: { sessionId: string }) => {
       ovSession.disconnect();
     }
 
+    const publisher = publisherRef.current;
     if (publisher) {
       const mediaStream = publisher.stream.getMediaStream();
       if (mediaStream && mediaStream.getTracks) {
@@ -63,25 +64,25 @@ const useJoinVoiceCall = ({ sessionId }: { sessionId: string }) => {
       }
     }
 
-    setSubscribers(() => []);
-    setPublisher(undefined);
-  }, [ovSession, publisher]);
+    setSubscribers([]);
+    publisherRef.current = undefined;
+  }, [ovSession]);
 
   useEffect(() => {
     joinVoiceCall(sessionId);
 
-    window.addEventListener('beforeunload', () => {
-      leaveVoiceCall();
-    });
+    window.addEventListener('beforeunload', leaveVoiceCall);
 
     return () => {
-      window.removeEventListener('beforeunload', () => {
-        leaveVoiceCall();
-      });
-    };
-  }, [joinVoiceCall, leaveVoiceCall, sessionId]);
+      leaveVoiceCall();
+      ovSession.off('streamCreated');
+      ovSession.off('streamDestroyed');
 
-  return { publisher, subscribers };
+      window.removeEventListener('beforeunload', leaveVoiceCall);
+    };
+  }, [joinVoiceCall, leaveVoiceCall, ovSession, sessionId]);
+
+  return { publisher: publisherRef.current, subscribers };
 };
 
 export default useJoinVoiceCall;
