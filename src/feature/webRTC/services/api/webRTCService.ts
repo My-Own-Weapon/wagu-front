@@ -6,7 +6,7 @@ import ApiService from '@/services/apiService';
 class WebRTCService extends ApiService {
   async fetchConnectionToken(
     sessionId: RTCSessionId,
-  ): Promise<FetchConnectionTokenData> {
+  ): Promise<FetchConnectionTokenSchma> {
     const res = await this.fetcher(
       `/api/sessions/${sessionId}/connections/voice`,
       {
@@ -32,6 +32,8 @@ const fetchConnectionTokenSchema = z.object({
   token: z.string(),
   memberId: z.number(),
 });
-type FetchConnectionTokenData = z.infer<typeof fetchConnectionTokenSchema>;
+export type FetchConnectionTokenSchma = z.infer<
+  typeof fetchConnectionTokenSchema
+>;
 
 export const webRTCService = new WebRTCService();

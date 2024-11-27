@@ -1,9 +1,12 @@
 import { RTCSessionId } from '@/feature/_types';
-import { useFetchConnectionToken } from '@/feature/webRTC/services/hooks';
+import webRTCOptions from '@/feature/webRTC/services/options/mutations';
+import { useMutation } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
 const useGetRTCConnectionToken = () => {
-  const { mutateAsync } = useFetchConnectionToken();
+  const { mutateAsync } = useMutation(
+    webRTCOptions.mutation.fetchConnectionToken,
+  );
 
   const getConnectionToken = useCallback(
     (sessionId: RTCSessionId) => {
