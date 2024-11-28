@@ -14,6 +14,7 @@
     "test:run": "vitest run",
     "lint:css": "stylelint 'src/**/*.{css,scss}' --fix",
     "generate:theme": "node ./generateColors.cjs",
+    "generate:types": "npx openapi-typescript https://wagubook.shop:8080/v3/api-docs.yaml -o ./src/feature/_types/openApi.ts",
     "playwright:ui": "REACT_QEURY_SHOW_DEV_TOOLS=false npx playwright test --ui"
   },
   "dependencies": {
