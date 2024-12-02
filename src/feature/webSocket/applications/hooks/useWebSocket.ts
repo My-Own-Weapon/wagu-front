@@ -9,9 +9,8 @@ enum ServerProtocolType {
 }
 type WebSocketStatus = 'CONNECTING' | 'OPEN' | 'CLOSING' | 'CLOSED';
 
-interface UseWebSocketProps<THandlers> {
+interface UseWebSocketProps {
   sessionId: WebSocketSessionId;
-  messageHandlers: THandlers;
 }
 
 interface WebSocketMessage {
@@ -25,11 +24,7 @@ interface WebSocketMessage {
   };
 }
 
-const useWebSocket = <
-  THandlers extends Record<string, (...args: unknown[]) => unknown>,
->({
-  sessionId,
-}: UseWebSocketProps<THandlers>) => {
+const useWebSocket = ({ sessionId }: UseWebSocketProps) => {
   const [status, setStatus] = useState<WebSocketStatus>('CLOSED');
   const webSocketRef = useRef<WebSocket | null>(null);
   const sendMessageRef = useRef<ReturnType<typeof curriedSendMessage>>();
@@ -44,7 +39,7 @@ const useWebSocket = <
       ws.addEventListener('open', () => {
         console.log('WebSocket open');
 
-        sendMessageRef.current = curriedSendMessage<THandlers>(sessionId, ws);
+        sendMessageRef.current = curriedSendMessage(sessionId, ws);
         setStatus('OPEN');
         sendMessageRef.current(
           'socket-init',
@@ -127,15 +122,10 @@ const useWebSocket = <
   return value;
 };
 
-const curriedSendMessage = <
-  THandlers extends Record<string, (...args: unknown[]) => unknown>,
->(
-  sessionId: string,
-  webSocket: WebSocket,
-) => {
+const curriedSendMessage = (sessionId: string, webSocket: WebSocket) => {
   return (
-    payloadType: keyof THandlers,
-    payload: Parameters<THandlers[typeof payloadType]>[0],
+    payloadType: string,
+    payload: unknown,
     serverProtocolType: ServerProtocolType = ServerProtocolType.CHAT,
   ) => {
     if (webSocket.readyState === WebSocket.OPEN) {
