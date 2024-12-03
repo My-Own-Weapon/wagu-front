@@ -18,7 +18,7 @@ export default function MainHeader() {
   const handleClickLogout: MouseEventHandler<HTMLButtonElement> = async () => {
     try {
       await apiService.logout();
-      localStorageApi.setName('');
+      localStorageApi.setUserFullName('');
       router.push('/login');
     } catch (e) {
       if (e instanceof Error) {

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { CandidateStoresViewModel } from '@/feature/vote/viewModels';
-import { CandidateStore } from '@/components/domain/vote';
+import { CandidateStore } from '@/components/feature/vote';
 import { Spacing } from '@/components/ui';
 import { Fragment } from 'react';
 

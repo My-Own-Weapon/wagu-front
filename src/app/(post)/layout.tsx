@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
-import { CheckLoginSessionProvider } from '@/components/context';
+
+import { CheckLoginSessionProvider } from '@/feature/auth/context';
 
 export default function Layout({
   children,

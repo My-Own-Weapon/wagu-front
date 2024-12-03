@@ -7,7 +7,7 @@ import { StoreResponse } from '@/types';
 import StorePosts from '@/app/map/_components/StorePosts';
 import { BoxButton, Heading, Spacing } from '@/components/ui';
 import { useBoundaryStores, useKakaoMap } from '@/hooks/domains';
-import { Map, OnLiveFollowingsAtStore } from '@/components/domain';
+import { Map, OnLiveFollowingsAtStore } from '@/components/feature';
 
 import s from './page.module.scss';
 
@@ -64,7 +64,12 @@ export default function MapPage() {
         )}
       </div>
       <div className={s.urlButtonContainer}>
-        <BoxButton height="48px" styleType="fill" onClick={toggleModalOpen}>
+        <BoxButton
+          height="48px"
+          styleType="fill"
+          onClick={toggleModalOpen}
+          data-testid="create-vote-url-button"
+        >
           함께 투표 링크 생성
         </BoxButton>
       </div>

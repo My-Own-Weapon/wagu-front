@@ -5,7 +5,7 @@ import {
   useGetCandidateStores,
   useRemoveCandidateStore,
 } from '@/feature/vote/applications/hooks';
-import { CandidateStore } from '@/components/domain/vote';
+import { CandidateStore } from '@/components/feature/vote';
 import { RTCSessionId } from '@/feature/_types';
 import { isLastIndex } from '@/utils';
 
@@ -16,7 +16,9 @@ export default function CandidateStores({
 }) {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <CandidateStoreList sessionId={sessionId} />
+      <div data-testid="nominate-stores">
+        <CandidateStoreList sessionId={sessionId} />
+      </div>
     </Suspense>
   );
 }
