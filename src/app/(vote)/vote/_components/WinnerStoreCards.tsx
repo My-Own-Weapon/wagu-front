@@ -1,4 +1,4 @@
-import { WinnerStoreCard } from '@/components/domain/vote';
+import { WinnerStoreCard } from '@/components/feature/vote';
 import { useGetWinnerStores } from '@/feature/vote/applications/hooks';
 import { Spacing } from '@/components/ui';
 import { isLastIndex } from '@/utils';

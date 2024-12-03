@@ -8,7 +8,7 @@ import { MouseEvent, MouseEventHandler, useReducer } from 'react';
 import { NextImageWithCover } from '@/components/ui';
 import { VotedStoreResponse } from '@/types';
 import useGetCandidateStores from '@/feature/vote/applications/hooks/useGetCandidateStores';
-import { CandidateStore } from '@/components/domain/vote';
+import { CandidateStore } from '@/components/feature/vote';
 
 import s from './StoreCard.module.scss';
 
