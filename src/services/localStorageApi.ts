@@ -3,9 +3,9 @@
 'use client';
 
 class LocalStorage {
-  private NAME = 'fullName';
-  private USERNAME = 'useName';
-  private PROFILE_IMAGE = 'profileImage';
+  private USER_FULL_NAME = 'user_full_name';
+  private USER_NAME = 'user_name';
+  private PROFILE_IMAGE = 'profile_image';
 
   private saveGet(key: string) {
     if (typeof window === 'undefined') return null;
@@ -20,19 +20,19 @@ class LocalStorage {
   }
 
   getUserName() {
-    return this.saveGet(this.USERNAME);
+    return this.saveGet(this.USER_NAME);
   }
 
   setUserName(name: string) {
-    this.saveSet(this.USERNAME, name);
+    this.saveSet(this.USER_NAME, name);
   }
 
-  getName() {
-    return this.saveGet(this.NAME);
+  getUserFullName() {
+    return this.saveGet(this.USER_FULL_NAME);
   }
 
-  setName(name: string) {
-    this.saveSet(this.NAME, name);
+  setUserFullName(name: string) {
+    this.saveSet(this.USER_FULL_NAME, name);
   }
 
   getProfileImage() {
