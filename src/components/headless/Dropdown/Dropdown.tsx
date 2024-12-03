@@ -1,4 +1,5 @@
 import React, {
+  ComponentProps,
   createContext,
   useContext,
   useEffect,
@@ -35,12 +36,14 @@ function Dropdown({ children }: { children: React.ReactNode }) {
   );
 }
 
+interface TriggerProps extends ComponentProps<'button'> {
+  children: React.ReactNode;
+}
+
 Dropdown.Trigger = function Dropdown__Trigger({
   children,
   ...rest
-}: {
-  children: React.ReactNode;
-}) {
+}: TriggerProps) {
   const { isOpen, setIsOpen, $trigger } = useDropdownContext();
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLButtonElement> = (e) => {
@@ -107,12 +110,13 @@ Dropdown.Portal = function Dropdown__Portal({
   );
 };
 
+interface ContentProps extends ComponentProps<'ul'> {
+  children: React.ReactNode;
+}
 Dropdown.Content = function Dropdown__Content({
   children,
   ...rest
-}: {
-  children: React.ReactNode;
-}) {
+}: ContentProps) {
   const { isOpen, setIsOpen, $trigger } = useDropdownContext();
   const $content = useRef<HTMLUListElement>(null);
   const focusIndex = useRef(-1);
@@ -224,16 +228,17 @@ Dropdown.Content = function Dropdown__Content({
   );
 };
 
+interface ItemProps extends ComponentProps<'li'> {
+  children: React.ReactNode;
+  onSelect?: (e: React.MouseEvent<HTMLLIElement>) => unknown;
+  disabled?: boolean;
+}
 Dropdown.Item = function Dropdown__Item({
   children,
   onSelect = undefined,
   disabled = false,
   ...rest
-}: {
-  children: React.ReactNode;
-  onSelect?: React.MouseEventHandler<HTMLLIElement>;
-  disabled?: boolean;
-}) {
+}: ItemProps) {
   const { setIsOpen } = useDropdownContext();
 
   const handleClick = (event: React.MouseEvent<HTMLLIElement>) => {

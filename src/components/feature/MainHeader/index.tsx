@@ -1,13 +1,14 @@
 'use client';
 
-import { MouseEventHandler } from 'react';
-
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSelectedLayoutSegment } from 'next/navigation';
 
 import { localStorageApi } from '@/services/localStorageApi';
 import { apiService } from '@/services/apiService';
+import Dropdown from '@/components/headless/Dropdown/Dropdown';
+import { colors } from '@/constants/theme';
+import { Stack, Text, Flex } from '@/components/ui';
 
 import s from './index.module.scss';
 
@@ -15,7 +16,7 @@ export default function MainHeader() {
   const router = useRouter();
   const segment = useSelectedLayoutSegment();
 
-  const handleClickLogout: MouseEventHandler<HTMLButtonElement> = async () => {
+  const handleLogoutClick = async () => {
     try {
       await apiService.logout();
       localStorageApi.setUserFullName('');
@@ -27,17 +28,21 @@ export default function MainHeader() {
     }
   };
 
+  const handleMyPageClick = () => {
+    alert('마이페이지 기능이 아직 준비되지 않았어요.');
+  };
+
   return (
     <header
       className={s.container}
       style={segment === 'search' ? { backgroundColor: '#1c0a00' } : {}}
     >
-      <div>
-        <Link href="/">
-          <p className={s.logoTitle}>WAGU BOOK</p>
-        </Link>
-      </div>
-      <div className={s.navBtnArea}>
+      <Link href="/">
+        <Text fontSize="big" fontWeight="regular" color={colors.primary}>
+          WAGU BOOK
+        </Text>
+      </Link>
+      <Flex justifyContent="center" gap={16}>
         {segment !== 'search' ? (
           <Link href="/search">
             <Image
@@ -55,36 +60,84 @@ export default function MainHeader() {
             }}
           />
         )}
-        <div className={s.profileContainer}>
-          <Image
-            className={s.profileIcon}
-            src="/newDesign/nav/user_profile.svg"
-            alt="profile-btn"
-            width={24}
-            height={24}
-          />
-          <div className={s.dropdownMenu}>
-            <Link className={s.myPage} href="/profile">
-              마이페이지
-            </Link>
-            <div className={s.logout}>
-              <button
-                type="button"
-                className={s.logoutBtn}
-                onClick={handleClickLogout}
-              >
-                <p className={s.text}>로그아웃</p>
-              </button>
-              <Image
-                src="/newDesign/sign_out.svg"
-                alt="arrow-down"
-                width={20}
-                height={20}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+        <Dropdown>
+          <Dropdown.Trigger
+            style={{
+              backgroundColor: 'transparent',
+              margin: 0,
+              padding: 0,
+            }}
+          >
+            <Image
+              style={{
+                cursor: 'pointer',
+              }}
+              src="/newDesign/nav/user_profile.svg"
+              alt="profile-btn"
+              width={24}
+              height={24}
+            />
+          </Dropdown.Trigger>
+          <Dropdown.Portal offsetX={-80} offsetY={8}>
+            <Dropdown.Content style={STYLE.dropdownContent}>
+              <Stack>
+                <Dropdown.Item
+                  style={STYLE.dropDownItem}
+                  onSelect={handleMyPageClick}
+                >
+                  <Flex
+                    style={STYLE.dropDownItem}
+                    justifyContent="center"
+                    alignItems="center"
+                  >
+                    <Text
+                      fontSize="medium"
+                      fontWeight="medium"
+                      color={colors.grayBlue800}
+                    >
+                      마이페이지
+                    </Text>
+                  </Flex>
+                </Dropdown.Item>
+                <Dropdown.Item
+                  style={STYLE.dropDownItem}
+                  onSelect={handleLogoutClick}
+                >
+                  <Flex
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                    }}
+                    justifyContent="center"
+                    alignItems="center"
+                  >
+                    <Text
+                      fontSize="medium"
+                      fontWeight="medium"
+                      color={colors.grayBlue800}
+                    >
+                      로그아웃
+                    </Text>
+                  </Flex>
+                </Dropdown.Item>
+              </Stack>
+            </Dropdown.Content>
+          </Dropdown.Portal>
+        </Dropdown>
+      </Flex>
     </header>
   );
 }
+
+const STYLE = {
+  dropdownContent: {
+    width: '100px',
+    backgroundColor: colors.white,
+    borderRadius: '4px',
+    boxShadow: '0 4px 8px rgb(0 0 0 / 10%)',
+  },
+  dropDownItem: {
+    height: 40,
+    cursor: 'pointer',
+  },
+};
