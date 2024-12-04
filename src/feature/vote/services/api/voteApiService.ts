@@ -142,7 +142,7 @@ class VoteApiService extends ApiService {
   /**
    * @description 후보자 목록에서 투표한 후보자 투표 취소
    */
-  async cancelVoteStore(
+  async removeVotedStore(
     sessionId: PatchPathParams['/share/{url}/vote']['url'],
     storeId: PatchQueryParams['/share/{url}/vote']['store_id'],
   ): Promise<CancelVoteStoreSchema> {
