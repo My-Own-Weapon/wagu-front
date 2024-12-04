@@ -10,7 +10,7 @@
 'use client';
 
 import { OpenVidu } from 'openvidu-browser';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
@@ -34,6 +34,7 @@ export default function StreamingPage({ params }) {
   const [subscribers, setSubscribers] = useState([]);
   const [publisher, setPublisher] = useState(undefined);
   const [currentVideoDevice, setCurrentVideoDevice] = useState(undefined);
+  const chatBoxRef = useRef(null);
 
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
@@ -216,6 +217,12 @@ export default function StreamingPage({ params }) {
     };
   }, [handleLeaveSessionClick]);
 
+  useEffect(() => {
+    if (chatBoxRef.current) {
+      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+    }
+  }, [messages]);
+
   return (
     <>
       <LiveHeader
@@ -237,7 +244,7 @@ export default function StreamingPage({ params }) {
           )}
         </div>
         <div className={s.chatBoxContianer}>
-          <div className={s.chatBoxWrapper}>
+          <div className={s.chatBoxWrapper} ref={chatBoxRef}>
             {messages.map(({ user, text }, i) => {
               const userName = JSON.parse(user).clientData;
 

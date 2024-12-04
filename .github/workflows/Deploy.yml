@@ -46,6 +46,10 @@ jobs:
       - name: create theme.ts
         run: npm run generate:theme
 
+      # generate openApi-ts types
+      - name: generate openApi-ts types
+        run: npm run generate:types
+
       # 프로젝트 빌드.
       - name: Build next app
         run: npm run build

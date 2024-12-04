@@ -8,7 +8,7 @@ import { MouseEvent, MouseEventHandler, useReducer } from 'react';
 import { NextImageWithCover } from '@/components/ui';
 import { VotedStoreResponse } from '@/types';
 import useGetCandidateStores from '@/feature/vote/applications/hooks/useGetCandidateStores';
-import { CandidateStore } from '@/components/domain/vote';
+import { CandidateStore } from '@/components/feature/vote';
 
 import s from './StoreCard.module.scss';
 
@@ -89,77 +89,5 @@ export function CandidateStoreList({
         />
       ))}
     </ul>
-  );
-}
-
-export function VotableStoreCards({
-  stores,
-  handleAddVote,
-  handleDeleteVote,
-}: {
-  stores: Store[];
-  handleAddVote: MouseEventHandler;
-  handleDeleteVote: MouseEventHandler;
-}) {
-  return (
-    <ul className={s.votableCardsContainer}>
-      {stores.map((store) => (
-        <VotableStoreCard
-          key={store.storeId}
-          store={store}
-          handleAddVote={handleAddVote}
-          handleDeleteVote={handleDeleteVote}
-        />
-      ))}
-    </ul>
-  );
-}
-
-export function VotableStoreCard({
-  store,
-  handleAddVote,
-  handleDeleteVote,
-}: {
-  store: Store;
-  handleAddVote: (e: MouseEvent) => void;
-  handleDeleteVote: (e: MouseEvent) => void;
-}) {
-  const [isVoted, toggleVoted] = useReducer((prev) => !prev, false);
-  const { storeId } = store;
-
-  return (
-    <li
-      className={s.votableStoreCardContainer}
-      style={{
-        opacity: isVoted ? 1 : 0.6,
-      }}
-    >
-      <button
-        className={s.voteWrapperBtn}
-        type="button"
-        data-store-id={storeId}
-        onClick={
-          isVoted
-            ? (e) => {
-                handleDeleteVote(e);
-                toggleVoted();
-              }
-            : (e) => {
-                handleAddVote(e);
-              }
-        }
-      >
-        <NextImageWithCover
-          src={store.menuImage.url}
-          alt="store-img"
-          height="140px"
-          borderRadius="8px"
-        />
-        <div className={s.storeInfoArea}>
-          <p className={s.storeName}>{store.storeName}</p>
-          <p className={s.menuName}>{store.menuName}</p>
-        </div>
-      </button>
-    </li>
   );
 }

@@ -62,6 +62,12 @@
       padding: 0 24px;
       overflow: auto;
 
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      -ms-overflow-style: none; /* IE and Edge */
+      scrollbar-width: none; /* Firefox */
+
       .chatArea {
         position: relative;
 
@@ -90,6 +96,12 @@
 
           margin-left: 40px;
           overflow-y: auto;
+
+          &::-webkit-scrollbar {
+            display: none;
+          }
+          -ms-overflow-style: none;
+          scrollbar-width: none;
 
           .userName {
             font-size: $textMedium;
