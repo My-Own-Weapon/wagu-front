@@ -65,3 +65,15 @@ export const Shapes: Story = {
     </div>
   ),
 };
+
+export const WithTextballoon: Story = {
+  render: () => (
+    <UserIcon.Root size="medium" shape="circle">
+      <UserIcon.Textballoon />
+      <UserIcon.Image alt="사용자 아이콘" />
+      <UserIcon.Text fontSize="small" color="black">
+        사용자 이름
+      </UserIcon.Text>
+    </UserIcon.Root>
+  ),
+};
