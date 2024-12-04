@@ -1,0 +1,101 @@
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/radius.scss';
+@import '@styles/variables/textSize.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/zIndex.scss';
+@import '@styles/mixins/index.scss';
+
+.addVoteContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  background: $bgWhite;
+
+  .top {
+    position: relative;
+    width: 100%;
+
+    .map {
+      position: relative;
+
+      width: 100%;
+      height: 480px;
+    }
+
+    .userContainer {
+      position: absolute;
+      z-index: 1;
+      bottom: 64px;
+      left: 24px;
+
+      width: auto;
+
+      @include flexCenter;
+      gap: 16px;
+    }
+  }
+
+  .bottom {
+    position: absolute;
+    top: 424px;
+    right: 0;
+    left: 0;
+    z-index: 1;
+    overflow: hidden;
+
+    padding: 24px 24px 152px;
+
+    background-color: $white;
+    border-radius: 24px 24px 0;
+
+    .navUpperBtnContainer {
+      position: fixed;
+      z-index: $footer;
+      bottom: 0;
+      left: 0;
+      right: 0;
+
+      max-width: calc(410px - 48px);
+      height: 60px;
+
+      margin: 0 auto 60px;
+      padding: 16px 24px 0 24px;
+
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+
+      background-color: $white;
+
+      .startVoteBtn {
+        width: 100%;
+        height: 48px;
+        background: $primaryOrange;
+        border: none;
+        border-radius: 8px;
+
+        color: $white;
+        font-size: $textLarge;
+        font-weight: $semiBold;
+        letter-spacing: -0.025em;
+      }
+
+      .addVoteListBtn {
+        width: 100%;
+        height: 48px;
+        background: $white;
+        border: 1px solid $primaryOrange;
+        border-radius: 8px;
+
+        color: $primaryOrange;
+        font-size: $textLarge;
+        font-weight: $semiBold;
+        letter-spacing: -0.025em;
+      }
+    }
+  }
+}

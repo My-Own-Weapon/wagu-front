@@ -1,0 +1,33 @@
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/radius.scss';
+@import '@styles/variables/textSize.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/zIndex.scss';
+@import '@styles/mixins/index.scss';
+
+@import url('https://fonts.cdnfonts.com/css/nats');
+
+.resultHeaderContainer {
+  position: sticky;
+
+  padding: 0 24px;
+  height: 60px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background-color: $bgBrown;
+
+  .logoTitle {
+    color: $primaryOrange;
+    font-family: 'NATS', sans-serif;
+    font-size: $textTitle;
+    font-weight: $regular;
+  }
+
+  .navBtnArea {
+    @include flexCenter;
+    gap: 16px;
+  }
+}
