@@ -1,7 +1,6 @@
 'use client';
 
-import { BoxButton } from '@/components/ui';
-import { useEffect, useReducer, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 /**
  * ⛔️ mobile device에서 카메라 접근은 확인했습니다.
@@ -12,9 +11,8 @@ import { useEffect, useReducer, useRef } from 'react';
  *
  * ✅ TODO : custom hook을 분리한다.
  */
-export default function Camera() {
+export default function Camera({ isCameraOn }: { isCameraOn: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isCameraOn, toggleCamera] = useReducer((state) => !state, false);
 
   useEffect(() => {
     const initCamera = async () => {
@@ -42,47 +40,41 @@ export default function Camera() {
     };
   }, [isCameraOn]);
 
-  useEffect(() => {
-    if (!videoRef.current) return;
-
-    const userAgent = navigator.userAgent;
-    if (userAgent.indexOf('Mobile') > -1) {
-      videoRef.current.style.left = '-40px';
-    } else {
-      videoRef.current.style.left = '-410px';
-    }
-  }, [isCameraOn]);
-
-  const handleClickCameraOnOff = () => {
-    toggleCamera();
-  };
-
   return (
     <div
       style={{
         position: 'relative',
         width: '100%',
+        height: '400px',
+        overflow: 'hidden',
+        ...(isCameraOn ? STYLE.CONTAINER.CAMERA_ON : {}),
       }}
     >
       {isCameraOn ? (
         <video
           style={{
             position: 'absolute',
-            left: '-410px',
-            height: '100dvh',
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
           }}
           ref={videoRef}
           autoPlay
           muted
         />
       ) : null}
-
-      <BoxButton onClick={handleClickCameraOnOff} styleType="outline">
-        {isCameraOn ? '카메라 테스트 종료' : '카메라 테스트 시작'}
-      </BoxButton>
     </div>
   );
 }
+
+const STYLE = {
+  CONTAINER: {
+    CAMERA_ON: {
+      borderRadius: '16px',
+      boxShadow: '8px 8px 16px 0px rgba(0, 0, 0, 0.20)',
+    },
+  },
+};
 
 /**
  *  ✅ TODO: file 시스템을 이용해서 mobile device에서 카메라 접근을 확인했으나
