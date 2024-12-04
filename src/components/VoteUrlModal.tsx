@@ -37,7 +37,8 @@ export default function VoteUrlModal({
       const sessionId = await apiService.createShareMapRandomSessionId();
       await apiService.publishShareMapSession(sessionId);
 
-      setVoteUrl(`${BASE_URL}/vote?sessionId=${sessionId}`);
+      // setVoteUrl(`${BASE_URL}/vote?sessionId=${sessionId}`);
+      setVoteUrl(`${BASE_URL}/vote/${sessionId}/nominatePhase`);
     };
 
     createVoteUrl();
@@ -80,8 +81,9 @@ export default function VoteUrlModal({
           <div
             className={s.urlBox}
             onClick={() => handleShareMapUrlClick(voteUrl)}
+            data-testid="navigate-vote-url-button"
           >
-            {voteUrl}
+            <p>{voteUrl}</p>
           </div>
           <NextImageWithCover
             src="/newDesign/share_url_hand.svg"

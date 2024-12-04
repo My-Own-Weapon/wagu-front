@@ -70,6 +70,7 @@
       }
 
       .urlBox {
+        max-width: 240px;
         padding: 12px 24px;
 
         font-size: $textLarge;
@@ -83,6 +84,10 @@
         border: 0.5px solid $gray400;
         border-radius: $radiusMedium;
         box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+
+        p {
+          word-break: break-all;
+        }
       }
 
       .shareButton {
