@@ -6,7 +6,7 @@ import {
 import { create } from 'zustand';
 
 interface UseSelectedStore {
-  selectedStore: StoreResponse | null;
+  selectedStore?: StoreResponse;
   setSelectedStore: (selectedStore: StoreResponse) => void;
 }
 
@@ -21,7 +21,7 @@ interface UseVotedStore {
 }
 
 export const useSelectedStore = create<UseSelectedStore>((set) => ({
-  selectedStore: null,
+  selectedStore: undefined,
   setSelectedStore: (selectedStore: StoreResponse) => set({ selectedStore }),
 }));
 
