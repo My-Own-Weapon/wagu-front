@@ -1,0 +1,20 @@
+@import 'https://fonts.cdnfonts.com/css/nats';
+@import '@styles/variables/colors.scss';
+
+.container {
+  position: sticky;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  height: 60px;
+  padding: 0 24px;
+
+  background-color: $bgBrown;
+
+  .logoTitle {
+    font-family: NATS, sans-serif;
+  }
+}

@@ -1,4 +1,5 @@
 import React, {
+  ComponentProps,
   createContext,
   useContext,
   useEffect,
@@ -12,7 +13,7 @@ import { zIndex } from '@/constants/theme';
 const DropdownContext = createContext<{
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  $trigger: React.RefObject<HTMLButtonElement>;
+  $triggerRef: React.RefObject<HTMLButtonElement>;
 } | null>(null);
 
 export const useDropdownContext = () => {
@@ -25,8 +26,8 @@ export const useDropdownContext = () => {
 
 function Dropdown({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
-  const $trigger = useRef<HTMLButtonElement>(null);
-  const value = useMemo(() => ({ isOpen, setIsOpen, $trigger }), [isOpen]);
+  const $triggerRef = useRef<HTMLButtonElement>(null);
+  const value = useMemo(() => ({ isOpen, setIsOpen, $triggerRef }), [isOpen]);
 
   return (
     <DropdownContext.Provider value={value}>
@@ -35,13 +36,15 @@ function Dropdown({ children }: { children: React.ReactNode }) {
   );
 }
 
+interface TriggerProps extends ComponentProps<'button'> {
+  children: React.ReactNode;
+}
+
 Dropdown.Trigger = function Dropdown__Trigger({
   children,
   ...rest
-}: {
-  children: React.ReactNode;
-}) {
-  const { isOpen, setIsOpen, $trigger } = useDropdownContext();
+}: TriggerProps) {
+  const { isOpen, setIsOpen, $triggerRef } = useDropdownContext();
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault();
@@ -53,7 +56,9 @@ Dropdown.Trigger = function Dropdown__Trigger({
   };
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (e) => {
-    if (isOpen && $trigger.current === e.target) {
+    const $trigger = $triggerRef.current;
+
+    if (isOpen && $trigger?.contains(e.target as Node)) {
       setIsOpen(false);
       return;
     }
@@ -63,7 +68,7 @@ Dropdown.Trigger = function Dropdown__Trigger({
 
   return (
     <button
-      ref={$trigger}
+      ref={$triggerRef}
       type="button"
       onClick={handleClick}
       onKeyDown={handleKeyDown}
@@ -86,9 +91,9 @@ Dropdown.Portal = function Dropdown__Portal({
   offsetY?: number;
   children: React.ReactNode;
 }) {
-  const { isOpen, $trigger } = useDropdownContext();
+  const { isOpen, $triggerRef } = useDropdownContext();
 
-  const triggerRect = $trigger.current?.getBoundingClientRect();
+  const triggerRect = $triggerRef.current?.getBoundingClientRect();
   if (!triggerRect) return null;
 
   return (
@@ -107,33 +112,37 @@ Dropdown.Portal = function Dropdown__Portal({
   );
 };
 
+interface ContentProps extends ComponentProps<'ul'> {
+  children: React.ReactNode;
+}
 Dropdown.Content = function Dropdown__Content({
   children,
   ...rest
-}: {
-  children: React.ReactNode;
-}) {
-  const { isOpen, setIsOpen, $trigger } = useDropdownContext();
-  const $content = useRef<HTMLUListElement>(null);
+}: ContentProps) {
+  const { isOpen, setIsOpen, $triggerRef } = useDropdownContext();
+  const $contentRef = useRef<HTMLUListElement>(null);
   const focusIndex = useRef(-1);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
+      const $content = $contentRef.current;
+      const $trigger = $triggerRef.current;
+
       if (
-        $content.current &&
-        !$content.current.contains(e.target as Node) &&
-        !$trigger.current?.contains(e.target as Node)
+        $content &&
+        !$content.contains(e.target as Node) &&
+        !$trigger?.contains(e.target as Node)
       ) {
         setIsOpen(false);
       }
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isOpen || !$content.current) return;
+      if (!isOpen || !$contentRef.current) return;
       if (e.key === 'ArrowDown') {
         e.preventDefault();
 
-        const $menuItems = $content.current.querySelectorAll(
+        const $menuItems = $contentRef.current.querySelectorAll(
           '[role="menuitem"]',
         ) as NodeListOf<HTMLElement>;
         if (!$menuItems?.length) return;
@@ -150,7 +159,7 @@ Dropdown.Content = function Dropdown__Content({
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
 
-        const $menuItems = $content.current.querySelectorAll(
+        const $menuItems = $contentRef.current.querySelectorAll(
           '[role="menuitem"]',
         ) as NodeListOf<HTMLElement>;
         if (!$menuItems?.length) return;
@@ -172,7 +181,7 @@ Dropdown.Content = function Dropdown__Content({
       document.addEventListener('mousedown', handleClickOutside);
       document.addEventListener('keydown', handleKeyDown);
 
-      const $firstMenuItem = $content.current?.querySelector(
+      const $firstMenuItem = $contentRef.current?.querySelector(
         '[role="menuitem"]',
       ) as HTMLElement;
       if (!$firstMenuItem) return;
@@ -188,7 +197,7 @@ Dropdown.Content = function Dropdown__Content({
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [$trigger, isOpen, setIsOpen]);
+  }, [$triggerRef, isOpen, setIsOpen]);
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLUListElement> = (
     event,
@@ -208,7 +217,7 @@ Dropdown.Content = function Dropdown__Content({
   return (
     isOpen && (
       <ul
-        ref={$content}
+        ref={$contentRef}
         role="menu"
         /** focus되지 않도록
          * @see https://html.spec.whatwg.org/multipage/interaction.html#sequential-focus-navigation-and-the-tabindex-attribute
@@ -224,16 +233,17 @@ Dropdown.Content = function Dropdown__Content({
   );
 };
 
+interface ItemProps extends ComponentProps<'li'> {
+  children: React.ReactNode;
+  onSelect?: (e: React.MouseEvent<HTMLLIElement>) => unknown;
+  disabled?: boolean;
+}
 Dropdown.Item = function Dropdown__Item({
   children,
   onSelect = undefined,
   disabled = false,
   ...rest
-}: {
-  children: React.ReactNode;
-  onSelect?: React.MouseEventHandler<HTMLLIElement>;
-  disabled?: boolean;
-}) {
+}: ItemProps) {
   const { setIsOpen } = useDropdownContext();
 
   const handleClick = (event: React.MouseEvent<HTMLLIElement>) => {

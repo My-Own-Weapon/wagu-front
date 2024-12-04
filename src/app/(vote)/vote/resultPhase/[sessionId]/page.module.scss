@@ -1,0 +1,48 @@
+@import '@styles/variables/colors.scss';
+@import '@styles/variables/radius.scss';
+@import '@styles/variables/textSize.scss';
+@import '@styles/variables/fontWeight.scss';
+@import '@styles/variables/zIndex.scss';
+@import '@styles/mixins/index.scss';
+
+.endVoteContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  background-color: $bgBrown;
+
+  .top {
+    height: 200px;
+    background-color: $bgBrown;
+
+    @include flexCenter;
+
+    .winningMsgArea {
+      @include flexCenter;
+      gap: 8px;
+    }
+  }
+
+  .bottom {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 20px;
+
+    padding: 24px 24px 80px 24px;
+
+    background-color: $white;
+
+    border-radius: 32px 32px 0 0;
+
+    .endVoteWrapper {
+      @include flexColumnCenter;
+      gap: 4px;
+
+      // padding: 24px 24px 0 24px;
+
+      border-radius: 24px 24px 0;
+    }
+  }
+}

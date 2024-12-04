@@ -1,4 +1,4 @@
-import { OnLiveFollowings } from '@/components/domain';
+import { OnLiveFollowings } from '@/components/feature';
 import { Flex, Heading, Spacing, Stack } from '@/components/ui';
 
 import { Friend } from '@/types';
