@@ -1,7 +1,7 @@
 /* eslint-disable brace-style */
 
 import ViewModel from '@/feature/_lib/ViewModel';
-import { WinnerStoreViewModelImpl } from '@/components/domain/vote/WinnerStoreCard/WinnerStoreCardImple';
+import { WinnerStoreViewModelImpl } from '@/components/feature/vote/WinnerStoreCard/WinnerStoreCardImple';
 import { z } from 'zod';
 
 class WinnerStoreViewModel
