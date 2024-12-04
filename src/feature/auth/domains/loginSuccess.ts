@@ -9,7 +9,7 @@ interface UserInfo {
 const loginSuccess = (userInfo: UserInfo, router: AppRouterInstance) => {
   localStorageApi.setUserName(userInfo.userName);
   localStorageApi.setProfileImage(
-    userInfo.imageUrl ?? '/public/profile/profile-default-icon-male.svg',
+    userInfo.imageUrl ?? '/profile/profile-default-icon-male.svg',
   );
   router.push('/');
 };
