@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import Image from 'next/image';
-import React, { createContext, useContext, ReactElement, useMemo } from 'react';
+import React, { createContext, useContext, useMemo, ReactNode } from 'react';
 
 import s from './UserIcon.module.scss';
 
@@ -18,11 +18,12 @@ export default (function UserIcon() {
     Root: UserIcon__Root,
     Image: UserIcon__Image,
     Text: UserIcon__Text,
+    Textballoon: UserIcon__Textballoon,
   };
 })();
 
 interface RootProps extends UserIconContextType {
-  children: ReactElement | ReactElement[];
+  children: ReactNode | ReactNode[];
 }
 function UserIcon__Root({ children, size, shape, border = 'none' }: RootProps) {
   const value = useMemo(() => ({ size, shape, border }), [size, shape, border]);
@@ -74,7 +75,7 @@ function UserIcon__Image({
 }
 
 interface TextProps {
-  children: ReactElement | string;
+  children: ReactNode | string;
   fontSize?: 'small' | 'medium' | 'large';
   color?: 'white' | 'black';
 }
@@ -98,5 +99,16 @@ function UserIcon__Text({
     >
       {children}
     </p>
+  );
+}
+
+function UserIcon__Textballoon() {
+  return (
+    <Image
+      src="/newDesign/vote/vote_done.svg"
+      alt="text-balloon"
+      width={54}
+      height={25}
+    />
   );
 }
