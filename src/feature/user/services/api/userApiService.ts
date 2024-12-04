@@ -17,15 +17,15 @@ class UserApiService extends ApiService {
    * @returns user profile image & full name
    */
   async fetchProfileWithoutFollow(
-    username: GetPathParams['/member/{username}/profile'],
-  ): Promise<ProfileDetailsResponse> {
+    username: GetPathParams['/member/{username}/profile']['username'],
+  ): Promise<ProfileDetailsSchema> {
     const res = await this.fetcher(`/member/${username}/profile`, {
       method: 'GET',
       credentials: 'include',
     });
     const data = await res.json();
 
-    return profileDetailsResponse.parse(data);
+    return profileDetailsSchema.parse(data);
   }
 
   /**
@@ -38,14 +38,14 @@ class UserApiService extends ApiService {
    */
   async fetchProfileWithFollowInfo(
     memberId: number,
-  ): Promise<ProfileWithFollowInfoResponse> {
+  ): Promise<ProfileWithFollowInfoSchema> {
     const res = await this.fetcher(`/members/${memberId}`, {
       method: 'GET',
       credentials: 'include',
     });
     const data = await res.json();
 
-    return profileWithFollowInfoResponse.parse(data);
+    return profileWithFollowInfoSchema.parse(data);
   }
 
   /**
@@ -53,14 +53,14 @@ class UserApiService extends ApiService {
    *
    * @returns followings list
    */
-  async fetchFollowings(): Promise<FollowingsResponse> {
+  async fetchFollowings(): Promise<FollowingsSchema> {
     const res = await this.fetcher(`/followings`, {
       method: 'GET',
       credentials: 'include',
     });
 
     const data = await res.json();
-    return followingsResponse.parse(data);
+    return followingsSchema.parse(data);
   }
 
   /**
@@ -70,7 +70,7 @@ class UserApiService extends ApiService {
    */
   async followUser(
     memberId: PostPathParams['/members/{fromMemberId}/follow'],
-  ): Promise<FollowUserResponse> {
+  ): Promise<FollowUserSchema> {
     const res = await this.fetcher(`/members/${memberId}/follow`, {
       method: 'POST',
       credentials: 'include',
@@ -86,7 +86,7 @@ class UserApiService extends ApiService {
    */
   async unFollowUser(
     memberId: PathParams<'delete'>['/members/{fromMemberId}/follow'],
-  ): Promise<UnFollowUserResponse> {
+  ): Promise<UnFollowUserSchema> {
     const res = await this.fetcher(`/members/${memberId}/follow`, {
       method: 'DELETE',
       credentials: 'include',
@@ -100,18 +100,18 @@ class UserApiService extends ApiService {
    *
    * @returns name을 포함한 검색된 user 목록
    */
-  async searchUsers(name: string): Promise<SearchUsersResponse> {
+  async searchUsers(name: string): Promise<SearchUsersSchema> {
     const res = await this.fetcher(`/members?username=${name}&page=0&size=12`, {
       method: 'GET',
       credentials: 'include',
     });
 
     const data = await res.json();
-    return searchUsersResponse.parse(data);
+    return searchUsersSchema.parse(data);
   }
 }
 
-const profileDetailsResponse = z.object({
+const profileDetailsSchema = z.object({
   memberId: z.number(),
   imageUrl: z.string().nullable(),
   username: z.string(),
@@ -119,9 +119,9 @@ const profileDetailsResponse = z.object({
 }) satisfies z.ZodType<
   PickNullable<Required<GetResponses['/member/{username}/profile']>, 'imageUrl'>
 >;
-type ProfileDetailsResponse = z.infer<typeof profileDetailsResponse>; // 새로운 타입 정의
+export type ProfileDetailsSchema = z.infer<typeof profileDetailsSchema>;
 
-const profileWithFollowInfoResponse = z.object({
+const profileWithFollowInfoSchema = z.object({
   userName: z.string(),
   followerNum: z.number(),
   followingNum: z.number(),
@@ -130,11 +130,11 @@ const profileWithFollowInfoResponse = z.object({
 }) satisfies z.ZodType<
   PickNullable<Required<GetResponses['/members/{memberId}']>, 'profileImage'>
 >;
-type ProfileWithFollowInfoResponse = z.infer<
-  typeof profileWithFollowInfoResponse
+export type ProfileWithFollowInfoSchema = z.infer<
+  typeof profileWithFollowInfoSchema
 >;
 
-const followingsResponse = z.array(
+const followingsSchema = z.array(
   z.object({
     memberId: z.number(),
     username: z.string(),
@@ -150,19 +150,19 @@ const followingsResponse = z.array(
     >
   >
 >;
-type FollowingsResponse = z.infer<typeof followingsResponse>;
+export type FollowingsSchema = z.infer<typeof followingsSchema>;
 
-const followUserResponse = z.string() satisfies z.ZodType<
+const followUserSchema = z.string() satisfies z.ZodType<
   PostResponses['/members/{fromMemberId}/follow']
 >;
-type FollowUserResponse = z.infer<typeof followUserResponse>;
+export type FollowUserSchema = z.infer<typeof followUserSchema>;
 
-const unFollowUserResponse = z.string() satisfies z.ZodType<
+const unFollowUserSchema = z.string() satisfies z.ZodType<
   DeleteResponses['/members/{fromMemberId}/follow']
 >;
-type UnFollowUserResponse = z.infer<typeof unFollowUserResponse>;
+type UnFollowUserSchema = z.infer<typeof unFollowUserSchema>;
 
-const searchUsersResponse = z.array(
+const searchUsersSchema = z.array(
   z.object({
     memberId: z.number(),
     memberUsername: z.string(),
@@ -184,6 +184,6 @@ const searchUsersResponse = z.array(
     }
   >
 >;
-type SearchUsersResponse = z.infer<typeof searchUsersResponse>;
+type SearchUsersSchema = z.infer<typeof searchUsersSchema>;
 
 export const userApiService = new UserApiService();
