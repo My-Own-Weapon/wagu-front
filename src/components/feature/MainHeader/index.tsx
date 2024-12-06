@@ -6,9 +6,9 @@ import { useRouter, useSelectedLayoutSegment } from 'next/navigation';
 
 import { localStorageApi } from '@/services/localStorageApi';
 import { apiService } from '@/services/apiService';
-import Dropdown from '@/components/headless/Dropdown/Dropdown';
 import { colors } from '@/constants/theme';
 import { Stack, Text, Flex } from '@/components/ui';
+import { Dropdown } from '@/components/headless';
 
 import s from './index.module.scss';
 

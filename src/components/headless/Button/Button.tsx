@@ -7,7 +7,7 @@ export interface ButtonProps extends ComponentProps<'button'> {
   children?: ReactNode;
 }
 
-export function Button({
+export default function Button({
   className = undefined,
   type = 'button',
   onClick = undefined,

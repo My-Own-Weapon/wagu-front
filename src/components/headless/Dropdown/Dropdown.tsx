@@ -24,7 +24,7 @@ export const useDropdownContext = () => {
   return context;
 };
 
-function Dropdown({ children }: { children: React.ReactNode }) {
+export default function Dropdown({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const $triggerRef = useRef<HTMLButtonElement>(null);
   const value = useMemo(() => ({ isOpen, setIsOpen, $triggerRef }), [isOpen]);
@@ -331,5 +331,3 @@ Dropdown.Label = function Dropdown__Label({
     </span>
   );
 };
-
-export default Dropdown;

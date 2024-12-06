@@ -53,6 +53,7 @@ function CategoryButton({
 
   return (
     <Button
+      type="button"
       className={s.categoryBtn}
       data-category={name}
       name="postCategory"

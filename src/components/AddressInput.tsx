@@ -14,7 +14,7 @@ import React, {
 
 import { apiService } from '@/services/apiService';
 import { AddressSearchDetails } from '@/types';
-import Select, { useSelectContext } from '@/components/headless/Select/Select';
+import { Select, useSelectContext } from '@/components/headless';
 import {
   Flex,
   InputBox,
