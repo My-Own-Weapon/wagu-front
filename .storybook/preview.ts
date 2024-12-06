@@ -17,7 +17,7 @@ const preview: Preview = {
           name: 'wagu-book 개발 환경 (small)',
           styles: {
             width: '410px',
-            height: '100dvh',
+            height: '100%',
           },
         },
         ...MINIMAL_VIEWPORTS,
