@@ -59,10 +59,11 @@ type CustomUrlOrErrorConfig = z.infer<typeof ErrorConfigSchema>;
 export default class ApiService {
   private mswBaseUrl = 'http://localhost:9090';
   private kakaoBaseUrl = 'https://dapi.kakao.com/v2';
-  private baseUrl =
-    process.env.NODE_ENV === 'production'
-      ? process.env.NEXT_PUBLIC_BASE_URL
-      : this.mswBaseUrl;
+  // private baseUrl =
+  //   process.env.NODE_ENV === 'production'
+  //     ? process.env.NEXT_PUBLIC_BASE_URL
+  //     : this.mswBaseUrl;
+  private baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   /**
    * @example

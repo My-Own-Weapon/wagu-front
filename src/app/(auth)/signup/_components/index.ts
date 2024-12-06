@@ -1,5 +1,2 @@
-import SignupForm from './SignupForm';
-import SignupPending from './SignupPending';
-import SocialSignupArea from './SocialSignupArea';
-
-export { SignupForm, SignupPending, SocialSignupArea };
+export { default as SignupForm } from './SignupForm';
+export { default as SignupPending } from './SignupPending';

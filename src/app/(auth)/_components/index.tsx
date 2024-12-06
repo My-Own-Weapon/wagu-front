@@ -1,5 +1,3 @@
-import AuthHeader from './AuthHeader';
-import ErrorMessage from './ErrorMessage';
-import PendingMessage from './PendingMessage';
-
-export { ErrorMessage, AuthHeader, PendingMessage };
+export { default as AuthHeader } from './AuthHeader';
+export { default as ErrorMessage } from './ErrorMessage';
+export { default as PendingMessage } from './PendingMessage';

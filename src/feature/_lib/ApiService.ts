@@ -24,10 +24,11 @@ type CustomUrlOrErrorConfig = z.infer<typeof ConfigSchema>;
 
 export default abstract class ApiService {
   private readonly mswBaseUrl = 'http://localhost:9090';
-  private readonly baseUrl =
-    process.env.NODE_ENV === 'production'
-      ? process.env.NEXT_PUBLIC_BASE_URL
-      : this.mswBaseUrl;
+  // private readonly baseUrl =
+  //   process.env.NODE_ENV === 'production'
+  //     ? process.env.NEXT_PUBLIC_BASE_URL
+  //     : this.mswBaseUrl;
+  private baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   /**
    * @example

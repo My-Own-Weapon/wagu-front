@@ -1,5 +1,2 @@
-import LoginForm from './LoginForm';
-import SocialLoginArea from './SocialLoginArea';
-import NotYetSignupText from './NotYetSignupText';
-
-export { LoginForm, SocialLoginArea, NotYetSignupText };
+export { default as LoginForm } from './LoginForm';
+export { default as NotYetSignupText } from './NotYetSignupText';
