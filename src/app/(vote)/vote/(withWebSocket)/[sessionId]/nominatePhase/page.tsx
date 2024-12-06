@@ -30,6 +30,7 @@ import { StoreResponse } from '@/types';
 import { localStorageApi } from '@/services/localStorageApi';
 import { useDebounce } from '@/lib/hooks';
 import UserIcon from '@/components/ui/UserIcon/UserIcon';
+import { KakaoMap } from '@/components/feature/map';
 
 import s from './page.module.scss';
 
@@ -225,7 +226,7 @@ function NominatePhase() {
   return (
     <div className={s.addVoteContainer}>
       <div className={s.top}>
-        <div id="map" className={s.map} ref={onLoadMapRef} />
+        <KakaoMap className={s.map} mountRefCallback={onLoadMapRef} />
         <UserIcons connectedUsers={connectedUsers} />
       </div>
       <div className={s.bottom}>

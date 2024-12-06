@@ -7,7 +7,8 @@ import { StoreResponse } from '@/types';
 import StorePosts from '@/app/map/_components/StorePosts';
 import { BoxButton, Heading, Spacing } from '@/components/ui';
 import { useBoundaryStores, useKakaoMap } from '@/hooks/domains';
-import { Map, OnLiveFollowingsAtStore } from '@/components/feature';
+import { OnLiveFollowingsAtStore } from '@/components/feature';
+import { KakaoMap } from '@/components/feature/map';
 
 import s from './page.module.scss';
 
@@ -34,7 +35,7 @@ export default function MapPage() {
   return (
     <main className={s.container}>
       <div className={s.top}>
-        <Map className={s.map} mountRefCallback={onLoadMapRef} />
+        <KakaoMap className={s.map} mountRefCallback={onLoadMapRef} />
       </div>
       <div className={s.bottom}>
         {!selectedStore ? (
