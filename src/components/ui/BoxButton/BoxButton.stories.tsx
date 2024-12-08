@@ -46,7 +46,7 @@ const meta = {
         },
       },
     },
-    styleType: { control: 'radio', description: '버튼 스타일' },
+    styleType: { control: 'select', description: '버튼 스타일' },
     disabled: {
       control: 'boolean',
       description: '버튼의 비활성화 여부 ',
@@ -76,21 +76,21 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
+export const FillButton: Story = {
   args: {
     children: '회원가입',
     styleType: 'fill',
   },
 };
 
-export const Outline: Story = {
+export const OutlineButton: Story = {
   args: {
     children: '로그인',
     styleType: 'outline',
   },
 };
 
-export const Disabled: Story = {
+export const DisabledButton: Story = {
   args: {
     children: '회원가입',
     styleType: 'fill',
