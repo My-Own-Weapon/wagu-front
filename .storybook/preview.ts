@@ -13,16 +13,8 @@ const preview: Preview = {
     },
     viewport: {
       viewports: {
-        small: {
-          name: 'wagu-book 개발 환경 (small)',
-          styles: {
-            width: '410px',
-            height: '100%',
-          },
-        },
         ...MINIMAL_VIEWPORTS,
       },
-      defaultViewport: 'small',
     },
     controls: {
       matchers: {
