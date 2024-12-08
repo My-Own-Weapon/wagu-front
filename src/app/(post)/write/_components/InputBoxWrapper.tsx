@@ -1,12 +1,18 @@
-import { ReactNode } from 'react';
+import { ComponentProps, PropsWithChildren } from 'react';
+
+interface InputBoxWrapperProps
+  extends ComponentProps<'div'>,
+    PropsWithChildren {
+  gap: string;
+  style?: React.CSSProperties;
+}
 
 export default function InputBoxWrapper({
   gap,
   children,
-}: {
-  gap: string;
-  children: ReactNode;
-}) {
+  style = {},
+  ...rest
+}: InputBoxWrapperProps) {
   return (
     <div
       style={{
@@ -18,7 +24,9 @@ export default function InputBoxWrapper({
         justifyContent: 'center',
         alignItems: 'flex-start',
         gap,
+        ...style,
       }}
+      {...rest}
     >
       {children}
     </div>
