@@ -6,6 +6,7 @@ class LocalStorage {
   private USER_FULL_NAME = 'user_full_name';
   private USER_NAME = 'user_name';
   private USER_PROFILE_IMAGE_URL = 'user_profile_image_url';
+  private INSTALL_PROMPT_CLOSED_AT = 'install_prompt_closed_at';
 
   private saveGet(key: string) {
     if (typeof window === 'undefined') return null;
@@ -41,6 +42,14 @@ class LocalStorage {
 
   setProfileImage(profileImage: string) {
     this.saveSet(this.USER_PROFILE_IMAGE_URL, profileImage);
+  }
+
+  getInstallPromptClosedAt() {
+    return this.saveGet('install_prompt_closed_at');
+  }
+
+  setInstallPromptClosedAt(date: string) {
+    this.saveSet('install_prompt_closed_at', date);
   }
 }
 
