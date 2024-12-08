@@ -14,10 +14,9 @@ import React, {
   useContext,
   useMemo,
 } from 'react';
-
 import { ErrorMessage } from '@/app/(auth)/_components';
-
 import Stack from '@/components/ui/Stack';
+
 import s from './index.module.scss';
 
 interface InputBoxContextValue {
@@ -30,7 +29,15 @@ const InputBoxContext = createContext<InputBoxContextValue | undefined>(
   undefined,
 );
 
-interface InputBoxProps extends ComponentPropsWithoutRef<'div'> {
+export const useInputBoxContext = () => {
+  const context = useContext(InputBoxContext);
+  if (!context) {
+    throw new Error('InputBoxContext must be used within an InputBox');
+  }
+  return context;
+};
+
+interface InputBox__RootProps extends ComponentPropsWithoutRef<'div'> {
   children: ReactNode;
   errorMessage?: string;
 }
@@ -40,7 +47,7 @@ export default function InputBox({
   errorMessage = undefined,
   style = {},
   ...rest
-}: InputBoxProps) {
+}: InputBox__RootProps) {
   const id = useId();
   const error = !!errorMessage;
   const contextValue: InputBoxContextValue = useMemo(
@@ -54,35 +61,33 @@ export default function InputBox({
 
   return (
     <InputBoxContext.Provider value={contextValue}>
-      <Stack style={{ ...style, gap: '8px' }} {...rest}>
+      <Stack style={{ ...style, width: '100%', gap: '8px' }} {...rest}>
         {children}
-        {errorMessage && <InputBox.ErrorMessage />}
+        {error && <InputBox.ErrorMessage />}
       </Stack>
     </InputBoxContext.Provider>
   );
 }
 
-interface InputProps extends ComponentPropsWithoutRef<'input'> {
+interface InputBox__InputProps extends ComponentPropsWithoutRef<'input'> {
   width?: string;
-  height: 48 | 56;
+  height?: 48 | 56;
   type?: 'text' | 'number' | 'password' | 'tel';
 }
 
 InputBox.Input = forwardRef(function InputBox__Input(
-  { width = '100%', height = 56, type = 'text', ...rest }: InputProps,
+  {
+    width = '100%',
+    height = 56,
+    type = 'text',
+    onChange = undefined,
+    ...rest
+  }: InputBox__InputProps,
   forwardedRef: React.Ref<HTMLInputElement>,
 ) {
-  const context = useContext(InputBoxContext);
-  if (!context) {
-    throw new Error('InputBox.Input must be used within <InputBox />');
-  }
-
-  const { id, error } = context;
+  const { id, error } = useInputBoxContext();
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = (event) => {
-    console.log(rest.onChange);
-
-    const { onChange } = rest;
     if (!onChange) return;
 
     onChange(event);
@@ -104,26 +109,22 @@ InputBox.Input = forwardRef(function InputBox__Input(
     />
   );
 });
+InputBox.Input.displayName = 'InputBox.Input@@@@@@@@@@@';
 
-interface LabelProps extends ComponentPropsWithoutRef<'label'> {
+interface InputBox__LabelProps extends ComponentPropsWithoutRef<'label'> {
   children: string;
 }
 
-InputBox.Label = function InputBox__Label({ children }: LabelProps) {
-  const context = useContext(InputBoxContext);
-  if (!context) {
-    throw new Error('InputBox.Label must be used within <InputBox />');
-  }
-
-  const { id, error } = context;
+InputBox.Label = function InputBox__Label({ children }: InputBox__LabelProps) {
+  const { id, error } = useInputBoxContext();
 
   return (
     <label
+      htmlFor={id}
       className={s.label}
       style={{
         color: error ? '#e42939' : undefined,
       }}
-      htmlFor={id}
     >
       {children}
     </label>
@@ -131,12 +132,7 @@ InputBox.Label = function InputBox__Label({ children }: LabelProps) {
 };
 
 InputBox.ErrorMessage = function InputBox__ErrorMessage() {
-  const context = useContext(InputBoxContext);
-  if (!context) {
-    throw new Error('InputBox.ErrorMessage must be used within an InputBox');
-  }
-
-  const { errorMessage } = context;
+  const { errorMessage } = useInputBoxContext();
 
   return <ErrorMessage role="alert">{errorMessage}</ErrorMessage>;
 };

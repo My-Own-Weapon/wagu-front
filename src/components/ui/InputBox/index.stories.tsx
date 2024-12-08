@@ -1,54 +1,62 @@
-import { InputBox } from '@/components/ui';
-import { Args, Meta, StoryObj } from '@storybook/react';
-import { ChangeEventHandler, ComponentProps, ComponentType } from 'react';
-import { useArgs } from 'storybook/internal/preview-api';
+import type { Meta, StoryObj } from '@storybook/react';
+import { ReactNode } from 'react';
 
-const meta: Meta<
-  ComponentProps<typeof InputBox> & ComponentProps<typeof InputBox.Input>
-> = {
-  title: 'ui/InputBox',
-  component: InputBox,
+import { InputBoxWrapper } from '@/app/(post)/write/_components';
+import InputBox from './index';
+
+const meta = {
+  title: 'UI/InputBox',
+  component: InputBox.Input,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component: 'InputBox 컴포넌트',
+      },
+    },
+  },
+
+  argTypes: {
+    width: {
+      control: 'text',
+      description: 'Input 너비를 설정합니다.',
+      table: {
+        type: { summary: '{n}px | {n}% | {n}vw' },
+      },
+    },
+    height: {
+      control: 'select',
+      options: [48, 56],
+      description: 'Input 높이를 설정합니다.',
+      table: {
+        type: { summary: '48 | 56' },
+      },
+    },
+    placeholder: {
+      control: 'text',
+      description: 'Input placeholder 설정',
+    },
+    type: {
+      control: 'select',
+      options: ['text', 'number', 'password', 'tel'],
+      description: 'Input type을 설정합니다.',
+      table: {
+        type: { summary: 'text | number | password | tel' },
+      },
+    },
+  },
   args: {
     width: '100%',
-    value: '',
+    height: 48,
+    placeholder: '아이디를 입력해주세요',
+    type: 'text',
   },
-  subcomponents: {
-    'InputBox.Input': InputBox.Input as ComponentType<unknown>,
-    'InputBox.Label': InputBox.Label as ComponentType<unknown>,
-  },
-  decorators: [
-    (Story, context) => {
-      const [{ value }, updateArgs] = useArgs();
+} satisfies Meta<typeof InputBox.Input>;
 
-      return (
-        <Story
-          args={{
-            ...context.args,
-            value,
-            onChange: handleChange(updateArgs),
-          }}
-        />
-      );
-    },
-  ],
-};
 export default meta;
-
 type Story = StoryObj<typeof meta>;
 
-const handleChange = (
-  setArgs: (args: Args) => void,
-): ChangeEventHandler<HTMLInputElement> => {
-  return (e) => {
-    setArgs({ value: e.target.value });
-  };
-};
-
 export const Default: Story = {
-  args: {
-    type: 'text',
-  },
   render: (args) => (
     <InputBox>
       <InputBox.Label>아이디</InputBox.Label>
@@ -57,31 +65,49 @@ export const Default: Story = {
   ),
 };
 
-export const Tel: Story = {
-  args: {
-    type: 'tel',
-    placeholder: '000-0000-0000',
-  },
+export const WithStyledWrapper: Story = {
   render: (args) => (
-    <InputBox>
-      <InputBox.Label>전화번호</InputBox.Label>
-      <InputBox.Input {...args} />
-    </InputBox>
+    <StyledWrapper>
+      <InputBox>
+        <InputBox.Label>아이디</InputBox.Label>
+        <InputBox.Input {...args} />
+      </InputBox>
+    </StyledWrapper>
   ),
 };
 
-export const Errors: Story = {
-  args: {
-    width: '100%',
-    height: 56,
-    type: 'text',
-    errorMessage: '아이디를 입력해 주세요',
-    value: 'asd',
-  },
+export const WithErrorMessage: Story = {
   render: (args) => (
-    <InputBox errorMessage={args.errorMessage}>
+    <InputBox errorMessage="아이디는 영문자만 입력 가능합니다.">
       <InputBox.Label>아이디</InputBox.Label>
       <InputBox.Input {...args} />
     </InputBox>
   ),
 };
+
+export const WithStyledWrapperAndErrorMessage: Story = {
+  render: (args) => (
+    <StyledWrapper>
+      <InputBox errorMessage="아이디는 영문자만 입력 가능합니다.">
+        <InputBox.Label>아이디</InputBox.Label>
+        <InputBox.Input {...args} />
+      </InputBox>
+    </StyledWrapper>
+  ),
+};
+
+function StyledWrapper({ children }: { children: ReactNode }) {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        width: '100%',
+        maxWidth: '400px',
+        padding: '16px',
+        backgroundColor: '#f0f0f0',
+      }}
+    >
+      <InputBoxWrapper gap="8px">{children}</InputBoxWrapper>
+    </div>
+  );
+}
