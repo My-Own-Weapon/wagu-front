@@ -10,7 +10,7 @@ interface StoryArgs {
 }
 
 const meta = {
-  title: 'Domain/Vote/WinnerStoreCard',
+  title: 'Feature/Vote/WinnerStoreCard',
   component: WinnerStoreCard,
   parameters: {
     layout: 'centered',

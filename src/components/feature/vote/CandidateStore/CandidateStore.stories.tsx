@@ -5,7 +5,7 @@ import { Spacing } from '@/components/ui';
 import { Fragment } from 'react';
 
 const meta = {
-  title: 'Domain/Vote/CandidateStore',
+  title: 'Feature/Vote/CandidateStore',
   component: CandidateStore,
   parameters: {
     layout: 'centered',
