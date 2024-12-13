@@ -1,11 +1,12 @@
-import type { Metadata, Viewport } from 'next';
-
-import React from 'react';
-import Footer from '@/components/Footer';
-import RQProvider from '@/components/RQProvider';
-
 import '@/styles/reset.css';
 import '@/styles/globals.css';
+
+import type { Metadata, Viewport } from 'next';
+import React from 'react';
+
+import Footer from '@/components/Footer';
+import RQProvider from '@/components/RQProvider';
+import { ModalPortalProvider } from '@/feature/_hooks/useModal';
 
 const APP_NAME = 'WaGu Book';
 const APP_DEFAULT_TITLE = 'WaGu Book';
@@ -60,7 +61,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <RQProvider>{children}</RQProvider>
+        <RQProvider>
+          <ModalPortalProvider>{children}</ModalPortalProvider>
+        </RQProvider>
         <Footer />
       </body>
     </html>
