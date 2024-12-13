@@ -5,7 +5,7 @@ import { ModalPortalProvider } from '@/feature/_hooks/useModal/provider';
 import InstallPrompt, { BeforeInstallPromptEvent } from './InstallPrompt';
 
 const meta = {
-  title: 'Common/InstallPrompt',
+  title: 'Common/Components/InstallPrompt',
   component: InstallPrompt,
   parameters: {
     layout: 'fullscreen',
