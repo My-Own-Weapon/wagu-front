@@ -1,8 +1,10 @@
 import React, {
   ComponentProps,
   createContext,
+  useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -92,17 +94,54 @@ Dropdown.Portal = function Dropdown__Portal({
   children: React.ReactNode;
 }) {
   const { isOpen, $triggerRef } = useDropdownContext();
+  const [position, setPosition] = useState<{ top: number; left: number }>({
+    top: 0,
+    left: 0,
+  });
 
-  const triggerRect = $triggerRef.current?.getBoundingClientRect();
-  if (!triggerRect) return null;
+  const updatePosition = useCallback(() => {
+    if (isSSR()) return;
+
+    const $trigger = $triggerRef.current;
+    if (!$trigger) return;
+
+    const { x: clientX, y: clientY, height } = $trigger.getBoundingClientRect();
+    const top = clientY + offsetY + height;
+    const left = clientX + offsetX;
+
+    setPosition({ top, left });
+  }, [$triggerRef, offsetX, offsetY]);
+
+  useLayoutEffect(() => {
+    if (!isOpen) return;
+
+    updatePosition();
+  }, [isOpen, updatePosition]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleResizeOrScroll = () => {
+      updatePosition();
+    };
+
+    window.addEventListener('scroll', handleResizeOrScroll);
+    window.addEventListener('resize', handleResizeOrScroll);
+
+    // eslint-disable-next-line consistent-return
+    return () => {
+      window.removeEventListener('scroll', handleResizeOrScroll);
+      window.removeEventListener('resize', handleResizeOrScroll);
+    };
+  }, [isOpen, updatePosition]);
 
   return (
     isOpen && (
       <div
         style={{
           position: 'fixed',
-          top: `${triggerRect.bottom + window.scrollY + offsetY}px`,
-          left: `${triggerRect.left + window.scrollX + offsetX}px`,
+          top: `${position.top}px`,
+          left: `${position.left}px`,
           zIndex: zIndex.dropDown,
         }}
       >
@@ -331,3 +370,5 @@ Dropdown.Label = function Dropdown__Label({
     </span>
   );
 };
+
+const isSSR = () => typeof window === 'undefined';
