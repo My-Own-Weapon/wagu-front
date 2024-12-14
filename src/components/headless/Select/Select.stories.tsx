@@ -7,6 +7,45 @@ const meta = {
   args: {
     children: undefined,
   },
+  argTypes: {
+    value: {
+      name: 'value',
+      description: '선택된 값',
+      control: false,
+      table: {
+        type: {
+          summary: 'T as Any',
+        },
+        defaultValue: {
+          summary: '선택된 값',
+        },
+      },
+    },
+    defaultValue: {
+      name: 'defaultValue',
+      description: '기본 선택 값',
+      control: false,
+      table: {
+        type: {
+          summary: 'T as Any',
+        },
+        defaultValue: {
+          summary: '선택된 값',
+        },
+      },
+    },
+
+    onChange: {
+      table: {
+        disable: true,
+      },
+    },
+    children: {
+      table: {
+        disable: true,
+      },
+    },
+  },
   tags: ['autodocs'],
 } satisfies Meta<typeof Select>;
 
