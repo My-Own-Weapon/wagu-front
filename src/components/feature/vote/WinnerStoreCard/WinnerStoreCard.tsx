@@ -3,10 +3,10 @@ import Link from 'next/link';
 
 import { colors } from '@/constants/theme';
 import ViewModel from '@/feature/_lib/ViewModel';
-import { WinnerStoreViewModelImpl } from './WinnerStoreCardImple';
+import { WinnerStoreViewModelSpec } from './WinnerStoreViewModelSpec';
 
 interface WinnerStoreCardProps {
-  viewModel: ViewModel & WinnerStoreViewModelImpl;
+  viewModel: ViewModel & WinnerStoreViewModelSpec;
 }
 
 export default function WinnerStoreCard({ viewModel }: WinnerStoreCardProps) {

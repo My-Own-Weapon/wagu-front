@@ -1,12 +1,12 @@
 /* eslint-disable brace-style */
 
 import ViewModel from '@/feature/_lib/ViewModel';
-import { WinnerStoreViewModelImpl } from '@/components/feature/vote/WinnerStoreCard/WinnerStoreCardImple';
+import { WinnerStoreViewModelSpec } from '@/components/feature/vote/WinnerStoreCard/WinnerStoreViewModelSpec';
 import { z } from 'zod';
 
 class WinnerStoreViewModel
   extends ViewModel
-  implements WinnerStoreViewModelImpl
+  implements WinnerStoreViewModelSpec
 {
   private readonly storeName: string;
   private readonly storeId: number;
