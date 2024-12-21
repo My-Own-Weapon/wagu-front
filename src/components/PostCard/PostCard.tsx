@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { formatDate } from '@/utils';
 import { type Post } from '@/feature/post/domains/post';
 
-import s from './index.module.scss';
+import s from './PostCard.module.scss';
 
 interface PostCardProps extends Post {
   priority?: boolean;
