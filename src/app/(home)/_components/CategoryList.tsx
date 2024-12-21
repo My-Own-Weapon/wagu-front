@@ -1,4 +1,4 @@
-import React, { MouseEventHandler } from 'react';
+import React, { Dispatch, MouseEventHandler, SetStateAction } from 'react';
 
 import * as Icons from '@public/newDesign/categories/index';
 import { CategoriesWithAllEN, Category } from '@/types';
@@ -10,13 +10,20 @@ import s from './styles/CategoryList.module.scss';
 
 interface Props {
   selectedCategory: CategoriesWithAllEN;
-  handleClickCategory: MouseEventHandler<HTMLButtonElement>;
+  setSelectedCategory: Dispatch<SetStateAction<CategoriesWithAllEN>>;
 }
 
 export default function CategoryList({
   selectedCategory,
-  handleClickCategory,
+  setSelectedCategory,
 }: Props) {
+  const handleCategoryClick: MouseEventHandler = (e) => {
+    const target = e.currentTarget as HTMLElement;
+    const { category = 'ALL' } = target.dataset;
+
+    setSelectedCategory(category as CategoriesWithAllEN);
+  };
+
   return (
     <Container>
       <ul className={s.categoriesWrapper} data-testid="category-list">
@@ -27,7 +34,7 @@ export default function CategoryList({
                 id={id}
                 name={name}
                 IconSVG={IconSVG}
-                handleClickCategory={handleClickCategory}
+                handleClickCategory={handleCategoryClick}
                 selectedCategory={selectedCategory}
               />
             </Flex>

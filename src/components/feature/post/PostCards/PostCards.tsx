@@ -1,43 +1,32 @@
 'use client';
 
 import { PostCard } from '@/components';
-import { Spacing, Stack, Text } from '@/components/ui';
-import React, { Dispatch, Fragment, SetStateAction } from 'react';
-import useGetMyPost from '@/feature/post/applications/hooks/useGetMyPost';
-import { useIntersectionObserver } from '@/feature/_hooks';
+import { Spacing, Stack } from '@/components/ui';
+import React, { Fragment } from 'react';
 import { isLastIndex } from '@/utils';
-import { CategoriesWithAllEN } from '@/types';
+import { Post } from '@/feature/post/domains/post';
 
 interface PostCardsProps {
-  category: CategoriesWithAllEN;
-  setHasPosts: Dispatch<SetStateAction<boolean>>;
+  posts: Post[];
+  /* For infinite scroll */
+  refElement?: React.RefCallback<HTMLElement>;
 }
 
-export default function PostCards({ category, setHasPosts }: PostCardsProps) {
-  const { posts, fetchNextPage, hasNextPage, isFetching } = useGetMyPost();
-  const { ref } = useIntersectionObserver({
-    onIntersect: (entry) =>
-      handleIntersect({
-        entry,
-        fetchNextPage,
-        hasNextPage,
-        isFetching,
-      }),
-  });
-  const filteredPosts = filterPosts(posts, category);
-
-  setHasPosts(filteredPosts.length > 0);
-
+export default function PostCards({
+  posts,
+  refElement = undefined,
+}: PostCardsProps) {
   return (
     <Stack as="ul" data-testid="post-cards">
-      {filteredPosts.map((post, idx) => {
-        return (
+      {posts.map((post, idx) => {
+        return isLastIndex(posts, idx) ? (
+          <IntersectionWrapper key={post.postId} refElement={refElement}>
+            <PostCard {...post} priority={idx <= 1} />
+            <Spacing size={24} />
+          </IntersectionWrapper>
+        ) : (
           <Fragment key={post.postId}>
             <PostCard {...post} priority={idx <= 1} />
-            {idx !== posts.length - 1 && <Spacing size={24} />}
-            {isLastIndex(filteredPosts, idx) && (
-              <div ref={ref} key={post.postId} style={{ height: '1px' }} />
-            )}
           </Fragment>
         );
       })}
@@ -45,27 +34,12 @@ export default function PostCards({ category, setHasPosts }: PostCardsProps) {
   );
 }
 
-const handleIntersect = ({
-  entry,
-  fetchNextPage,
-  hasNextPage,
-  isFetching,
+function IntersectionWrapper({
+  children,
+  refElement = undefined,
 }: {
-  entry: IntersectionObserverEntry;
-  fetchNextPage: () => void;
-  hasNextPage: boolean;
-  isFetching: boolean;
-}) => {
-  if (entry?.isIntersecting && hasNextPage && !isFetching) {
-    fetchNextPage?.();
-  }
-};
-
-const filterPosts = (
-  posts: ReturnType<typeof useGetMyPost>['posts'],
-  category: CategoriesWithAllEN,
-) => {
-  return category !== 'ALL'
-    ? posts.filter((post) => post.category === category)
-    : posts;
-};
+  children: React.ReactNode;
+  refElement?: React.RefCallback<HTMLElement>;
+}) {
+  return <div ref={refElement}>{children}</div>;
+}

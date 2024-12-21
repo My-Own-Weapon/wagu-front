@@ -1,5 +1,2 @@
-import useFetchPosts from './useFetchPosts';
-import useCategoryFilter from './useCategoryFilter';
-import useFetchLiveFollowings from './useFetchLiveFollowings';
-
-export { useCategoryFilter, useFetchPosts, useFetchLiveFollowings };
+export { default as useFetchPosts } from './useFetchPosts';
+export { default as useFetchLiveFollowings } from './useFetchLiveFollowings';

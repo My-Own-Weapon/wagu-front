@@ -1,47 +1,32 @@
-import React from 'react';
-
 import { NextImageWithCover, Spacing, Stack, Text } from '@/components/ui';
-import { PostOfStoreResponse } from '@/types';
 import Link from 'next/link';
 import { formatDate } from '@/utils';
+import { type Post } from '@/feature/post/domains/post';
 
 import s from './index.module.scss';
 
-const ellipsisStyle = {
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  letterSpacing: '-0.03em',
-  lineHeight: '150%',
-};
-
-type Props = Pick<
-  PostOfStoreResponse,
-  'postId' | 'storeName' | 'menuImage' | 'postMainMenu' | 'createdDate'
-> & {
+interface PostCardProps extends Post {
   priority?: boolean;
   alt?: string;
-};
-
+}
 export default function PostCard({
   postId,
-  storeName,
-  menuImage,
-  postMainMenu,
-  createdDate,
+  store,
+  menu,
+  date,
   priority = false,
   alt = 'post-image',
-}: Props) {
-  if (!menuImage) return null;
+}: PostCardProps) {
+  if (!menu.image.url) return null;
 
-  const formattedDate = formatDate(createdDate);
+  const formattedDate = formatDate(date.createdAt);
 
   return (
     <Stack as="li" className={s.cardContainer} data-id={postId}>
       <Link className={s.cardWrapper} href={`/posts/${postId}`}>
         <NextImageWithCover
-          id={menuImage.id}
-          src={menuImage.url}
+          id={String(menu.image.id)}
+          src={menu.image.url}
           height="240px"
           borderRadius="16px"
           priority={priority}
@@ -53,9 +38,9 @@ export default function PostCard({
           fontSize="large"
           fontWeight="semiBold"
           color="#444444"
-          style={ellipsisStyle}
+          style={STYLE.ellipsis}
         >
-          {storeName}
+          {store.name}
         </Text>
         <Spacing size={8} />
         <Text
@@ -63,17 +48,17 @@ export default function PostCard({
           fontSize="medium"
           fontWeight="medium"
           color="#767676"
-          style={ellipsisStyle}
+          style={STYLE.ellipsis}
         >
-          {postMainMenu}
+          {menu.name}
         </Text>
         <Spacing size={8} />
         <Text
           as="p"
+          style={STYLE.ellipsis}
           fontSize="small"
           fontWeight="regular"
           color="#767676"
-          style={ellipsisStyle}
         >
           {formattedDate}
         </Text>
@@ -81,3 +66,29 @@ export default function PostCard({
     </Stack>
   );
 }
+
+export function PostCardSkeleton() {
+  return (
+    <Stack as="li" className={s.cardContainer}>
+      <div className={s.cardWrapper}>
+        <div className={s.imageSkeleton} />
+        <Spacing size={16} />
+        <div className={`${s.textSkeleton} ${s.large}`} />
+        <Spacing size={8} />
+        <div className={`${s.textSkeleton} ${s.medium}`} />
+        <Spacing size={8} />
+        <div className={`${s.textSkeleton} ${s.small}`} />
+      </div>
+    </Stack>
+  );
+}
+
+const STYLE = {
+  ellipsis: {
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    letterSpacing: '-0.03em',
+    lineHeight: '150%',
+  },
+};

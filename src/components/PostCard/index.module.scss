@@ -11,3 +11,47 @@
     flex-grow: 1;
   }
 }
+
+@keyframes pulse {
+  0% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 0.9;
+  }
+}
+
+.skeleton {
+  background-color: #e0e0e0;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.imageSkeleton {
+  @extend .skeleton;
+  width: 100%;
+  height: 240px;
+  border-radius: 16px;
+}
+
+.textSkeleton {
+  @extend .skeleton;
+  border-radius: 4px;
+}
+
+.textSkeleton.large {
+  width: 60%;
+  height: 24px;
+}
+
+.textSkeleton.medium {
+  width: 40%;
+  height: 20px;
+}
+
+.textSkeleton.small {
+  width: 30%;
+  height: 18px;
+}
