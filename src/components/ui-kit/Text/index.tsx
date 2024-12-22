@@ -1,7 +1,7 @@
 import { ComponentProps, ElementType } from 'react';
 
-import { FONT_SIZE, FONT_WEIGHTS } from '@/components/ui/_contants';
-import { PropsWithNotUndefinedChildren } from '@/components/ui/_types';
+import { FONT_SIZE, FONT_WEIGHTS } from '@/components/_contants';
+import { PropsWithNotUndefinedChildren } from '@/components/_types';
 
 export interface Props extends ComponentProps<'p'> {
   as?: ElementType;

@@ -1,5 +1,5 @@
-import { PropsWithNotUndefinedChildren } from '@/components/ui/_types';
 import { zIndex } from '@/constants/theme';
+import { PropsWithNotUndefinedChildren } from '@/components/_types';
 
 interface OverlayProps {
   close?: () => void;

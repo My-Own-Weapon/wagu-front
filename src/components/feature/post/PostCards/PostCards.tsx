@@ -1,8 +1,7 @@
-'use client';
+import React from 'react';
 
-import { PostCard } from '@/components';
-import { Spacing, Stack } from '@/components/ui';
-import React, { Fragment } from 'react';
+import { PostCard } from '@/components/feature/post';
+import { Spacing, Stack } from '@/components/layout';
 import { isLastIndex } from '@/utils';
 import { Post } from '@/feature/post/domains/post';
 
@@ -25,9 +24,9 @@ export default function PostCards({
             <Spacing size={24} />
           </IntersectionWrapper>
         ) : (
-          <Fragment key={post.postId}>
+          <React.Fragment key={post.postId}>
             <PostCard {...post} priority={idx <= 1} />
-          </Fragment>
+          </React.Fragment>
         );
       })}
     </Stack>

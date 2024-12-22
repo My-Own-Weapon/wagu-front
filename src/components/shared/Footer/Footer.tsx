@@ -22,7 +22,7 @@ interface NavItem {
 export default function Footer() {
   const segment = useSelectedLayoutSegment();
   const segments = useSelectedLayoutSegments();
-  // console.log(segment, segments);
+
   if (
     segment === '(auth)' ||
     segment === 'live' ||
