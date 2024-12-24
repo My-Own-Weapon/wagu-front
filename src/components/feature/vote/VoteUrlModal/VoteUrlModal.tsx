@@ -5,26 +5,20 @@
 
 'use client';
 
-import Modal from 'react-modal';
 import { useRouter } from 'next/navigation';
 
 import { XSVG } from '@public/newDesign';
-import Heading from '@/components/ui/Heading';
-import { NextImageWithCover } from '@/components/ui';
-import { useEffect, useState } from 'react';
 import { apiService } from '@/services/apiService';
+import { Heading, NextImageWithCover } from '@/components/ui-kit';
+import { useEffect, useState } from 'react';
 
 import s from './VoteUrlModal.module.scss';
 
-interface VoteUrlModalProps {
-  isOpen: boolean;
-  onRequestClose: () => void;
-}
-
 export default function VoteUrlModal({
-  isOpen,
-  onRequestClose,
-}: VoteUrlModalProps) {
+  onCloseModal,
+}: {
+  onCloseModal: () => void;
+}) {
   const router = useRouter();
   const [voteUrl, setVoteUrl] = useState<string>('');
 
@@ -51,48 +45,34 @@ export default function VoteUrlModal({
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onRequestClose={onRequestClose}
-      className={s.modal}
-      overlayClassName={s.overlay}
-      /* ✅ TODO : `Modal.setAppElement(el)` 사용해서 리팩토링 (for 웹 접근성) */
-      ariaHideApp={false}
-    >
-      <div className={s.modalWrapper}>
-        <button className={s.closeButton} onClick={onRequestClose}>
-          <XSVG />
-        </button>
-        <div className={s.contentArea}>
-          <div className={s.titleArea}>
-            <Heading
-              as="h2"
-              fontSize="20px"
-              fontWeight="semiBold"
-              color="black"
-            >
-              투표 링크가 생성되었어요 !
-            </Heading>
+    <div className={s.modalWrapper}>
+      <button className={s.closeButton} onClick={onCloseModal}>
+        <XSVG />
+      </button>
+      <div className={s.contentArea}>
+        <div className={s.titleArea}>
+          <Heading as="h2" fontSize="20px" fontWeight="semiBold" color="black">
+            투표 링크가 생성되었어요 !
+          </Heading>
 
-            <p className={s.subTitle}>
-              아래의 Box를 클릭하면 자동으로 복사됩니다
-            </p>
-          </div>
-          <div
-            className={s.urlBox}
-            onClick={() => handleShareMapUrlClick(voteUrl)}
-            data-testid="navigate-vote-url-button"
-          >
-            <p>{voteUrl}</p>
-          </div>
-          <NextImageWithCover
-            src="/newDesign/share_url_hand.svg"
-            width="220px"
-            height="220px"
-            alt="share-url-hand-img"
-          />
+          <p className={s.subTitle}>
+            아래의 Box를 클릭하면 자동으로 복사됩니다
+          </p>
         </div>
+        <div
+          className={s.urlBox}
+          onClick={() => handleShareMapUrlClick(voteUrl)}
+          data-testid="navigate-vote-url-button"
+        >
+          <p>{voteUrl}</p>
+        </div>
+        <NextImageWithCover
+          src="/newDesign/share_url_hand.svg"
+          width="220px"
+          height="220px"
+          alt="share-url-hand-img"
+        />
       </div>
-    </Modal>
+    </div>
   );
 }

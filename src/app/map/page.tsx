@@ -1,14 +1,15 @@
 'use client';
 
-import { Suspense, useEffect, useReducer, useState } from 'react';
-import VoteUrlModal from '@/components/VoteUrlModal';
+import { Suspense, useEffect, useState } from 'react';
 import { StoreResponse } from '@/types';
-
+import { Spacing } from '@/components/layout';
 import StorePosts from '@/app/map/_components/StorePosts';
-import { BoxButton, Heading, Spacing } from '@/components/ui';
+import { BoxButton, Heading } from '@/components/ui-kit';
 import { useBoundaryStores, useKakaoMap } from '@/hooks/domains';
-import { OnLiveFollowingsAtStore } from '@/components/feature';
+import { OnLiveFollowingsAtStore } from '@/components/feature/live';
 import { KakaoMap } from '@/components/feature/map';
+import { VoteUrlModal } from '@/components/feature/vote';
+import { useModal } from '@/feature/_hooks';
 
 import s from './page.module.scss';
 
@@ -18,7 +19,7 @@ export default function MapPage() {
   const [selectedStore, setSelectedStore] = useState<StoreResponse | null>(
     null,
   );
-  const [isModalOpen, toggleModalOpen] = useReducer((isOpen) => !isOpen, false);
+  const { open, close, Overlay } = useModal();
 
   /**
    * ✅ TODO: 이전 움직임의 캐쉬된 위치 기반으로 움직이기 때문에
@@ -68,13 +69,15 @@ export default function MapPage() {
         <BoxButton
           height="48px"
           styleType="fill"
-          onClick={toggleModalOpen}
+          onClick={open}
           data-testid="create-vote-url-button"
         >
           함께 투표 링크 생성
         </BoxButton>
       </div>
-      <VoteUrlModal isOpen={isModalOpen} onRequestClose={toggleModalOpen} />
+      <Overlay onBackgroundClick={close}>
+        <VoteUrlModal onCloseModal={close} />
+      </Overlay>
     </main>
   );
 }
