@@ -13,22 +13,26 @@ import React, {
   createContext,
   useContext,
   useMemo,
+  useRef,
+  useLayoutEffect,
+  useState,
 } from 'react';
-import { ErrorMessage } from '@/app/(auth)/_components';
-import Stack from '@/components/ui/Stack';
+
+import { Stack, Flex } from '@/components/layout';
+import Text from '@/components/ui-kit/Text';
 
 import s from './index.module.scss';
 
 interface InputBoxContextValue {
   id: string;
-  error: boolean;
+  isError: boolean;
   errorMessage?: string;
+  $inputBoxWrapperRef: React.RefObject<HTMLDivElement>;
 }
 
 const InputBoxContext = createContext<InputBoxContextValue | undefined>(
   undefined,
 );
-
 export const useInputBoxContext = () => {
   const context = useContext(InputBoxContext);
   if (!context) {
@@ -49,22 +53,26 @@ export default function InputBox({
   ...rest
 }: InputBox__RootProps) {
   const id = useId();
-  const error = !!errorMessage;
+  const isError = !!errorMessage;
+  const $inputBoxWrapperRef = useRef<HTMLDivElement | null>(null);
   const contextValue: InputBoxContextValue = useMemo(
     () => ({
       id,
-      error,
+      isError,
       errorMessage,
+      $inputBoxWrapperRef,
     }),
-    [id, error, errorMessage],
+    [id, isError, errorMessage, $inputBoxWrapperRef],
   );
 
   return (
     <InputBoxContext.Provider value={contextValue}>
-      <Stack style={{ ...style, width: '100%', gap: '8px' }} {...rest}>
-        {children}
-        {error && <InputBox.ErrorMessage />}
-      </Stack>
+      <div style={{ position: 'relative' }} ref={$inputBoxWrapperRef}>
+        <Stack style={{ ...style, width: '100%', gap: '8px' }} {...rest}>
+          {children}
+          {isError && <InputBox.ErrorMessage />}
+        </Stack>
+      </div>
     </InputBoxContext.Provider>
   );
 }
@@ -85,7 +93,7 @@ InputBox.Input = forwardRef(function InputBox__Input(
   }: InputBox__InputProps,
   forwardedRef: React.Ref<HTMLInputElement>,
 ) {
-  const { id, error } = useInputBoxContext();
+  const { id, isError } = useInputBoxContext();
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     if (!onChange) return;
@@ -98,9 +106,10 @@ InputBox.Input = forwardRef(function InputBox__Input(
       id={id}
       className={s.inputBox}
       style={{
+        position: 'relative',
         width,
         height,
-        borderBottomColor: error ? '#e42939' : undefined,
+        borderBottomColor: isError ? '#e42939' : undefined,
       }}
       type={type}
       onChange={handleChange}
@@ -109,21 +118,20 @@ InputBox.Input = forwardRef(function InputBox__Input(
     />
   );
 });
-InputBox.Input.displayName = 'InputBox.Input@@@@@@@@@@@';
 
 interface InputBox__LabelProps extends ComponentPropsWithoutRef<'label'> {
   children: string;
 }
 
 InputBox.Label = function InputBox__Label({ children }: InputBox__LabelProps) {
-  const { id, error } = useInputBoxContext();
+  const { id, isError } = useInputBoxContext();
 
   return (
     <label
       htmlFor={id}
       className={s.label}
       style={{
-        color: error ? '#e42939' : undefined,
+        color: isError ? '#e42939' : undefined,
       }}
     >
       {children}
@@ -132,7 +140,48 @@ InputBox.Label = function InputBox__Label({ children }: InputBox__LabelProps) {
 };
 
 InputBox.ErrorMessage = function InputBox__ErrorMessage() {
-  const { errorMessage } = useInputBoxContext();
+  const { errorMessage, $inputBoxWrapperRef } = useInputBoxContext();
+  const [offsetY, setOffsetY] = useState<number | undefined>(undefined);
 
-  return <ErrorMessage role="alert">{errorMessage}</ErrorMessage>;
+  useLayoutEffect(() => {
+    if ($inputBoxWrapperRef.current) {
+      const { height } = $inputBoxWrapperRef.current.getBoundingClientRect();
+
+      setOffsetY(height);
+    }
+  }, [$inputBoxWrapperRef]);
+
+  return (
+    <ErrorMessage role="alert" offsetY={offsetY}>
+      {errorMessage}
+    </ErrorMessage>
+  );
 };
+
+interface Props {
+  align?: 'left' | 'center';
+  role?: 'alert';
+  offsetY?: number;
+  children: ReactNode;
+}
+
+export function ErrorMessage({
+  align = 'left',
+  role = 'alert',
+  offsetY = undefined,
+  children,
+}: Props) {
+  return (
+    <Flex
+      justifyContent={align === 'left' ? 'flex-start' : 'center'}
+      style={{
+        position: offsetY ? 'absolute' : undefined,
+        top: offsetY ? offsetY - 16 : undefined,
+      }}
+    >
+      <Text as="p" fontSize="small" fontWeight="medium" color="red" role={role}>
+        {children}
+      </Text>
+    </Flex>
+  );
+}
