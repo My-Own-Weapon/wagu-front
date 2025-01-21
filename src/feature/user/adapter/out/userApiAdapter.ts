@@ -1,4 +1,6 @@
-import ApiService from '@/feature/_lib/ApiService';
+import { z } from 'zod';
+
+import ApiService from '@/lib/ApiService';
 import {
   GetResponses,
   PostResponses,
@@ -6,11 +8,105 @@ import {
   GetPathParams,
   PostPathParams,
   PathParams,
-} from '@/feature/_types/openApiAccess';
+  ApiParameters,
+  ApiResponses,
+} from '@/types/openApiAccess';
+import CheckLoginSessionError from '@/services/errors/CheckLoginSessionError';
 import { PickNullable } from '@/types';
-import { z } from 'zod';
+import {
+  AuthPortInput,
+  AuthPortOutput,
+} from '@/feature/user/application/port/out/AuthPort';
 
-class UserApiService extends ApiService {
+class UserApiAdapter extends ApiService {
+  async authenticate({
+    userName,
+    password,
+  }: AuthPortInput): Promise<AuthPortOutput> {
+    const serverParams = {
+      username: userName,
+      password,
+    } satisfies Required<ApiParameters['/login']['POST']>;
+    const res = await this.fetcher(`/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(serverParams),
+      credentials: 'include',
+    });
+    const data = await res.json();
+    const result = loginSchema.safeParse(data);
+
+    if (!result.success) {
+      return {
+        ok: false,
+        reason: result.error.message,
+        error: result.error,
+      };
+    }
+
+    return {
+      ok: true,
+      data: {
+        userName: result.data.memberUsername,
+        profileImageUrl: result.data.memberImage.url ?? '',
+      },
+    };
+  }
+
+  async logout() {
+    const res = await this.fetcher(`/logout`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+    const message = await res.text();
+
+    return logoutSchema.parse(message);
+  }
+
+  async signup({
+    username,
+    password,
+    passwordConfirm,
+    name,
+    phoneNumber,
+  }: Required<ApiParameters['/join']['POST']>) {
+    const res = await this.fetcher(`/join`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username,
+        password,
+        passwordConfirm,
+        name,
+        phoneNumber,
+      }),
+    });
+    const message = await res.text();
+
+    return signupSchema.parse(message);
+  }
+
+  async checkLoginSession(): Promise<ApiResponses['/session']['GET']> {
+    const res = await this.fetcher(
+      '/session',
+      {
+        method: 'GET',
+        credentials: 'include',
+      },
+      {
+        CustomError: CheckLoginSessionError,
+        errorMessage: '로그인 유지 기간이 만료되었습니다. 다시 로그인해주세요.',
+      },
+    );
+    const message = await res.text();
+
+    return checkLoginSessionSchema.parse(message);
+  }
+
   /**
    * @description user의 profile 정보조회
    *
@@ -111,6 +207,34 @@ class UserApiService extends ApiService {
   }
 }
 
+const loginSchema = z.object({
+  memberUsername: z.string(),
+  memberImage: z.object({
+    id: z.number().nullable(),
+    url: z.string().nullable(),
+  }),
+}) satisfies z.ZodType<
+  PickNullable<Required<PostResponses['/login']>, 'memberImage'>
+>;
+export type LoginSchema = z.infer<typeof loginSchema>;
+
+const logoutSchema = z.string() satisfies z.ZodType<
+  Required<GetResponses['/logout']>
+>;
+export type LogoutSchema = z.infer<typeof logoutSchema>;
+
+const signupSchema = z.string() satisfies z.ZodType<
+  Required<PostResponses['/join']>
+>;
+export type SignupServerResponse = z.infer<typeof signupSchema>;
+
+const checkLoginSessionSchema = z.string() satisfies z.ZodType<
+  Required<GetResponses['/session']>
+>;
+export type CheckLoginSessionServerResponse = z.infer<
+  typeof checkLoginSessionSchema
+>;
+
 const profileDetailsSchema = z.object({
   memberId: z.number(),
   imageUrl: z.string().nullable(),
@@ -160,7 +284,7 @@ export type FollowUserSchema = z.infer<typeof followUserSchema>;
 const unFollowUserSchema = z.string() satisfies z.ZodType<
   DeleteResponses['/members/{fromMemberId}/follow']
 >;
-type UnFollowUserSchema = z.infer<typeof unFollowUserSchema>;
+export type UnFollowUserSchema = z.infer<typeof unFollowUserSchema>;
 
 const searchUsersSchema = z.array(
   z.object({
@@ -184,6 +308,6 @@ const searchUsersSchema = z.array(
     }
   >
 >;
-type SearchUsersSchema = z.infer<typeof searchUsersSchema>;
+export type SearchUsersSchema = z.infer<typeof searchUsersSchema>;
 
-export const userApiService = new UserApiService();
+export const userApiAdapter = new UserApiAdapter();
