@@ -10,7 +10,6 @@ export interface AuthPortInput {
 }
 
 export type AuthPortOutput = AuthPortSuccess | AuthPortFailure;
-
 export type AuthPortSuccess = {
   ok: true;
   data: {
@@ -18,7 +17,6 @@ export type AuthPortSuccess = {
     profileImageUrl: User['profileImageUrl'];
   };
 };
-
 export type AuthPortFailure = {
   ok: false;
   reason: string;
