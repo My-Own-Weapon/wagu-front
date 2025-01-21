@@ -53,7 +53,7 @@ export default class PostApiAdapter
   /**
    * @description 특정 게시글 정보 조회
    */
-  async fetchPost(
+  async fetchPostDetails(
     postId: GetPathParams['/posts/{postId}']['postId'],
   ): Promise<FetchPostDetailsSchema> {
     const res = await this.fetcher(`/posts/${postId}`, {
