@@ -1,5 +1,6 @@
-import 'reflect-metadata';
+'use client';
 
+import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import {
